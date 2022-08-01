@@ -25,6 +25,7 @@ What a great idea!
 - Player Join
 - Player Leave
 - Player send chat message (Including commands)
+- Player entering another dimension
 - Player Death (WIP)
 
 ## Future Goals
