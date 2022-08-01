@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "dclink",
+  "version": "${version}",
+
+  "name": "DCLink",
+  "description": "",
+  "authors": [
+    "LX86"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+
+  "license": "MIT",
+  "icon": "assets/dclink/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.lx.dclink.DCLink"
+    ]
+  },
+  "mixins": [
+    "dclink.mixin.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.12.12",
+    "fabric": "*",
+    "minecraft": "1.17.x",
+    "java": ">=16"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
