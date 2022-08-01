@@ -18,6 +18,7 @@ public class DiscordMessages {
     public String command = "**{playerTeam}{playerName}**: {message}";
     public String playerJoin = "**{playerTeam}{playerName}** has joined the game.";
     public String playerLeft = "**{playerTeam}{playerName}** left the game.";
+    public String playerDisconnectReason = "({reason})";
     public String changeDimension = "**{playerTeam}{playerName}** has warped to {worldName}";
     public String playerDeath = ":skull: **{playerTeam}{playerName}** {reason}";
 
@@ -41,8 +42,13 @@ public class DiscordMessages {
         return format(playerJoin, player, server, world);
     }
 
-    public String getPlayerLeftMessage(ServerPlayerEntity player, MinecraftServer server, World world, String disconReason) {
-        return format(playerLeft, player, server, world, disconReason);
+    public String getPlayerLeftMessage(ServerPlayerEntity player, MinecraftServer server, World world) {
+        return format(playerLeft, player, server, world);
+    }
+
+    public String getPlayerDisconnectReason(String reason) {
+        if(reason.equals("Disconnected")) return "";
+        return playerDisconnectReason.replace("{reason}", reason);
     }
 
     public String getPlayerMessage(String content, ServerPlayerEntity player, MinecraftServer server, World world) {

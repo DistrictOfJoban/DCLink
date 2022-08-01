@@ -6,11 +6,13 @@ import com.lx.dclink.Data.ContentType;
 import com.lx.dclink.Data.DCEntry;
 import com.lx.dclink.DiscordBot;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.world.World;
 
 public class PlayerEvent {
 
@@ -36,7 +38,26 @@ public class PlayerEvent {
         ServerPlayerEntity player = handler.getPlayer();
         ServerWorld world = handler.getPlayer().getServerWorld();
         String worldId = world.getRegistryKey().getValue().toString();
-        Text disconReason = handler.getConnection().getDisconnectReason();
+        Text disconnectReasonText = handler.getConnection().getDisconnectReason();
+        for(DCEntry entry : DiscordConfig.entries) {
+            if(!entry.contentType.contains(ContentType.PLAYER)) continue;
+            if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) {
+                continue;
+            }
+            String disconnectReason = disconnectReasonText == null ? "" : entry.message.getPlayerDisconnectReason(disconnectReasonText.asString());
+            String leftMessage = entry.message.getPlayerLeftMessage(player, server, world)
+            .replace("{reason}", disconnectReason);
+
+            DiscordBot.sendSimpleEmbed(
+                    leftMessage,
+                    entry.channelID,
+                    entry.getThumbnailURL(player, server, world)
+            );
+        }
+    }
+
+    public static void playerDied(ServerPlayerEntity player, DamageSource source, World world) {
+        String worldId = world.getRegistryKey().getValue().toString();
         for(DCEntry entry : DiscordConfig.entries) {
             if(!entry.contentType.contains(ContentType.PLAYER)) continue;
             if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) {
@@ -44,9 +65,8 @@ public class PlayerEvent {
             }
 
             DiscordBot.sendSimpleEmbed(
-                    entry.message.getPlayerLeftMessage(player, server, world, disconReason == null ? null : disconReason.asString()),
-                    entry.channelID,
-                    entry.getThumbnailURL(player, server, world)
+                    entry.message.getPlayerDeathMessage(player, source, world),
+                    entry.channelID
             );
         }
     }
