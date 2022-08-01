@@ -71,7 +71,7 @@ public class DCLink implements ModInitializer {
 	public static void sendMessage(List<ServerPlayerEntity> players, List<MutableText> textToBeSent) {
 		for(ServerPlayerEntity player : players) {
 			for(MutableText text : textToBeSent) {
-				player.sendSystemMessage(text, null);
+				player.sendMessage(text, false);
 			}
 		}
 	}
