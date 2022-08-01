@@ -65,6 +65,7 @@ public class DiscordMessages {
 
     public String getPlayerDeathMessage(ServerPlayerEntity player, DamageSource source, World world) {
         String formatted = format(playerDeath, player, null, world);
+        //TODO: source.getDeathMessage(player) is a translatable component, seems to only return an empty string.
         return formatted.replace("{reason}", source.getDeathMessage(player).getString());
     }
 

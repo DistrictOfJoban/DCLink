@@ -1,6 +1,7 @@
 package com.lx.dclink.mixin;
 
 import com.lx.dclink.Events.PlayerEvent;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,5 +17,10 @@ public abstract class ServerPlayerEntityMixin {
     @Inject(method = "worldChanged", at = @At("TAIL"))
     public void worldChanged(ServerWorld origin, CallbackInfo ci) {
         PlayerEvent.worldChanged(origin, getServerWorld(), ((ServerPlayerEntity)(Object)this));
+    }
+
+    @Inject(method = "onDeath", at = @At("TAIL"))
+    public void onDeath(DamageSource source, CallbackInfo ci) {
+        PlayerEvent.playerDied(((ServerPlayerEntity)(Object)this), source, getServerWorld());
     }
 }
