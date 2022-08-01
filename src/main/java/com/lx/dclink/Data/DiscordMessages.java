@@ -1,7 +1,9 @@
 package com.lx.dclink.Data;
 
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.crash.CrashReport;
 import net.minecraft.world.World;
 
 import static com.lx.dclink.Data.DiscordFormatter.format;
@@ -11,11 +13,13 @@ public class DiscordMessages {
     public String serverStarted = ":white_check_mark: Server started (**{timer}** elapsed)";
     public String serverStopping = ":warning: Server is stopping (It was up for **{timer}**)";
     public String serverStopped = ":x: Server no longer linked with Discord";
+    public String serverCrashed = ":warning: **Crash Exception Detected!\n```{reason}```**";
     public String relay = "**<{playerTeam}{playerName}>** {message}";
     public String command = "**{playerTeam}{playerName}**: {message}";
     public String playerJoin = "**{playerTeam}{playerName}** has joined the game.";
     public String playerLeft = "**{playerTeam}{playerName}** left the game.";
     public String changeDimension = "**{playerTeam}{playerName}** has warped to {worldName}";
+    public String playerDeath = ":skull: **{playerTeam}{playerName}** {reason}";
 
     public String getServerStartingMessage() {
         return serverStarting;
@@ -51,5 +55,14 @@ public class DiscordMessages {
 
     public String getDimensionChangeMessage(ServerPlayerEntity player, MinecraftServer server, World world) {
         return format(changeDimension, player, server, world);
+    }
+
+    public String getPlayerDeathMessage(ServerPlayerEntity player, DamageSource source, World world) {
+        String formatted = format(playerDeath, player, null, world);
+        return formatted.replace("{reason}", source.getDeathMessage(player).getString());
+    }
+
+    public String getServerCrashedMessage(CrashReport report) {
+        return serverCrashed.replace("{reason}", report.getMessage());
     }
 }

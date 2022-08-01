@@ -85,6 +85,10 @@ public class DiscordConfig {
                         entry.message.serverStopped = msg.get("serverStopped").getAsString();
                     }
 
+                    if(msg.has("serverCrashed")) {
+                        entry.message.serverCrashed = msg.get("serverCrashed").getAsString();
+                    }
+
                     if(msg.has("playerJoin")) {
                         entry.message.playerJoin = msg.get("playerJoin").getAsString();
                     }

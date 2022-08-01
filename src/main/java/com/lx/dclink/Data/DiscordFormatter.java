@@ -3,12 +3,13 @@ package com.lx.dclink.Data;
 import com.lx.dclink.Util;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 
 import java.util.concurrent.TimeUnit;
 
 public class DiscordFormatter {
-    public static String format(String content, ServerPlayerEntity player, MinecraftServer server, World world, Long time, String message, String gamerule, String disconnectReason) {
+    public static String format(String content, ServerPlayerEntity player, MinecraftServer server, World world, Long time, String message, String gamerule, String reason) {
         String modifiedContent = content;
         String playerTeam;
         if(world == null || world.getScoreboard().getPlayerTeam(player.getGameProfile().getName()) == null) {
@@ -22,6 +23,7 @@ public class DiscordFormatter {
                 .replace("{playerName}", player.getGameProfile().getName())
                 .replace("{playerTeam}", playerTeam)
                 .replace("{playerPing}", String.valueOf(player.pingMilliseconds))
+                .replace("{playerGameMode}", player.interactionManager.getGameMode() == GameMode.CREATIVE ? "Creative" : player.interactionManager.getGameMode() == GameMode.SURVIVAL ? "Survival" : player.interactionManager.getGameMode() == GameMode.ADVENTURE ? "Adventure" : "Spectator")
                 .replace("{playerX}", String.valueOf(Math.round(player.getX())))
                 .replace("{playerY}", String.valueOf(Math.round(player.getY())))
                 .replace("{playerZ}", String.valueOf(Math.round(player.getZ())));
@@ -63,12 +65,12 @@ public class DiscordFormatter {
                     .replace("{gamerule}", gamerule);
         }
 
-        if(disconnectReason != null) {
+        if(reason != null) {
             modifiedContent = modifiedContent
-                    .replace("{disconnectReason}", "(" + disconnectReason + ")");
+                    .replace("{reason}", "(" + reason + ")");
         } else {
             modifiedContent = modifiedContent
-                    .replace("{disconnectReason}", "");
+                    .replace("{reason}", "");
         }
 
         return modifiedContent;
@@ -86,7 +88,7 @@ public class DiscordFormatter {
         return format(content, player, server, world, null, null, null, null);
     }
 
-    public static String format(String content, ServerPlayerEntity player, MinecraftServer server, World world, String kickReason) {
-        return format(content, player, server, world, null, null, null, kickReason);
+    public static String format(String content, ServerPlayerEntity player, MinecraftServer server, World world, String reason) {
+        return format(content, player, server, world, null, null, null, reason);
     }
 }

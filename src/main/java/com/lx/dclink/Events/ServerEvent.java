@@ -6,6 +6,7 @@ import com.lx.dclink.Data.ContentType;
 import com.lx.dclink.Data.DCEntry;
 import com.lx.dclink.DiscordBot;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.crash.CrashReport;
 
 public class ServerEvent {
     public static long serverStartingTimestamp;
@@ -43,6 +44,13 @@ public class ServerEvent {
         for(DCEntry entry : DiscordConfig.entries) {
             if(!entry.contentType.contains(ContentType.SERVER)) continue;
             DiscordBot.sendSimpleEmbed(entry.message.getServerStoppedMessage(), entry.channelID);
+        }
+    }
+
+    public static void serverCrashed(CrashReport report) {
+        for(DCEntry entry : DiscordConfig.entries) {
+            if(!entry.contentType.contains(ContentType.SERVER)) continue;
+            DiscordBot.sendSimpleEmbed(entry.message.getServerCrashedMessage(report), entry.channelID);
         }
     }
 }
