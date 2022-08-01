@@ -72,6 +72,9 @@ public class DiscordBot extends ListenerAdapter {
         /* Don't send if coming from self */
         if(event.getMember().getId().equals(client.getSelfUser().getId())) return;
         String messageContent = event.getMessage().getContentDisplay();
+        Message repliedMessage = event.getMessage().getReferencedMessage();
+        String repliedMessageContent = repliedMessage == null ? null : repliedMessage.getContentDisplay();
+        Member repliedMessageAuthor = repliedMessage == null ? null : repliedMessage.getMember();
         List<Message.Attachment> attachments = event.getMessage().getAttachments();
 
         for(MCEntry entry : MinecraftConfig.entries) {
@@ -81,8 +84,8 @@ public class DiscordBot extends ListenerAdapter {
 
             List<MutableText> textToBeSent = new ArrayList<>();
             if(!messageContent.isEmpty()) {
-                MutableText formattedMessage = entry.message.getDiscordMessage(event.getMessage().getContentDisplay(), event.getGuildChannel(), event.getMember());
-                textToBeSent.add(formattedMessage);
+                MutableText relayMessageText = entry.message.getDiscord2MCMessage(event.getMessage().getContentDisplay(), event.getGuildChannel(), event.getMember(), repliedMessageContent, repliedMessageAuthor);
+                textToBeSent.add(relayMessageText);
             }
 
             textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel(), event.getMember()));

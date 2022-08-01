@@ -3,9 +3,7 @@ package com.lx.dclink.Data;
 import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,14 +14,33 @@ public class MinecraftMessages {
     public String attachments = "Attachments";
     public String relay = "{memberTag}: {message}";
     public String relayDeleted = "~~{memberTag}: {message}~~";
+    public String replyText = null;
 
-    public MutableText getDiscordMessage(String content, GuildMessageChannel channel, Member guildMember) {
+    public MutableText getDiscord2MCMessage(String content, GuildMessageChannel channel, Member guildMember, String repliedMessage, Member repliedMember) {
+        MutableText repliedText;
+
+        try {
+            repliedText = repliedMessage == null && repliedMember == null ? null : Text.Serializer.fromJson(format(replyText, repliedMessage, null, repliedMember, null));
+        } catch (Exception e) {
+            repliedText = new LiteralText("");
+        }
+
         String formatted = format(relay, content, channel, guildMember, null);
 
         try {
-            return Text.Serializer.fromJson(formatted);
+            MutableText parsedText = Text.Serializer.fromJson(formatted);
+
+            if(repliedText != null) {
+                return repliedText.append(parsedText);
+            } else {
+                return parsedText;
+            }
         } catch (Exception e) {
-            return new LiteralText(formatted);
+            if(repliedText != null) {
+                return repliedText.append(new LiteralText(formatted));
+            } else {
+                return new LiteralText(formatted);
+            }
         }
     }
 

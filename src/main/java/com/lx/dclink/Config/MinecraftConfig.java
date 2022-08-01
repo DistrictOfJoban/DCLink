@@ -47,6 +47,10 @@ public class MinecraftConfig {
                         entry.message.relayDeleted = msg.get("relayDeleted").getAsString();
                     }
 
+                    if(msg.has("replyText")) {
+                        entry.message.replyText = msg.get("replyText").getAsString();
+                    }
+
                     if(msg.has("attachments")) {
                         entry.message.attachments = msg.get("attachments").getAsString();
                     }
