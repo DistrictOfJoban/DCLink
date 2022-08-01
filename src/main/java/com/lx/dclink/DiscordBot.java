@@ -3,6 +3,7 @@ package com.lx.dclink;
 import com.lx.dclink.Config.MinecraftConfig;
 import com.lx.dclink.Config.BotConfig;
 import com.lx.dclink.Data.DCEntry;
+import com.lx.dclink.Data.DiscordFormatter;
 import com.lx.dclink.Data.MCEntry;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -27,6 +28,8 @@ public class DiscordBot extends ListenerAdapter {
     public static JDA client;
     public static Map<String, List<RichCustomEmoji>> emojiMap = new HashMap<>();
     public static Map<Long, Message> messageCache = new HashMap<>();
+    private static Timer timer;
+    private static int currentStatus;
 
     public static void load(String token, Collection<GatewayIntent> intents) {
         if(token == null) {
@@ -43,21 +46,50 @@ public class DiscordBot extends ListenerAdapter {
                     .setMemberCachePolicy(memberCachePolicy)
                     .enableIntents(intents)
                     .setChunkingFilter(chunkingFilter)
-                    .build();
+                    .build()
+                    .awaitReady();
 
-            client.getGuildCache().forEach(g -> {
-                System.out.println(g.getId());
-                emojiMap.put(g.getId(), g.getEmojis());
+            client.getGuildCache().forEach(guild -> {
+                emojiMap.put(guild.getId(), guild.getEmojis());
             });
 
             LOGGER.info("[DCLink] Logged in as: " + client.getSelfUser().getAsTag());
+
+            stopStatus();
+            startCyclingStatus();
         } catch (LoginException | IllegalArgumentException ex) {
             LOGGER.error(ex.getStackTrace());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
     public static void disconnect() {
         client.shutdown();
+    }
+
+    public static void startCyclingStatus() {
+        if(!BotConfig.statuses.isEmpty()) {
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+
+                @Override
+                public void run() {
+                    if(DCLink.server == null) return;
+                    String status = BotConfig.statuses.get(currentStatus++ % BotConfig.statuses.size());
+                    String formattedStatus = DiscordFormatter.format(status, null, DCLink.server, null);
+                    client.getPresence().setActivity(Activity.playing(formattedStatus));
+                }
+            }, 0, BotConfig.getStatusRefreshInterval() * 1000L);
+        }
+    }
+
+    public static void stopStatus() {
+        if(timer != null) {
+            timer.cancel();
+            timer.purge();
+        }
+        client.getPresence().setActivity(null);
     }
 
     @Override

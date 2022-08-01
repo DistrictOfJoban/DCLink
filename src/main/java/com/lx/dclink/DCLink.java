@@ -31,7 +31,6 @@ public class DCLink implements ModInitializer {
 		BotConfig.load();
 		DiscordConfig.load();
 		MinecraftConfig.load();
-		DiscordBot.load(BotConfig.getToken(), BotConfig.getIntents());
 
 		ServerLifecycleEvents.SERVER_STARTING.register((ServerEvent::serverStarting));
 		ServerLifecycleEvents.SERVER_STARTED.register((ServerEvent::serverStarted));

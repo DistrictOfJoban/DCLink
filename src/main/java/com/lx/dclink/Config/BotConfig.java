@@ -14,14 +14,17 @@ import java.util.List;
 
 public class BotConfig {
     public static final List<String> sendChannel = new ArrayList<>();
+    public static final List<String> statuses = new ArrayList<>();
     private static String token;
     private static boolean cacheMember;
+    private static int statusRefreshInterval;
     private static final Collection<String> intents = new ArrayList<>();
     private static final Path ConfigFile = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("config.json");
 
     public static void load() {
         sendChannel.clear();
         intents.clear();
+        statuses.clear();
         if(!Files.exists(ConfigFile)) return;
 
         try {
@@ -46,6 +49,16 @@ public class BotConfig {
                 });
             }
 
+            if(jsonConfig.has("status")) {
+                jsonConfig.get("status").getAsJsonArray().forEach(jsonElement -> {
+                    statuses.add(jsonElement.getAsString());
+                });
+            }
+
+            if(jsonConfig.has("statusRefreshInterval")) {
+                statusRefreshInterval = jsonConfig.get("statusRefreshInterval").getAsInt();
+            }
+
             if(jsonConfig.has("cacheMember")) {
                 cacheMember = jsonConfig.get("cacheMember").getAsBoolean();
             }
@@ -60,6 +73,10 @@ public class BotConfig {
 
     public static boolean getCacheMember() {
         return cacheMember;
+    }
+
+    public static int getStatusRefreshInterval() {
+        return statusRefreshInterval;
     }
 
     public static Collection<GatewayIntent> getIntents() {

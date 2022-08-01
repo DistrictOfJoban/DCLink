@@ -1,5 +1,6 @@
 package com.lx.dclink.Events;
 
+import com.lx.dclink.Config.BotConfig;
 import com.lx.dclink.Config.DiscordConfig;
 import com.lx.dclink.DCLink;
 import com.lx.dclink.Data.ContentType;
@@ -13,6 +14,8 @@ public class ServerEvent {
     public static long serverStartedTimestamp;
 
     public static void serverStarting(MinecraftServer server) {
+        DiscordBot.load(BotConfig.getToken(), BotConfig.getIntents());
+
         serverStartingTimestamp = System.currentTimeMillis();
 
         for(DCEntry entry : DiscordConfig.entries) {
@@ -45,6 +48,7 @@ public class ServerEvent {
             if(!entry.contentType.contains(ContentType.SERVER)) continue;
             DiscordBot.sendSimpleEmbed(entry.message.getServerStoppedMessage(), entry.channelID);
         }
+        DiscordBot.disconnect();
     }
 
     public static void serverCrashed(CrashReport report) {
