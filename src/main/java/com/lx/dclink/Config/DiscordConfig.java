@@ -3,6 +3,7 @@ package com.lx.dclink.Config;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.lx.dclink.DCLink;
 import com.lx.dclink.Data.ContentType;
 import com.lx.dclink.Data.DCEntry;
 import net.fabricmc.loader.api.FabricLoader;
@@ -16,9 +17,12 @@ public class DiscordConfig {
     public static List<DCEntry> entries = new ArrayList<>();
     private static final Path ConfigFile = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("discord.json");
 
-    public static void load() {
+    public static boolean load() {
         entries.clear();
-        if(!Files.exists(ConfigFile)) return;
+        if(!Files.exists(ConfigFile)) {
+            DCLink.LOGGER.warn("Cannot find the Discord config file (MC -> DC)!");
+            return false;
+        }
 
         try {
             final JsonArray jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(ConfigFile))).getAsJsonArray();
@@ -114,8 +118,10 @@ public class DiscordConfig {
 
                 entries.add(entry);
             });
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 }

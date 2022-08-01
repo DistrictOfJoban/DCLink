@@ -45,10 +45,8 @@ public class DCLink implements ModInitializer {
 		}));
 	}
 
-	public static void loadAllConfig() {
-		DiscordConfig.load();
-		MinecraftConfig.load();
-		BotConfig.load();
+	public static boolean loadAllConfig() {
+		return BotConfig.load() && MinecraftConfig.load() && DiscordConfig.load();
 	}
 
 	public static void sendInGameMessage(List<MutableText> textToBeSent, MCEntry entry) {

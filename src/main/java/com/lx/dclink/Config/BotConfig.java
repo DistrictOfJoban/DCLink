@@ -3,6 +3,7 @@ package com.lx.dclink.Config;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.lx.dclink.DCLink;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -21,11 +22,14 @@ public class BotConfig {
     private static final Collection<String> intents = new ArrayList<>();
     private static final Path ConfigFile = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("config.json");
 
-    public static void load() {
+    public static boolean load() {
         sendChannel.clear();
         intents.clear();
         statuses.clear();
-        if(!Files.exists(ConfigFile)) return;
+        if(!Files.exists(ConfigFile)) {
+            DCLink.LOGGER.warn("Cannot find the main bot config file!");
+            return false;
+        }
 
         try {
             final JsonObject jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(ConfigFile))).getAsJsonObject();
@@ -62,8 +66,10 @@ public class BotConfig {
             if(jsonConfig.has("cacheMember")) {
                 cacheMember = jsonConfig.get("cacheMember").getAsBoolean();
             }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 
