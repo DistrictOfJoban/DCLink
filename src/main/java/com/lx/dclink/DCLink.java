@@ -1,6 +1,6 @@
 package com.lx.dclink;
 
-import com.lx.dclink.Commands.reload;
+import com.lx.dclink.Commands.dclink;
 import com.lx.dclink.Config.DiscordConfig;
 import com.lx.dclink.Config.MinecraftConfig;
 import com.lx.dclink.Config.BotConfig;
@@ -41,7 +41,7 @@ public class DCLink implements ModInitializer {
 		ServerPlayConnectionEvents.DISCONNECT.register(PlayerEvent::playerLeft);
 
 		CommandRegistrationCallback.EVENT.register(((dispatcher, dedicated) -> {
-			reload.register(dispatcher);
+			dclink.register(dispatcher);
 		}));
 	}
 

@@ -95,7 +95,7 @@ public class DiscordBot extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
-        if (event.isFromType(ChannelType.PRIVATE) || event.getMember() == null) {
+        if (event.isFromType(ChannelType.PRIVATE) || event.getMember() == null || !BotConfig.getInboundEnabled()) {
             return;
         }
 
@@ -128,7 +128,7 @@ public class DiscordBot extends ListenerAdapter {
     @Override
     public void onMessageDelete(MessageDeleteEvent event)
     {
-        if (event.isFromType(ChannelType.PRIVATE)) {
+        if (event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInboundEnabled()) {
             return;
         }
 
@@ -164,6 +164,8 @@ public class DiscordBot extends ListenerAdapter {
     }
 
     public static void sendMessage(String message, DCEntry entry) {
+        if(!BotConfig.getOutboundEnabled()) return;
+
         if(message == null) return;
 
         for(String channelId : entry.channelID) {
@@ -206,6 +208,7 @@ public class DiscordBot extends ListenerAdapter {
     }
 
     public static void sendSimpleEmbed(String description, List<String> channelList, String thumbnail) {
+        if(!BotConfig.getOutboundEnabled()) return;
         if(description == null) return;
 
         for(String channelId : channelList) {

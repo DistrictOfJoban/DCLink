@@ -1,7 +1,7 @@
 # DCLink
 
 ## Why
-I can't find a decent Discord Chat Linking Bot that suits my need and runs on 1.17.1
+I can't find a decent Discord Chat Linking Bot that suits my need and runs on Fabric 1.17.1
 
 [Chatter](https://github.com/axieum/chatter) is what I used to use, but it's on 1.16.5.
 While a newer rewritten mod, [Minecord](https://github.com/axieum/minecord) is only available for 1.19.
@@ -16,6 +16,7 @@ What a great idea!
 - Support bot activities
 - Support showing replied message from Discord to MC
 - Automatically fetch custom guild emoji, show properly when relaying to Discord
+- Dynamically toggle outbound/inbound messages
 
 ### Supported Server Events to be relayed to Discord
 - Server Starting / Started / Stopping / Stopped
@@ -29,9 +30,9 @@ What a great idea!
 - Player Death (WIP)
 
 ## Future Goals
-- Check the status of the bot with commands
 - Player Advancement Events
 - Relay Discord Reaction Event to Minecraft
+- Add Discord Commands
 - Allow exporting config to other Discord relaying mod
 - Support for 1.17 - 1.19
 - Touch some grass

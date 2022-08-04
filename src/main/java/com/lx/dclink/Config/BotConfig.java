@@ -19,6 +19,8 @@ public class BotConfig {
     private static String token;
     private static boolean cacheMember;
     private static int statusRefreshInterval;
+    private static boolean outboundEnabled = true;
+    private static boolean inboundEnabled = true;
     private static final Collection<String> intents = new ArrayList<>();
     private static final Path ConfigFile = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("config.json");
 
@@ -79,6 +81,22 @@ public class BotConfig {
 
     public static boolean getCacheMember() {
         return cacheMember;
+    }
+
+    public static boolean getOutboundEnabled() {
+        return outboundEnabled;
+    }
+
+    public static boolean getInboundEnabled() {
+        return inboundEnabled;
+    }
+
+    public static void setOutboundEnabled(boolean outbound) {
+        outboundEnabled = outbound;
+    }
+
+    public static void setInboundEnabled(boolean inbound) {
+        inboundEnabled = inbound;
     }
 
     public static int getStatusRefreshInterval() {
