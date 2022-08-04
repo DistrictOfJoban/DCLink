@@ -7,7 +7,6 @@ sourceCompatibility = JavaVersion.VERSION_16
 targetCompatibility = JavaVersion.VERSION_16
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version
 group = project.maven_group
 
 def default_version = "1.17.1"
@@ -25,6 +24,8 @@ boolean is_120 = (minecraft_version as String).startsWith("1.20")
 
 def yarn_version = is_116 ? project.yarn_mappings_1_16 : is_117 ? project.yarn_mappings_1_17 : is_118 ? project.yarn_mappings_1_18 : is_119 ? project.yarn_mappings_1_19 : project.yarn_mappings_1_20
 def fabric_api_version = is_116 ? project.fabric_version_1_16 : is_117 ? project.fabric_version_1_17 : is_118 ? project.fabric_version_1_18 : is_119 ? project.fabric_version_1_19 : project.fabric_version_1_20
+
+version = project.mod_version + "-" + minecraft_version
 
 repositories {
 	mavenCentral()
