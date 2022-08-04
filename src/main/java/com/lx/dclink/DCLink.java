@@ -1,6 +1,6 @@
 package com.lx.dclink;
 
-import com.lx.dclink.Commands.dclink;
+import com.lx.dclink.Commands.*;
 import com.lx.dclink.Config.DiscordConfig;
 import com.lx.dclink.Config.MinecraftConfig;
 import com.lx.dclink.Config.BotConfig;
@@ -8,7 +8,6 @@ import com.lx.dclink.Data.MCEntry;
 import com.lx.dclink.Events.PlayerEvent;
 import com.lx.dclink.Events.ServerEvent;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
@@ -40,9 +39,9 @@ public class DCLink implements ModInitializer {
 		ServerPlayConnectionEvents.JOIN.register(PlayerEvent::playerJoin);
 		ServerPlayConnectionEvents.DISCONNECT.register(PlayerEvent::playerLeft);
 
-		CommandRegistrationCallback.EVENT.register(((dispatcher, dedicated) -> {
+		CommandManager.registerCommand((dispatcher) -> {
 			dclink.register(dispatcher);
-		}));
+		});
 	}
 
 	public static boolean loadAllConfig() {

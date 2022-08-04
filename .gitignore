@@ -31,3 +31,6 @@ bin/
 # fabric
 
 run/
+src/main/java/com/lx/dclink/Mappings.java
+src/main/java/com/lx/dclink/mixin
+src/main/java/com/lx/dclink/CommandManager.java

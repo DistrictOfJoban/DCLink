@@ -3,11 +3,11 @@ package com.lx.dclink.Commands;
 import com.lx.dclink.Config.BotConfig;
 import com.lx.dclink.DCLink;
 import com.lx.dclink.DiscordBot;
+import com.lx.dclink.Mappings;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
 
@@ -42,8 +42,8 @@ public class dclink {
 
     public static int reloadConfig(CommandContext<ServerCommandSource> context) {
         boolean success = DCLink.loadAllConfig();
-        MutableText successMessage = new LiteralText("DCLink Config Reloaded, re-logging in...").formatted(Formatting.GREEN);
-        MutableText failedMessage = new LiteralText("DCLink Config Reload Failed, please check console for detail.").formatted(Formatting.RED);
+        MutableText successMessage = Mappings.literalText("DCLink Config Reloaded, re-logging in...").formatted(Formatting.GREEN);
+        MutableText failedMessage = Mappings.literalText("DCLink Config Reload Failed, please check console for detail.").formatted(Formatting.RED);
         context.getSource().sendFeedback(success ? successMessage : failedMessage, false);
 
         /* Re-login if successful*/
@@ -56,10 +56,10 @@ public class dclink {
     }
 
     public static int status(CommandContext<ServerCommandSource> context) {
-        MutableText onlineText = new LiteralText("Online").formatted(Formatting.GREEN);
-        MutableText offlineText = new LiteralText("Offline").formatted(Formatting.RED);
-        MutableText enabledText = new LiteralText("Enabled").formatted(Formatting.GREEN);
-        MutableText disabledText = new LiteralText("Disabled").formatted(Formatting.RED);
+        MutableText onlineText = Mappings.literalText("Online").formatted(Formatting.GREEN);
+        MutableText offlineText = Mappings.literalText("Offline").formatted(Formatting.RED);
+        MutableText enabledText = Mappings.literalText("Enabled").formatted(Formatting.GREEN);
+        MutableText disabledText = Mappings.literalText("Disabled").formatted(Formatting.RED);
 
         MutableText outBound = getPair("Outbound Messages", BotConfig.getOutboundEnabled() ? enabledText : disabledText);
         MutableText inBound = getPair("Inbound Messages", BotConfig.getInboundEnabled() ? enabledText : disabledText);
@@ -70,31 +70,31 @@ public class dclink {
     }
 
     public static MutableText getPair(String key, MutableText value) {
-        MutableText keyText = new LiteralText(key + ": ").formatted(Formatting.GOLD);
+        MutableText keyText = Mappings.literalText(key + ": ").formatted(Formatting.GOLD);
         return keyText.append(value);
     }
 
     public static int enableOutbound(CommandContext<ServerCommandSource> context) {
         BotConfig.setOutboundEnabled(true);
-        context.getSource().sendFeedback(new LiteralText("Outbound messages (MC -> DC) Enabled").formatted(Formatting.GREEN), false);
+        context.getSource().sendFeedback(Mappings.literalText("Outbound messages (MC -> DC) Enabled").formatted(Formatting.GREEN), false);
         return 1;
     }
 
     public static int enableInbound(CommandContext<ServerCommandSource> context) {
         BotConfig.setInboundEnabled(true);
-        context.getSource().sendFeedback(new LiteralText("Inbound messages (DC -> MC) Enabled").formatted(Formatting.GREEN), false);
+        context.getSource().sendFeedback(Mappings.literalText("Inbound messages (DC -> MC) Enabled").formatted(Formatting.GREEN), false);
         return 1;
     }
 
     public static int disableOutbound(CommandContext<ServerCommandSource> context) {
         BotConfig.setOutboundEnabled(false);
-        context.getSource().sendFeedback(new LiteralText("Outbound messages (MC -> DC) Disabled").formatted(Formatting.GOLD), false);
+        context.getSource().sendFeedback(Mappings.literalText("Outbound messages (MC -> DC) Disabled").formatted(Formatting.GOLD), false);
         return 1;
     }
 
     public static int disableInbound(CommandContext<ServerCommandSource> context) {
         BotConfig.setInboundEnabled(false);
-        context.getSource().sendFeedback(new LiteralText("Inbound messages (DC -> MC) Disabled").formatted(Formatting.GOLD), false);
+        context.getSource().sendFeedback(Mappings.literalText("Inbound messages (DC -> MC) Disabled").formatted(Formatting.GOLD), false);
         return 1;
     }
 }

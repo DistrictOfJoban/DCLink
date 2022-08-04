@@ -5,6 +5,7 @@ import com.lx.dclink.DCLink;
 import com.lx.dclink.Data.ContentType;
 import com.lx.dclink.Data.DCEntry;
 import com.lx.dclink.DiscordBot;
+import com.lx.dclink.Mappings;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
@@ -17,9 +18,9 @@ import net.minecraft.world.World;
 public class PlayerEvent {
 
     public static void playerJoin(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
-        ServerPlayerEntity player = handler.getPlayer();
-        ServerWorld world = player.getServerWorld();
-        String worldId = handler.getPlayer().getServerWorld().getRegistryKey().getValue().toString();
+        ServerPlayerEntity player = Mappings.getPlayer(handler);
+        ServerWorld world = Mappings.getServerWorld(player);
+        String worldId = world.getRegistryKey().getValue().toString();
         for(DCEntry entry : DiscordConfig.entries) {
             if(!entry.contentType.contains(ContentType.PLAYER)) continue;
             if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) {
@@ -35,8 +36,8 @@ public class PlayerEvent {
     }
 
     public static void playerLeft(ServerPlayNetworkHandler handler, MinecraftServer server) {
-        ServerPlayerEntity player = handler.getPlayer();
-        ServerWorld world = handler.getPlayer().getServerWorld();
+        ServerPlayerEntity player = Mappings.getPlayer(handler);
+        ServerWorld world = Mappings.getServerWorld(player);
         String worldId = world.getRegistryKey().getValue().toString();
         Text disconnectReasonText = handler.getConnection().getDisconnectReason();
         for(DCEntry entry : DiscordConfig.entries) {
@@ -44,7 +45,7 @@ public class PlayerEvent {
             if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) {
                 continue;
             }
-            String disconnectReason = disconnectReasonText == null ? "" : entry.message.getPlayerDisconnectReason(disconnectReasonText.asString());
+            String disconnectReason = disconnectReasonText == null ? "" : entry.message.getPlayerDisconnectReason(disconnectReasonText.getString());
             String leftMessage = entry.message.getPlayerLeftMessage(player, server, world)
             .replace("{reason}", disconnectReason);
 
@@ -89,7 +90,7 @@ public class PlayerEvent {
     }
 
     public static void sendMessage(String content, ServerPlayerEntity player) {
-        ServerWorld world = player.getServerWorld();
+        ServerWorld world = Mappings.getServerWorld(player);
         String worldId = world.getRegistryKey().getValue().toString();
 
         for(DCEntry entry : DiscordConfig.entries) {
