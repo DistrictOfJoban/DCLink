@@ -101,6 +101,10 @@ public class DiscordConfig {
                         entry.message.playerLeft = msg.get("playerLeft").getAsString();
                     }
 
+                    if(msg.has("playerDeath")) {
+                        entry.message.playerDeath = msg.get("playerDeath").getAsString();
+                    }
+
                     if(msg.has("changeDimension")) {
                         entry.message.changeDimension = msg.get("changeDimension").getAsString();
                     }
