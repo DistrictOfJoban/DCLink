@@ -1,3 +1,5 @@
+package com.lx.dclink.mixin;
+
 import com.lx.dclink.Events.PlayerEvent;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
