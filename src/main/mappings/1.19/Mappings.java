@@ -1,5 +1,3 @@
-package com.lx.dclink;
-
 import net.minecraft.text.MutableText;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;

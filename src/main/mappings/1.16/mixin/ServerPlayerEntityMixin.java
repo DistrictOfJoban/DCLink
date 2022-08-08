@@ -1,5 +1,3 @@
-package com.lx.dclink.mixin;
-
 import com.lx.dclink.Events.PlayerEvent;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;

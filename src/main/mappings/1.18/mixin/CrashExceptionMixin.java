@@ -1,5 +1,3 @@
-package com.lx.dclink.mixin;
-
 import com.lx.dclink.Events.ServerEvent;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
