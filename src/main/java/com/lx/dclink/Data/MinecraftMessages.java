@@ -1,5 +1,6 @@
 package com.lx.dclink.Data;
 
+import com.lx.dclink.Mappings;
 import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -22,7 +23,7 @@ public class MinecraftMessages {
         try {
             repliedText = repliedMessage == null && repliedMember == null ? null : Text.Serializer.fromJson(format(replyText, repliedMessage, null, repliedMember, null));
         } catch (Exception e) {
-            repliedText = new LiteralText("");
+            repliedText = Mappings.literalText("");
         }
 
         String formatted = format(relay, content, channel, guildMember, null);
@@ -37,9 +38,9 @@ public class MinecraftMessages {
             }
         } catch (Exception e) {
             if(repliedText != null) {
-                return repliedText.append(new LiteralText(formatted));
+                return repliedText.append(Mappings.literalText(formatted));
             } else {
-                return new LiteralText(formatted);
+                return Mappings.literalText(formatted);
             }
         }
     }
@@ -50,7 +51,7 @@ public class MinecraftMessages {
         try {
             return Text.Serializer.fromJson(formatted);
         } catch (Exception e) {
-            return new LiteralText(formatted);
+            return Mappings.literalText(formatted);
         }
     }
 
@@ -62,7 +63,7 @@ public class MinecraftMessages {
             try {
                 textList.add(Text.Serializer.fromJson(formatted));
             } catch (Exception e) {
-                textList.add(new LiteralText(formatted));
+                textList.add(Mappings.literalText(formatted));
             }
         }
         return textList;

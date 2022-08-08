@@ -11,7 +11,7 @@ Unfortunately I don't have enough understanding of the code to port either of th
 What a great idea!
 
 ## Features
-- Runs on Fabric 1.17.1
+- Fabric 1.16.5 - 1.19.1
 - Can reload config
 - Support bot activities
 - Support showing replied message from Discord to MC
@@ -34,7 +34,6 @@ What a great idea!
 - Relay Discord Reaction Event to Minecraft
 - Add Discord Commands
 - Allow exporting config to other Discord relaying mod
-- Support for 1.17 - 1.19
 - Touch some grass
 
 ## Downloads
@@ -43,6 +42,14 @@ What a great idea!
 For downloading the latest build, please [click here](https://github.com/Kenny-Hui/DCLink/actions).
 
 However no support will be provided, nor any guarantee on compatibilities, given that this is still a very early WIP
+
+## Cross Version Mapping
+For easier development, all version-specific code is stored in `src/main/mappings`.
+
+The files will then be copied over to `src/main/java/com/lx/dclink`.
+
+To change the Minecraft version, edit the **default_minecraft_version** in `build.gradle`.
+(Or if you simply want to build, `./gradlew build -PbuildVersion=<Minecraft Version Here>`)
 
 ## License
 This project is licensed under [MIT License](https://opensource.org/licenses/MIT)

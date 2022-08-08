@@ -2,11 +2,11 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.lx.dclink.mixin",
-  "compatibilityLevel": "JAVA_16",
+  "compatibilityLevel": "JAVA_8",
   "mixins": [
     "CrashExceptionMixin",
     "ServerPlayerEntityMixin",
-    "ServerPlayNetworkHandler"
+    "ServerPlayNetworkHandlerMixin"
   ],
   "client": [
   ],

@@ -15,7 +15,7 @@ public class DiscordFormatter {
         if(world == null || world.getScoreboard().getPlayerTeam(player.getGameProfile().getName()) == null) {
             playerTeam = "";
         } else {
-            playerTeam = world.getScoreboard().getPlayerTeam(player.getGameProfile().getName()).getPrefix().asString();
+            playerTeam = world.getScoreboard().getPlayerTeam(player.getGameProfile().getName()).getPrefix().getString();
         }
 
         if(player != null) {

@@ -11,13 +11,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(net.minecraft.server.network.ServerPlayNetworkHandler.class)
-public abstract class ServerPlayNetworkHandler {
+public abstract class ServerPlayNetworkHandlerMixin {
 
     @Shadow public ServerPlayerEntity player;
 
-    @Inject(method = "onGameMessage", at = @At("TAIL"))
+    @Inject(method = "onChatMessage", at = @At("TAIL"))
     public void sendMessage(ChatMessageC2SPacket packet, CallbackInfo ci) {
-        String message = StringUtils.normalizeSpace(packet.getChatMessage());
+        String message = StringUtils.normalizeSpace(packet.chatMessage());
         PlayerEvent.sendMessage(message, player);
     }
 }
