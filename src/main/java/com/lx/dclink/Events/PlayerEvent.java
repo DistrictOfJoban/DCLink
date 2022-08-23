@@ -7,6 +7,7 @@ import com.lx.dclink.Data.DCEntry;
 import com.lx.dclink.DiscordBot;
 import com.lx.dclink.Mappings;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.advancement.Advancement;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -67,6 +68,20 @@ public class PlayerEvent {
 
             DiscordBot.sendSimpleEmbed(
                     entry.message.getPlayerDeathMessage(player, source, world),
+                    entry.channelID
+            );
+        }
+    }
+
+    public static void playerAdvancementGranted(ServerPlayerEntity player, World world, Advancement advancement) {
+        //TODO: Unfinished achievement still shows up
+        if(advancement.getDisplay() == null || advancement.getDisplay().isHidden() || !advancement.getDisplay().shouldAnnounceToChat()) return;
+
+        for(DCEntry entry : DiscordConfig.entries) {
+            if(!entry.contentType.contains(ContentType.PLAYER)) continue;
+
+            DiscordBot.sendSimpleEmbed(
+                    entry.message.getPlayerAdvancementMessage(player, world, advancement),
                     entry.channelID
             );
         }

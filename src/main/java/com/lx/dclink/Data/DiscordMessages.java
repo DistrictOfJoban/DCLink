@@ -1,7 +1,7 @@
 package com.lx.dclink.Data;
 
+import net.minecraft.advancement.Advancement;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageTracker;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.crash.CrashReport;
@@ -22,6 +22,7 @@ public class DiscordMessages {
     public String playerDisconnectReason = "({reason})";
     public String changeDimension = "**{playerTeam}{playerName}** has warped to {worldName}";
     public String playerDeath = ":skull: **{playerTeam}{playerName}** {reason}";
+    public String playerAdvancement = ":medal: **{playerTeam}{playerName}** has achieved **{advancement}**!\n*{advancementDetails}*";
 
     public String getServerStartingMessage() {
         return serverStarting;
@@ -68,6 +69,13 @@ public class DiscordMessages {
         String cause = source.getDeathMessage(player).getString().replace(player.getGameProfile().getName(), "");
         String formatted = playerDeath.replace("{reason}", cause);
         return format(formatted, player, null, world);
+    }
+
+    public String getPlayerAdvancementMessage(ServerPlayerEntity player, World world, Advancement advancement) {
+        String advancementName = playerAdvancement
+                .replace("{advancement}", advancement.getDisplay().getTitle().getString())
+                .replace("{advancementDetails}", advancement.getDisplay().getDescription().getString());
+        return format(advancementName, player, null, world);
     }
 
     public String getServerCrashedMessage(CrashReport report) {

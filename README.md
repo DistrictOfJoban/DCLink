@@ -23,14 +23,14 @@ What a great idea!
 - Server Crash
 
 ### Supported Player Events to be relayed to Discord
-- Player Join
-- Player Leave
+- Player join
+- Player leave
 - Player send chat message (Including commands)
 - Player entering another dimension
-- Player Death (WIP)
+- Player death
+- Player Achieve Advancement
 
 ## Future Goals
-- Player Advancement Events
 - Relay Discord Reaction Event to Minecraft
 - Add Discord Commands
 - Allow exporting config to other Discord relaying mod
