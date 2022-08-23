@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 import java.util.concurrent.TimeUnit;
 
 public class DiscordFormatter {
-    public static String format(String content, ServerPlayerEntity player, MinecraftServer server, World world, Long time, String message, String gamerule, String reason) {
+    public static String format(String content, ServerPlayerEntity player, MinecraftServer server, World world, Long time, String message) {
         String modifiedContent = content;
         String playerTeam;
         if(world == null || world.getScoreboard().getPlayerTeam(player.getGameProfile().getName()) == null) {
@@ -60,35 +60,14 @@ public class DiscordFormatter {
                 .replace("{message}", message);
         }
 
-        if(gamerule != null) {
-            modifiedContent = modifiedContent
-                    .replace("{gamerule}", gamerule);
-        }
-
-        if(reason != null) {
-            modifiedContent = modifiedContent
-                    .replace("{reason}", "(" + reason + ")");
-        } else {
-            modifiedContent = modifiedContent
-                    .replace("{reason}", "");
-        }
-
         return modifiedContent;
     }
 
-    public static String format(String content, ServerPlayerEntity player, MinecraftServer server, World world, Long time, String message, String gamerule) {
-        return format(content, player, server, world, time, message, gamerule, null);
-    }
-
     public static String format(String content, ServerPlayerEntity player, MinecraftServer server, World world, Long time) {
-        return format(content, player, server, world, time, null, null, null);
+        return format(content, player, server, world, time, null);
     }
 
     public static String format(String content, ServerPlayerEntity player, MinecraftServer server, World world) {
-        return format(content, player, server, world, null, null, null, null);
-    }
-
-    public static String format(String content, ServerPlayerEntity player, MinecraftServer server, World world, String reason) {
-        return format(content, player, server, world, null, null, null, reason);
+        return format(content, player, server, world, null, null);
     }
 }

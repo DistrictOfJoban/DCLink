@@ -53,11 +53,11 @@ public class DiscordMessages {
     }
 
     public String getPlayerMessage(String content, ServerPlayerEntity player, MinecraftServer server, World world) {
-        return format(relay, player, server, world, null, content, null);
+        return format(relay, player, server, world, null, content);
     }
 
     public String getCommandMessage(String content, ServerPlayerEntity player, MinecraftServer server, World world) {
-        return format(command, player, server, world, null, content, null);
+        return format(command, player, server, world, null, content);
     }
 
     public String getDimensionChangeMessage(ServerPlayerEntity player, MinecraftServer server, World world) {
