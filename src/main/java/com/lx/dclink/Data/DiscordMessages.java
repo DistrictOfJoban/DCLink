@@ -1,6 +1,7 @@
 package com.lx.dclink.Data;
 
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTracker;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.crash.CrashReport;
@@ -64,9 +65,9 @@ public class DiscordMessages {
     }
 
     public String getPlayerDeathMessage(ServerPlayerEntity player, DamageSource source, World world) {
-        String formatted = format(playerDeath, player, null, world);
-        //TODO: source.getDeathMessage(player) is a translatable component, seems to only return an empty string.
-        return formatted.replace("{reason}", source.getDeathMessage(player).getString());
+        String cause = source.getDeathMessage(player).getString().replace(player.getGameProfile().getName(), "");
+        String formatted = playerDeath.replace("{reason}", cause);
+        return format(formatted, player, null, world);
     }
 
     public String getServerCrashedMessage(CrashReport report) {
