@@ -13,10 +13,12 @@ public class ServerEvent {
     public static long serverStartingTimestamp;
     public static long serverStartedTimestamp;
 
+    public static void serverPrelaunch() {
+        serverStartingTimestamp = System.currentTimeMillis();
+    }
+
     public static void serverStarting(MinecraftServer server) {
         DiscordBot.load(BotConfig.getToken(), BotConfig.getIntents());
-
-        serverStartingTimestamp = System.currentTimeMillis();
 
         for(DCEntry entry : DiscordConfig.entries) {
             if(!entry.contentType.contains(ContentType.SERVER)) continue;

@@ -45,14 +45,9 @@ public class DiscordFormatter {
         }
 
         if(time != null) {
+            int seconds = (int) (TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time)));
             modifiedContent = modifiedContent
-                .replace("{timer}", String.format("%02d:%02d:%02d",
-                        TimeUnit.MILLISECONDS.toHours(time),
-                        TimeUnit.MILLISECONDS.toMinutes(time) % 60,
-                        TimeUnit.MILLISECONDS.toSeconds(time) -
-                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time))
-                        )
-                );
+                .replace("{timer}", String.format("%02d:%02d:%02d", seconds / 3600, (seconds % 3600) / 60, seconds % 60));
         }
 
         if(message != null) {
