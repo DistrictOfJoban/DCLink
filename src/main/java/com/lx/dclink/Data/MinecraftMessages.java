@@ -14,34 +14,23 @@ import static com.lx.dclink.Data.MinecraftFormatter.format;
 public class MinecraftMessages {
     public String attachments = "Attachments";
     public String relay = "{memberTag}: {message}";
+    public String relayReplied = "<To: {repliedAuthorTag} {repliedMessage}> {memberTag}: {message}";
     public String relayDeleted = "~~{memberTag}: {message}~~";
-    public String replyText = null;
 
-    public MutableText getDiscord2MCMessage(String content, GuildMessageChannel channel, Member guildMember, String repliedMessage, Member repliedMember) {
-        MutableText repliedText;
-
-        try {
-            repliedText = repliedMessage == null && repliedMember == null ? null : Text.Serializer.fromJson(format(replyText, repliedMessage, null, repliedMember, null));
-        } catch (Exception e) {
-            repliedText = Mappings.literalText("");
+    public MutableText getDiscord2MCMessage(String content, GuildMessageChannel channel, Member guildMember, String repliedMessage, Member repliedAuthor)
+    {
+        String formatted = format(repliedMessage != null ? relayReplied : relay, content, channel, guildMember, null);
+        if(repliedMessage != null) {
+            formatted = formatted
+                    .replace("{repliedAuthorName}", repliedAuthor.getEffectiveName())
+                    .replace("{repliedAuthorTag}", repliedAuthor.getUser().getAsTag())
+                    .replace("{repliedMessage}", repliedMessage);
         }
 
-        String formatted = format(relay, content, channel, guildMember, null);
-
         try {
-            MutableText parsedText = Text.Serializer.fromJson(formatted);
-
-            if(repliedText != null) {
-                return repliedText.append(parsedText);
-            } else {
-                return parsedText;
-            }
+            return Text.Serializer.fromJson(formatted);
         } catch (Exception e) {
-            if(repliedText != null) {
-                return repliedText.append(Mappings.literalText(formatted));
-            } else {
-                return Mappings.literalText(formatted);
-            }
+            return Mappings.literalText(formatted);
         }
     }
 

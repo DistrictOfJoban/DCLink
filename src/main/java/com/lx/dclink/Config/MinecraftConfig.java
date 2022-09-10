@@ -47,12 +47,12 @@ public class MinecraftConfig {
                         entry.message.relay = msg.get("relay").getAsString();
                     }
 
-                    if(msg.has("relayDeleted")) {
-                        entry.message.relayDeleted = msg.get("relayDeleted").getAsString();
+                    if(msg.has("relayReply")) {
+                        entry.message.relayReplied = msg.get("relayReply").getAsString();
                     }
 
-                    if(msg.has("replyText")) {
-                        entry.message.replyText = msg.get("replyText").getAsString();
+                    if(msg.has("relayDeleted")) {
+                        entry.message.relayDeleted = msg.get("relayDeleted").getAsString();
                     }
 
                     if(msg.has("attachments")) {
