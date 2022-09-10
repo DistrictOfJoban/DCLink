@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.12-SNAPSHOT'
+	id 'fabric-loom' version '1.0-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -9,12 +9,10 @@ targetCompatibility = JavaVersion.VERSION_16
 archivesBaseName = project.archives_base_name
 group = project.maven_group
 
-def default_version = "1.17.1"
-
 /* You can set gradle properties in command line with the -P flag, this can be used in an unattended environment (e.g. Github Action) */
 /* e.g. gradlew build -PbuildVersion=1.16.5 */
 /* Otherwise we get the default_build_version above */
-def minecraft_version = rootProject.properties.containsKey("buildVersion") ? rootProject.getProperties().get("buildVersion") : default_version
+def minecraft_version = rootProject.properties.containsKey("buildVersion") ? rootProject.getProperties().get("buildVersion") : project.default_mc_version
 
 boolean is_116 = (minecraft_version as String).startsWith("1.16")
 boolean is_117 = (minecraft_version as String).startsWith("1.17")
