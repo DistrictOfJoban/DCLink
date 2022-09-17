@@ -8,6 +8,7 @@ import com.lx.dclink.DiscordBot;
 import com.lx.dclink.Mappings;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.advancement.Advancement;
+import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -73,17 +74,22 @@ public class PlayerEvent {
         }
     }
 
-    public static void playerAdvancementGranted(ServerPlayerEntity player, World world, Advancement advancement) {
-        //TODO: Unfinished achievement still shows up
-        if(advancement.getDisplay() == null || advancement.getDisplay().isHidden() || !advancement.getDisplay().shouldAnnounceToChat()) return;
+    public static void playerAdvancementGranted(ServerPlayerEntity player, AdvancementProgress advancementProgress,  World world, Advancement advancement, String criterionName) {
+        boolean advancementDoneOld = advancementProgress.isDone();
+        if (advancementProgress.obtain(criterionName)) {
+            boolean advancementDoneNew = advancementProgress.isDone();
+            if (!advancementDoneOld && advancementDoneNew) {
+                if (advancement.getDisplay() != null && advancement.getDisplay().shouldAnnounceToChat()) {
+                    for(DCEntry entry : DiscordConfig.entries) {
+                        if(!entry.contentType.contains(ContentType.PLAYER)) continue;
 
-        for(DCEntry entry : DiscordConfig.entries) {
-            if(!entry.contentType.contains(ContentType.PLAYER)) continue;
-
-            DiscordBot.sendSimpleEmbed(
-                    entry.message.getPlayerAdvancementMessage(player, world, advancement),
-                    entry.channelID
-            );
+                        DiscordBot.sendSimpleEmbed(
+                                entry.message.getPlayerAdvancementMessage(player, world, advancement),
+                                entry.channelID
+                        );
+                    }
+                }
+            }
         }
     }
 

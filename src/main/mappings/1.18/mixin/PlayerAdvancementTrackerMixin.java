@@ -20,8 +20,6 @@ public abstract class PlayerAdvancementTrackerMixin {
 
     @Inject(method = "grantCriterion", at = @At("HEAD"))
     public void grantCriterion(Advancement advancement, String criterionName, CallbackInfoReturnable<Boolean> cir) {
-        if (!getProgress(advancement).isDone()) {
-            PlayerEvent.playerAdvancementGranted(this.owner, this.owner.world, advancement);
-        }
+        PlayerEvent.playerAdvancementGranted(this.owner, getProgress(advancement), this.owner.world, advancement, criterionName);
     }
 }
