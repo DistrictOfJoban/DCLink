@@ -74,20 +74,16 @@ public class PlayerEvent {
         }
     }
 
-    public static void playerAdvancementGranted(ServerPlayerEntity player, AdvancementProgress advancementProgress,  World world, Advancement advancement, String criterionName) {
-        boolean advancementDoneOld = advancementProgress.isDone();
-        if (advancementProgress.obtain(criterionName)) {
-            boolean advancementDoneNew = advancementProgress.isDone();
-            if (!advancementDoneOld && advancementDoneNew) {
-                if (advancement.getDisplay() != null && advancement.getDisplay().shouldAnnounceToChat()) {
-                    for(DCEntry entry : DiscordConfig.entries) {
-                        if(!entry.contentType.contains(ContentType.PLAYER)) continue;
+    public static void playerAdvancementGranted(ServerPlayerEntity player, AdvancementProgress advancementProgress, World world, Advancement advancement) {
+        if (advancementProgress.isDone()) {
+            if (advancement.getDisplay() != null && advancement.getDisplay().shouldAnnounceToChat()) {
+                for(DCEntry entry : DiscordConfig.entries) {
+                    if(!entry.contentType.contains(ContentType.PLAYER)) continue;
 
-                        DiscordBot.sendSimpleEmbed(
-                                entry.message.getPlayerAdvancementMessage(player, world, advancement),
-                                entry.channelID
-                        );
-                    }
+                    DiscordBot.sendSimpleEmbed(
+                            entry.message.getPlayerAdvancementMessage(player, world, advancement),
+                            entry.channelID
+                    );
                 }
             }
         }

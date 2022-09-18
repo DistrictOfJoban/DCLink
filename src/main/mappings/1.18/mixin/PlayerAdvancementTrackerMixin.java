@@ -18,8 +18,10 @@ public abstract class PlayerAdvancementTrackerMixin {
 
     @Shadow private ServerPlayerEntity owner;
 
-    @Inject(method = "grantCriterion", at = @At("HEAD"))
-    public void grantCriterion(Advancement advancement, String criterionName, CallbackInfoReturnable<Boolean> cir) {
-        PlayerEvent.playerAdvancementGranted(this.owner, getProgress(advancement), this.owner.world, advancement, criterionName);
+    @Inject(method = "grantCriterion", at = @At("RETURN"))
+    public void grantCriterionReturn(Advancement advancement, String criterionName, CallbackInfoReturnable<Boolean> cir) {
+        if(cir.getReturnValue()) {
+            PlayerEvent.playerAdvancementGranted(this.owner, getProgress(advancement), this.owner.world, advancement);
+        }
     }
 }
