@@ -5,6 +5,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -45,9 +46,8 @@ public class DiscordFormatter {
         }
 
         if(time != null) {
-            int seconds = (int) (TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time)));
             modifiedContent = modifiedContent
-                .replace("{timer}", String.format("%02d:%02d:%02d", seconds / 3600, (seconds % 3600) / 60, seconds % 60));
+                .replace("{timer}", DurationFormatUtils.formatDuration(time, "HH:mm:ss"));
         }
 
         if(message != null) {
