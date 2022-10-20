@@ -16,6 +16,8 @@ public class MinecraftMessages {
     public String relay = "{memberTag}: {message}";
     public String relayReplied = "<To: {repliedAuthorTag} {repliedMessage}> {memberTag}: {message}";
     public String relayDeleted = "~~{memberTag}: {message}~~";
+    public String reactionAdded = "{memberTag} reacted {emoji} to {message}";
+    public String reactionRemoved = "{memberTag} removed reaction {emoji} to {message}";
 
     public MutableText getDiscord2MCMessage(String content, GuildMessageChannel channel, Member guildMember, String repliedMessage, Member repliedAuthor)
     {
@@ -56,5 +58,31 @@ public class MinecraftMessages {
             }
         }
         return textList;
+    }
+
+    public MutableText getReactionAddMessage(String emoji, GuildMessageChannel channel, Member reactMember, Member messageMember, String reactedMessage) {
+        String formatted = format(reactionAdded, reactedMessage, channel, reactMember, null);
+        formatted = formatted.replace("{emojiID}", emoji)
+                .replace("{emoji}", emoji)
+                .replace("{messageAuthorTag}", messageMember.getUser().getAsTag());
+
+        try {
+            return Text.Serializer.fromJson(formatted);
+        } catch (Exception e) {
+            return Mappings.literalText(formatted);
+        }
+    }
+
+    public MutableText getReactionRemoveMessage(String emoji, GuildMessageChannel channel, Member reactMember, Member messageMember, String reactedMessage) {
+        String formatted = format(reactionRemoved, reactedMessage, channel, reactMember, null);
+        formatted = formatted.replace("{emojiID}", emoji)
+                .replace("{emoji}", emoji)
+                .replace("{messageAuthorTag}", messageMember.getUser().getAsTag());
+
+        try {
+            return Text.Serializer.fromJson(formatted);
+        } catch (Exception e) {
+            return Mappings.literalText(formatted);
+        }
     }
 }

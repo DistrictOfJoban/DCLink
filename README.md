@@ -30,10 +30,14 @@ What a great idea!
 - Player death
 - Player Achieve Advancement
 
+### Supported Discord events relayed to Minecraft
+- Message Send
+- Message Delete
+- Message Reaction Add/Remove
+
 ## Future Goals
-- Relay Discord Reaction Event to Minecraft
 - Add Discord Commands
-- Allow exporting config to other Discord relaying mod
+- Allow custom embed
 - Touch some grass
 
 ## Downloads

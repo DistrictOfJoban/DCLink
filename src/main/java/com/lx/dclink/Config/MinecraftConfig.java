@@ -55,6 +55,14 @@ public class MinecraftConfig {
                         entry.message.relayDeleted = msg.get("relayDeleted").getAsString();
                     }
 
+                    if(msg.has("reactionAdd")) {
+                        entry.message.reactionAdded = msg.get("reactionAdd").getAsString();
+                    }
+
+                    if(msg.has("reactionRemove")) {
+                        entry.message.reactionRemoved = msg.get("reactionRemove").getAsString();
+                    }
+
                     if(msg.has("attachments")) {
                         entry.message.attachments = msg.get("attachments").getAsString();
                     }

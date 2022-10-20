@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
@@ -95,9 +97,7 @@ public class DiscordBot extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
-        if (event.isFromType(ChannelType.PRIVATE) || event.getMember() == null || !BotConfig.getInboundEnabled()) {
-            return;
-        }
+        if (event.isFromType(ChannelType.PRIVATE) || event.getMember() == null || !BotConfig.getInboundEnabled()) return;
 
         messageCache.put(event.getMessageIdLong(), event.getMessage());
 
@@ -128,19 +128,13 @@ public class DiscordBot extends ListenerAdapter {
     @Override
     public void onMessageDelete(MessageDeleteEvent event)
     {
-        if (event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInboundEnabled()) {
-            return;
-        }
+        if (event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInboundEnabled()) return;
 
         Message message = messageCache.get(event.getMessageIdLong());
-        if(message == null) {
-            return;
-        }
+        if(message == null) return;
 
         Member member = message.getMember();
-        if(member == null) {
-            return;
-        }
+        if(member == null) return;
 
         /* Don't send if coming from self */
         if(member.getId().equals(client.getSelfUser().getId())) return;
@@ -159,6 +153,60 @@ public class DiscordBot extends ListenerAdapter {
             }
 
             textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel(), member));
+            DCLink.sendInGameMessage(textToBeSent, entry);
+        }
+    }
+
+    @Override
+    public void onMessageReactionRemove(MessageReactionRemoveEvent event)
+    {
+        if (event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInboundEnabled()) return;
+
+        Message reactedMessage = messageCache.get(event.getMessageIdLong());
+        if(reactedMessage == null) return;
+
+        Member messageAuthor = reactedMessage.getMember();
+        if(messageAuthor == null) return;
+
+        String messageContent = reactedMessage.getContentDisplay();
+        String emoji = event.getEmoji().getFormatted();
+
+        for(MCEntry entry : MinecraftConfig.entries) {
+            if(!entry.channelID.contains(event.getGuildChannel().getId())) continue;
+
+            List<MutableText> textToBeSent = new ArrayList<>();
+            if(!messageContent.isEmpty()) {
+                MutableText formattedMessage = entry.message.getReactionRemoveMessage(emoji, event.getGuildChannel(), event.getMember(), messageAuthor, reactedMessage.getContentDisplay());
+                textToBeSent.add(formattedMessage);
+            }
+
+            DCLink.sendInGameMessage(textToBeSent, entry);
+        }
+    }
+
+    @Override
+    public void onMessageReactionAdd(MessageReactionAddEvent event)
+    {
+        if (event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInboundEnabled()) return;
+
+        Message reactedMessage = messageCache.get(event.getMessageIdLong());
+        if(reactedMessage == null) return;
+
+        Member messageAuthor = reactedMessage.getMember();
+        if(messageAuthor == null) return;
+
+        String messageContent = reactedMessage.getContentDisplay();
+        String emoji = event.getEmoji().getFormatted();
+
+        for(MCEntry entry : MinecraftConfig.entries) {
+            if(!entry.channelID.contains(event.getGuildChannel().getId())) continue;
+
+            List<MutableText> textToBeSent = new ArrayList<>();
+            if(!messageContent.isEmpty()) {
+                MutableText formattedMessage = entry.message.getReactionAddMessage(emoji, event.getGuildChannel(), event.getMember(), messageAuthor, reactedMessage.getContentDisplay());
+                textToBeSent.add(formattedMessage);
+            }
+
             DCLink.sendInGameMessage(textToBeSent, entry);
         }
     }
