@@ -1,11 +1,9 @@
 package com.lx.dclink;
 
-import com.lx.dclink.Config.MinecraftConfig;
+import com.google.gson.JsonArray;
 import com.lx.dclink.Config.BotConfig;
-import com.lx.dclink.Data.DCEntry;
-import com.lx.dclink.Data.DiscordFormatter;
-import com.lx.dclink.Data.MCEntry;
-import net.dv8tion.jda.api.EmbedBuilder;
+import com.lx.dclink.Config.MinecraftConfig;
+import com.lx.dclink.Data.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -16,6 +14,7 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.minecraft.text.MutableText;
@@ -24,6 +23,8 @@ import org.apache.logging.log4j.core.Logger;
 
 import javax.security.auth.login.LoginException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DiscordBot extends ListenerAdapter {
     public static final Logger LOGGER = (Logger) LogManager.getLogger("DCLinkClient");
@@ -32,6 +33,7 @@ public class DiscordBot extends ListenerAdapter {
     public static Map<Long, Message> messageCache = new HashMap<>();
     private static Timer timer;
     private static int currentStatus;
+    private static final Pattern embedPattern = Pattern.compile("(<<<.+>>>)");
 
     public static void load(String token, Collection<GatewayIntent> intents) {
         if(token == null) {
@@ -72,6 +74,8 @@ public class DiscordBot extends ListenerAdapter {
 
     public static void startCyclingStatus() {
         if(!BotConfig.statuses.isEmpty()) {
+            Placeholder placeholder = Placeholder.getDefaultPlaceholder(null, DCLink.server, null, null, null);
+
             timer = new Timer();
             timer.schedule(new TimerTask() {
 
@@ -79,7 +83,7 @@ public class DiscordBot extends ListenerAdapter {
                 public void run() {
                     if(DCLink.server == null) return;
                     String status = BotConfig.statuses.get(currentStatus++ % BotConfig.statuses.size());
-                    String formattedStatus = DiscordFormatter.format(status, null, DCLink.server, null);
+                    String formattedStatus = placeholder.parse(status);
                     client.getPresence().setActivity(Activity.playing(formattedStatus));
                 }
             }, 0, BotConfig.getStatusRefreshInterval() * 1000L);
@@ -211,13 +215,24 @@ public class DiscordBot extends ListenerAdapter {
         }
     }
 
-    public static void sendMessage(String message, DCEntry entry) {
+    public static void sendUniversalMessage(String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji) {
         if(!BotConfig.getOutboundEnabled()) return;
 
-        if(message == null) return;
+        ArrayList<MessageEmbed> embedToBeSent = new ArrayList<>();
+        Matcher matcher = embedPattern.matcher(template);
 
-        for(String channelId : entry.channelID) {
-            String finalMessage = message;
+        if(matcher.find()) {
+            template = template.replace(matcher.group(0), "");
+            String embedName = matcher.group(0).replace("<<<", "").replace(">>>", "");
+            JsonArray embedJson = BotConfig.getEmbedJson(embedName);
+            if(embedJson != null) {
+                embedToBeSent.addAll(EmbedGenerator.fromJson(placeholder, embedJson));
+            }
+        }
+
+        String finalMessage = placeholder == null ? template : placeholder.parse(template);
+
+        for(String channelId : channelList) {
             GuildMessageChannel channel = client.getChannelById(GuildMessageChannel.class, channelId);
             if(channel == null) {
                 LOGGER.warn("Cannot find text channel: " + channelId);
@@ -232,7 +247,7 @@ public class DiscordBot extends ListenerAdapter {
             List<RichCustomEmoji> emojiMap = channel.getGuild().getEmojis();
 
             /* Parse mention */
-            if(entry.allowMention && message.contains("@")) {
+            if(allowMention && finalMessage.contains("@")) {
                 if(client.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
                     for(Member member : channel.getGuild().getMembers()) {
                         finalMessage = finalMessage.replace("@" + member.getUser().getName(), String.format("<@%s>", member.getUser().getId()));
@@ -241,43 +256,19 @@ public class DiscordBot extends ListenerAdapter {
             }
 
             /* Parse emoji map */
-            if(entry.enableEmoji) {
+            if(enableEmoji) {
                 for (RichCustomEmoji emoji : emojiMap) {
                     finalMessage = finalMessage.replace(":" + emoji.getName() + ":", "<:" + emoji.getName() + ":" + emoji.getId() + ">");
                 }
             }
 
-            channel.sendMessage(finalMessage).queue();
-        }
-    }
-
-    public static void sendSimpleEmbed(String description, List<String> channelList) {
-        sendSimpleEmbed(description, channelList,null);
-    }
-
-    public static void sendSimpleEmbed(String description, List<String> channelList, String thumbnail) {
-        if(!BotConfig.getOutboundEnabled()) return;
-        if(description == null) return;
-
-        for(String channelId : channelList) {
-            EmbedBuilder embedBuilder = new EmbedBuilder();
-            embedBuilder.setDescription(description);
-            if(thumbnail != null) {
-                embedBuilder.setThumbnail(thumbnail);
+            if(finalMessage.isEmpty() && !embedToBeSent.isEmpty()) {
+                channel.sendMessageEmbeds(embedToBeSent).queue();
+            } else {
+                MessageAction action = channel.sendMessage(finalMessage);
+                action.setEmbeds(embedToBeSent);
+                action.queue();
             }
-            MessageEmbed embed = embedBuilder.build();
-            GuildMessageChannel channel = client.getChannelById(GuildMessageChannel.class, channelId);
-            if(channel == null) {
-                LOGGER.warn("Cannot find text channel: " + channelId);
-                continue;
-            }
-
-            if(!channel.canTalk()) {
-                LOGGER.warn("No permission to send message in Text Channel #" + channel.getName());
-                continue;
-            }
-
-            channel.sendMessageEmbeds(embed).queue();
         }
     }
 }

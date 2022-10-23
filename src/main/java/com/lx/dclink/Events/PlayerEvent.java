@@ -4,6 +4,7 @@ import com.lx.dclink.Config.DiscordConfig;
 import com.lx.dclink.DCLink;
 import com.lx.dclink.Data.ContentType;
 import com.lx.dclink.Data.DCEntry;
+import com.lx.dclink.Data.Placeholder;
 import com.lx.dclink.DiscordBot;
 import com.lx.dclink.Mappings;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -25,14 +26,16 @@ public class PlayerEvent {
         String worldId = world.getRegistryKey().getValue().toString();
         for(DCEntry entry : DiscordConfig.entries) {
             if(!entry.contentType.contains(ContentType.PLAYER)) continue;
-            if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) {
-                continue;
-            }
+            if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) continue;
 
-            DiscordBot.sendSimpleEmbed(
-                    entry.message.getPlayerJoinMessage(player, server, world),
+            Placeholder placeholder = Placeholder.getDefaultPlaceholder(player, server, world, null, null);
+
+            DiscordBot.sendUniversalMessage(
+                    entry.message.playerJoin,
+                    placeholder,
                     entry.channelID,
-                    entry.getThumbnailURL(player, server, world)
+                    entry.allowMention,
+                    entry.enableEmoji
             );
         }
     }
@@ -44,33 +47,26 @@ public class PlayerEvent {
         Text disconnectReasonText = handler.getConnection().getDisconnectReason();
         for(DCEntry entry : DiscordConfig.entries) {
             if(!entry.contentType.contains(ContentType.PLAYER)) continue;
-            if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) {
-                continue;
-            }
+            if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) continue;
             String disconnectReason = disconnectReasonText == null ? "" : entry.message.getPlayerDisconnectReason(disconnectReasonText.getString());
-            String leftMessage = entry.message.getPlayerLeftMessage(player, server, world)
-            .replace("{reason}", disconnectReason);
+            Placeholder placeholder = Placeholder.getDefaultPlaceholder(player, server, world, null, null);
+            placeholder.addPlaceholder("reason", disconnectReason);
 
-            DiscordBot.sendSimpleEmbed(
-                    leftMessage,
-                    entry.channelID,
-                    entry.getThumbnailURL(player, server, world)
-            );
+            DiscordBot.sendUniversalMessage(entry.message.playerLeft, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
         }
     }
 
     public static void playerDied(ServerPlayerEntity player, DamageSource source, World world) {
         String worldId = world.getRegistryKey().getValue().toString();
+        String deathCause = source.getDeathMessage(player).getString().replace(player.getGameProfile().getName(), "");
         for(DCEntry entry : DiscordConfig.entries) {
             if(!entry.contentType.contains(ContentType.PLAYER)) continue;
-            if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) {
-                continue;
-            }
+            if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) continue;
 
-            DiscordBot.sendSimpleEmbed(
-                    entry.message.getPlayerDeathMessage(player, source, world),
-                    entry.channelID
-            );
+            Placeholder placeholder = Placeholder.getDefaultPlaceholder(player, DCLink.server, world, null, null);
+            placeholder.addPlaceholder("cause", deathCause);
+
+            DiscordBot.sendUniversalMessage(entry.message.playerDeath, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
         }
     }
 
@@ -80,10 +76,11 @@ public class PlayerEvent {
                 for(DCEntry entry : DiscordConfig.entries) {
                     if(!entry.contentType.contains(ContentType.PLAYER)) continue;
 
-                    DiscordBot.sendSimpleEmbed(
-                            entry.message.getPlayerAdvancementMessage(player, world, advancement),
-                            entry.channelID
-                    );
+                    Placeholder placeholder = Placeholder.getDefaultPlaceholder(player, DCLink.server, world, null, null);
+                    placeholder.addPlaceholder("advancement", advancement.getDisplay().getTitle().getString());
+                    placeholder.addPlaceholder("advancementDetails", advancement.getDisplay().getDescription().getString());
+
+                    DiscordBot.sendUniversalMessage(entry.message.playerAdvancement, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
                 }
             }
         }
@@ -94,42 +91,29 @@ public class PlayerEvent {
         String newWorldId = currentWorld.getRegistryKey().getValue().toString();
         for(DCEntry entry : DiscordConfig.entries) {
             if(!entry.contentType.contains(ContentType.PLAYER)) continue;
-            if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(newWorldId) && !entry.allowedDimension.contains(oldWorldId)) {
-                continue;
-            }
+            if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(newWorldId) && !entry.allowedDimension.contains(oldWorldId)) continue;
+            Placeholder placeholder = Placeholder.getDefaultPlaceholder(player, DCLink.server, currentWorld, null, null);
 
-            DiscordBot.sendSimpleEmbed(
-                    entry.message.getDimensionChangeMessage(player, DCLink.server, currentWorld),
-                    entry.channelID,
-                    entry.getThumbnailURL(player, DCLink.server, currentWorld)
-            );
+            DiscordBot.sendUniversalMessage(entry.message.changeDimension, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
         }
     }
 
     public static void sendMessage(String content, ServerPlayerEntity player) {
         ServerWorld world = Mappings.getServerWorld(player);
         String worldId = world.getRegistryKey().getValue().toString();
+        Placeholder placeholder = Placeholder.getDefaultPlaceholder(player, player.server, player.world, null, content);
 
         for(DCEntry entry : DiscordConfig.entries) {
             if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) {
                 continue;
             }
 
-            if(content.startsWith("/")) {
-                if(entry.contentType.contains(ContentType.COMMAND)) {
-                    DiscordBot.sendMessage(
-                            entry.message.getCommandMessage(content, player, DCLink.server, world),
-                            entry
-                    );
-                }
-                return;
+            if(content.startsWith("/") && entry.contentType.contains(ContentType.COMMAND)) {
+                DiscordBot.sendUniversalMessage(entry.message.command, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
             }
 
             if(entry.contentType.contains(ContentType.CHAT)) {
-                DiscordBot.sendMessage(
-                        entry.message.getPlayerMessage(content, player, DCLink.server, world),
-                        entry
-                );
+                DiscordBot.sendUniversalMessage(entry.message.relay, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
             }
         }
     }

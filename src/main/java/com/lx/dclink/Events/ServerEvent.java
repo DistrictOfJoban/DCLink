@@ -5,6 +5,7 @@ import com.lx.dclink.Config.DiscordConfig;
 import com.lx.dclink.DCLink;
 import com.lx.dclink.Data.ContentType;
 import com.lx.dclink.Data.DCEntry;
+import com.lx.dclink.Data.Placeholder;
 import com.lx.dclink.DiscordBot;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.crash.CrashReport;
@@ -22,7 +23,7 @@ public class ServerEvent {
 
         for(DCEntry entry : DiscordConfig.entries) {
             if(!entry.contentType.contains(ContentType.SERVER)) continue;
-            DiscordBot.sendSimpleEmbed(entry.message.getServerStartingMessage(), entry.channelID);
+            DiscordBot.sendUniversalMessage(entry.message.serverStarting, null, entry.channelID, entry.allowMention, entry.enableEmoji);
         }
     }
 
@@ -31,7 +32,8 @@ public class ServerEvent {
         DCLink.server = server;
         for(DCEntry entry : DiscordConfig.entries) {
             if(!entry.contentType.contains(ContentType.SERVER)) continue;
-            DiscordBot.sendSimpleEmbed(entry.message.getServerStartedMessage(server, serverStartedTimestamp - serverStartingTimestamp), entry.channelID);
+            Placeholder placeholder = Placeholder.getDefaultPlaceholder(null, server, null, serverStartedTimestamp - serverStartingTimestamp, null);
+            DiscordBot.sendUniversalMessage(entry.message.serverStarted, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
         }
     }
 
@@ -41,14 +43,15 @@ public class ServerEvent {
 
         for(DCEntry entry : DiscordConfig.entries) {
             if(!entry.contentType.contains(ContentType.SERVER)) continue;
-            DiscordBot.sendSimpleEmbed(entry.message.getServerStoppingMessage(server, serverStoppingTimestamp - serverStartedTimestamp), entry.channelID);
+            Placeholder placeholder = Placeholder.getDefaultPlaceholder(null, server, null, serverStoppingTimestamp - serverStartedTimestamp, null);
+            DiscordBot.sendUniversalMessage(entry.message.serverStopping, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
         }
     }
 
     public static void serverStopped(MinecraftServer server) {
         for(DCEntry entry : DiscordConfig.entries) {
             if(!entry.contentType.contains(ContentType.SERVER)) continue;
-            DiscordBot.sendSimpleEmbed(entry.message.getServerStoppedMessage(), entry.channelID);
+            DiscordBot.sendUniversalMessage(entry.message.serverStopped, null, entry.channelID, entry.allowMention, entry.enableEmoji);
         }
         DiscordBot.disconnect();
     }
@@ -56,7 +59,9 @@ public class ServerEvent {
     public static void serverCrashed(CrashReport report) {
         for(DCEntry entry : DiscordConfig.entries) {
             if(!entry.contentType.contains(ContentType.SERVER)) continue;
-            DiscordBot.sendSimpleEmbed(entry.message.getServerCrashedMessage(report), entry.channelID);
+            Placeholder placeholder = new Placeholder();
+            placeholder.addPlaceholder("reason", report.getMessage());
+            DiscordBot.sendUniversalMessage(entry.message.serverCrashed, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
         }
     }
 }

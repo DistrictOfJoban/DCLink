@@ -6,11 +6,14 @@ import com.google.gson.JsonParser;
 import com.lx.dclink.DCLink;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.fabricmc.loader.api.FabricLoader;
+import org.apache.commons.io.FilenameUtils;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 public class BotConfig {
@@ -22,57 +25,78 @@ public class BotConfig {
     private static boolean outboundEnabled = true;
     private static boolean inboundEnabled = true;
     private static final Collection<String> intents = new ArrayList<>();
+    private static final HashMap<String, JsonArray> CustomEmbedsList = new HashMap<>();
     private static final Path ConfigFile = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("config.json");
+    private static final Path EmbedFolder = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("embeds");
 
     public static boolean load() {
+        boolean loadSuccessful = false;
         sendChannel.clear();
         intents.clear();
         statuses.clear();
+        CustomEmbedsList.clear();
+
+        if (Files.exists(EmbedFolder)) {
+            try {
+                File[] files = EmbedFolder.toFile().listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        String fileName = FilenameUtils.getBaseName(file.getName());
+                        final JsonArray json = new JsonParser().parse(String.join("", Files.readAllLines(file.toPath()))).getAsJsonArray();
+                        CustomEmbedsList.put(fileName, json);
+                    }
+                }
+                loadSuccessful = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         if(!Files.exists(ConfigFile)) {
             DCLink.LOGGER.warn("Cannot find the main bot config file!");
-            return false;
+            loadSuccessful = false;
+        } else {
+            try {
+                final JsonObject jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(ConfigFile))).getAsJsonObject();
+                if(jsonConfig.has("token")) {
+                    token = jsonConfig.get("token").getAsString();
+                }
+
+                if(jsonConfig.has("sendChannel")) {
+                    JsonArray channels = jsonConfig.get("sendChannel").getAsJsonArray();
+                    channels.forEach(jsonElement -> {
+                        String channelId = jsonElement.getAsString();
+                        sendChannel.add(channelId);
+                    });
+                }
+
+                if(jsonConfig.has("intents")) {
+                    JsonArray channels = jsonConfig.get("intents").getAsJsonArray();
+                    channels.forEach(jsonElement -> {
+                        String intent = jsonElement.getAsString();
+                        intents.add(intent);
+                    });
+                }
+
+                if(jsonConfig.has("status")) {
+                    jsonConfig.get("status").getAsJsonArray().forEach(jsonElement -> {
+                        statuses.add(jsonElement.getAsString());
+                    });
+                }
+
+                if(jsonConfig.has("statusRefreshInterval")) {
+                    statusRefreshInterval = jsonConfig.get("statusRefreshInterval").getAsInt();
+                }
+
+                if(jsonConfig.has("cacheMember")) {
+                    cacheMember = jsonConfig.get("cacheMember").getAsBoolean();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                loadSuccessful = false;
+            }
         }
-
-        try {
-            final JsonObject jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(ConfigFile))).getAsJsonObject();
-            if(jsonConfig.has("token")) {
-                token = jsonConfig.get("token").getAsString();
-            }
-
-            if(jsonConfig.has("sendChannel")) {
-                JsonArray channels = jsonConfig.get("sendChannel").getAsJsonArray();
-                channels.forEach(jsonElement -> {
-                    String channelId = jsonElement.getAsString();
-                    sendChannel.add(channelId);
-                });
-            }
-
-            if(jsonConfig.has("intents")) {
-                JsonArray channels = jsonConfig.get("intents").getAsJsonArray();
-                channels.forEach(jsonElement -> {
-                    String intent = jsonElement.getAsString();
-                    intents.add(intent);
-                });
-            }
-
-            if(jsonConfig.has("status")) {
-                jsonConfig.get("status").getAsJsonArray().forEach(jsonElement -> {
-                    statuses.add(jsonElement.getAsString());
-                });
-            }
-
-            if(jsonConfig.has("statusRefreshInterval")) {
-                statusRefreshInterval = jsonConfig.get("statusRefreshInterval").getAsInt();
-            }
-
-            if(jsonConfig.has("cacheMember")) {
-                cacheMember = jsonConfig.get("cacheMember").getAsBoolean();
-            }
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        return loadSuccessful;
     }
 
     public static String getToken() {
@@ -114,5 +138,12 @@ public class BotConfig {
         }
 
         return intentCollection;
+    }
+
+    public static JsonArray getEmbedJson(String key) {
+        if(CustomEmbedsList.containsKey(key)) {
+            return CustomEmbedsList.get(key);
+        }
+        return null;
     }
 }

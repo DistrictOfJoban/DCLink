@@ -54,10 +54,6 @@ public class DiscordConfig {
                     entry.contentType.add(ContentType.CHAT);
                 }
 
-                if(jsonEntry.has("playerHeadURL")) {
-                    entry.thumbnailURL = jsonEntry.get("playerHeadURL").getAsString();
-                }
-
                 if(jsonEntry.has("allowMention")) {
                     entry.allowMention = jsonEntry.get("allowMention").getAsBoolean();
                 }
