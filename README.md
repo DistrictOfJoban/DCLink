@@ -1,5 +1,6 @@
 # DCLink
-
+[![works badge](https://cdn.jsdelivr.net/gh/nikku/works-on-my-machine@v0.2.0/badge.svg)](https://github.com/nikku/works-on-my-machine)
+![build status](https://github.com/Kenny-Hui/DCLink/actions/workflows/build.yml/badge.svg)
 ## The story
 A server that I previously manages has been upgraded to 1.17.1.  
 Unfortunately, I can't find a decent Discord Chat Linking Bot that suits my need and runs on Fabric 1.17.1.
