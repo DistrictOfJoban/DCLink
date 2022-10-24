@@ -13,18 +13,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MinecraftConfig {
+    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("minecraft.json");
     public static List<MCEntry> entries = new ArrayList<>();
-    private static final Path ConfigFile = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("minecraft.json");
 
     public static boolean load() {
         entries.clear();
-        if(!Files.exists(ConfigFile)) {
+        if(!Files.exists(CONFIG_PATH)) {
             DCLink.LOGGER.warn("Cannot find the Minecraft config file (DC -> MC)!");
             return false;
         }
 
         try {
-            final JsonArray jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(ConfigFile))).getAsJsonArray();
+            final JsonArray jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(CONFIG_PATH))).getAsJsonArray();
             jsonConfig.forEach(jsonElement -> {
                 MCEntry entry = new MCEntry();
                 JsonObject jsonEntry = jsonElement.getAsJsonObject();

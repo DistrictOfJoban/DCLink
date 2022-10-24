@@ -9,80 +9,68 @@ import net.minecraft.text.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.lx.dclink.Data.MinecraftFormatter.format;
-
 public class MinecraftMessages {
-    public String attachments = "Attachments";
-    public String relay = "{memberTag}: {message}";
-    public String relayReplied = "<To: {repliedAuthorTag} {repliedMessage}> {memberTag}: {message}";
-    public String relayDeleted = "~~{memberTag}: {message}~~";
-    public String reactionAdded = "{memberTag} reacted {emoji} to {message}";
-    public String reactionRemoved = "{memberTag} removed reaction {emoji} to {message}";
+    public String attachments = "{member.user.tag} sent a attachment. ({attachment.size})";
+    public String relay = "{member.user.tag}: {message.content}";
+    public String relayReplied = "<To: {repliedAuthor.user.tag} {repliedMessage.content}> {member.tag}: {message.content}";
+    public String relayDeleted = "~~{member.user.tag}: {message.content}~~";
+    public String reactionAdded = "{member.user.tag} reacted {emoji} to {message.content}";
+    public String reactionRemoved = "{member.user.tag} removed reaction {emoji} to {message.content}";
 
-    public MutableText getDiscord2MCMessage(String content, GuildMessageChannel channel, Member guildMember, String repliedMessage, Member repliedAuthor)
+    public MutableText getDiscord2MCMessage(Message message, GuildMessageChannel channel, Member guildMember, Message repliedMessage, Member repliedAuthor)
     {
-        String formatted = format(repliedMessage != null ? relayReplied : relay, content, channel, guildMember, null);
+        DiscordPlaceholder placeholder = new DiscordPlaceholder(message, channel, guildMember, null);
+
         if(repliedMessage != null) {
-            formatted = formatted
-                    .replace("{repliedAuthorName}", repliedAuthor.getEffectiveName())
-                    .replace("{repliedAuthorTag}", repliedAuthor.getUser().getAsTag())
-                    .replace("{repliedMessage}", repliedMessage);
+            placeholder.setMessage("repliedMessage", repliedMessage);
         }
 
-        try {
-            return Text.Serializer.fromJson(formatted);
-        } catch (Exception e) {
-            return Mappings.literalText(formatted);
-        }
+        String formatted = placeholder.parse(repliedMessage != null ? relayReplied : relay);
+        return toText(formatted);
     }
 
-    public MutableText getDiscordDeletedMessage(String content, GuildMessageChannel channel, Member guildMember) {
-        String formatted = format(relayDeleted, content, channel, guildMember, null);
-
-        try {
-            return Text.Serializer.fromJson(formatted);
-        } catch (Exception e) {
-            return Mappings.literalText(formatted);
-        }
+    public MutableText getDiscordDeletedMessage(Message message, GuildMessageChannel channel, Member guildMember) {
+        DiscordPlaceholder placeholder = new DiscordPlaceholder(message, channel, guildMember, null);
+        String formatted = placeholder.parse(relayDeleted);
+        return toText(formatted);
     }
 
     public List<MutableText> getAttachmentText(List<Message.Attachment> attachmentList, GuildMessageChannel channel, Member guildMember) {
         List<MutableText> textList = new ArrayList<>();
         for(Message.Attachment attachment : attachmentList) {
-            String formatted = format(attachments, null, channel, guildMember, attachment);
+            DiscordPlaceholder placeholder = new DiscordPlaceholder(null, channel, guildMember, attachment);
+            String formatted = placeholder.parse(attachments);
 
-            try {
-                textList.add(Text.Serializer.fromJson(formatted));
-            } catch (Exception e) {
-                textList.add(Mappings.literalText(formatted));
-            }
+            textList.add(toText(formatted));
         }
         return textList;
     }
 
-    public MutableText getReactionAddMessage(String emoji, GuildMessageChannel channel, Member reactMember, Member messageMember, String reactedMessage) {
-        String formatted = format(reactionAdded, reactedMessage, channel, reactMember, null);
-        formatted = formatted.replace("{emojiID}", emoji)
-                .replace("{emoji}", emoji)
-                .replace("{messageAuthorTag}", messageMember.getUser().getAsTag());
+    public MutableText getReactionAddMessage(String emoji, GuildMessageChannel channel, Member reactMember, Member messageMember, Message reactedMessage) {
+        DiscordPlaceholder placeholder = new DiscordPlaceholder(reactedMessage, channel, reactMember, null);
+        placeholder.addPlaceholder("emojiID", emoji);
+        placeholder.addPlaceholder("emoji", emoji);
+        placeholder.setMember("author", messageMember);
+        String formatted = placeholder.parse(reactionAdded);
 
-        try {
-            return Text.Serializer.fromJson(formatted);
-        } catch (Exception e) {
-            return Mappings.literalText(formatted);
-        }
+        return toText(formatted);
     }
 
-    public MutableText getReactionRemoveMessage(String emoji, GuildMessageChannel channel, Member reactMember, Member messageMember, String reactedMessage) {
-        String formatted = format(reactionRemoved, reactedMessage, channel, reactMember, null);
-        formatted = formatted.replace("{emojiID}", emoji)
-                .replace("{emoji}", emoji)
-                .replace("{messageAuthorTag}", messageMember.getUser().getAsTag());
+    public MutableText getReactionRemoveMessage(String emoji, GuildMessageChannel channel, Member reactMember, Member messageMember, Message reactedMessage) {
+        DiscordPlaceholder placeholder = new DiscordPlaceholder(reactedMessage, channel, reactMember, null);
+        placeholder.addPlaceholder("emojiID", emoji);
+        placeholder.addPlaceholder("emoji", emoji);
+        placeholder.setMember("author", messageMember);
+        String formatted = placeholder.parse(reactionRemoved);
 
+        return toText(formatted);
+    }
+
+    private MutableText toText(String str) {
         try {
-            return Text.Serializer.fromJson(formatted);
+            return Text.Serializer.fromJson(str);
         } catch (Exception e) {
-            return Mappings.literalText(formatted);
+            return Mappings.literalText(str);
         }
     }
 }

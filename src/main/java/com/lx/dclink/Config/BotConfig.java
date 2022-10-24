@@ -17,33 +17,33 @@ import java.util.HashMap;
 import java.util.List;
 
 public class BotConfig {
-    public static final List<String> sendChannel = new ArrayList<>();
-    public static final List<String> statuses = new ArrayList<>();
     private static String token;
     private static boolean cacheMember;
     private static int statusRefreshInterval;
     private static boolean outboundEnabled = true;
     private static boolean inboundEnabled = true;
     private static final Collection<String> intents = new ArrayList<>();
-    private static final HashMap<String, JsonArray> CustomEmbedsList = new HashMap<>();
-    private static final Path ConfigFile = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("config.json");
-    private static final Path EmbedFolder = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("embeds");
+    private static final HashMap<String, JsonArray> customEmbedsList = new HashMap<>();
+    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("config.json");
+    private static final Path CUSTOM_DC_EMBED_PATH = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("embeds");
+    public static final List<String> sendChannel = new ArrayList<>();
+    public static final List<String> statuses = new ArrayList<>();
 
     public static boolean load() {
         boolean loadSuccessful = false;
         sendChannel.clear();
         intents.clear();
         statuses.clear();
-        CustomEmbedsList.clear();
+        customEmbedsList.clear();
 
-        if (Files.exists(EmbedFolder)) {
+        if (Files.exists(CUSTOM_DC_EMBED_PATH)) {
             try {
-                File[] files = EmbedFolder.toFile().listFiles();
+                File[] files = CUSTOM_DC_EMBED_PATH.toFile().listFiles();
                 if (files != null) {
                     for (File file : files) {
                         String fileName = FilenameUtils.getBaseName(file.getName());
                         final JsonArray json = new JsonParser().parse(String.join("", Files.readAllLines(file.toPath()))).getAsJsonArray();
-                        CustomEmbedsList.put(fileName, json);
+                        customEmbedsList.put(fileName, json);
                     }
                 }
                 loadSuccessful = true;
@@ -52,12 +52,12 @@ public class BotConfig {
             }
         }
 
-        if(!Files.exists(ConfigFile)) {
+        if(!Files.exists(CONFIG_PATH)) {
             DCLink.LOGGER.warn("Cannot find the main bot config file!");
             loadSuccessful = false;
         } else {
             try {
-                final JsonObject jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(ConfigFile))).getAsJsonObject();
+                final JsonObject jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(CONFIG_PATH))).getAsJsonObject();
                 if(jsonConfig.has("token")) {
                     token = jsonConfig.get("token").getAsString();
                 }
@@ -141,8 +141,8 @@ public class BotConfig {
     }
 
     public static JsonArray getEmbedJson(String key) {
-        if(CustomEmbedsList.containsKey(key)) {
-            return CustomEmbedsList.get(key);
+        if(customEmbedsList.containsKey(key)) {
+            return customEmbedsList.get(key);
         }
         return null;
     }

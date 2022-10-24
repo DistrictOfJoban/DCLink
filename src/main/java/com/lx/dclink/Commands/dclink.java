@@ -40,7 +40,7 @@ public class dclink {
         );
     }
 
-    public static int reloadConfig(CommandContext<ServerCommandSource> context) {
+    private static int reloadConfig(CommandContext<ServerCommandSource> context) {
         boolean success = DCLink.loadAllConfig();
         MutableText successMessage = Mappings.literalText("DCLink Config Reloaded, re-logging in...").formatted(Formatting.GREEN);
         MutableText failedMessage = Mappings.literalText("DCLink Config Reload Failed, please check console for detail.").formatted(Formatting.RED);
@@ -55,7 +55,7 @@ public class dclink {
         return 1;
     }
 
-    public static int status(CommandContext<ServerCommandSource> context) {
+    private static int status(CommandContext<ServerCommandSource> context) {
         MutableText onlineText = Mappings.literalText("Online").formatted(Formatting.GREEN);
         MutableText offlineText = Mappings.literalText("Offline").formatted(Formatting.RED);
         MutableText enabledText = Mappings.literalText("Enabled").formatted(Formatting.GREEN);

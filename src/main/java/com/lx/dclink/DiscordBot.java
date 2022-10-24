@@ -74,7 +74,7 @@ public class DiscordBot extends ListenerAdapter {
 
     public static void startCyclingStatus() {
         if(!BotConfig.statuses.isEmpty()) {
-            Placeholder placeholder = Placeholder.getDefaultPlaceholder(null, DCLink.server, null, null, null);
+            Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.server, null, null);
 
             timer = new Timer();
             timer.schedule(new TimerTask() {
@@ -109,7 +109,6 @@ public class DiscordBot extends ListenerAdapter {
         if(event.getMember().getId().equals(client.getSelfUser().getId())) return;
         String messageContent = event.getMessage().getContentDisplay();
         Message repliedMessage = event.getMessage().getReferencedMessage();
-        String repliedMessageContent = repliedMessage == null ? null : repliedMessage.getContentDisplay();
         Member repliedMessageAuthor = repliedMessage == null ? null : repliedMessage.getMember();
         List<Message.Attachment> attachments = event.getMessage().getAttachments();
 
@@ -120,7 +119,7 @@ public class DiscordBot extends ListenerAdapter {
 
             List<MutableText> textToBeSent = new ArrayList<>();
             if(!messageContent.isEmpty()) {
-                MutableText relayMessageText = entry.message.getDiscord2MCMessage(event.getMessage().getContentDisplay(), event.getGuildChannel(), event.getMember(), repliedMessageContent, repliedMessageAuthor);
+                MutableText relayMessageText = entry.message.getDiscord2MCMessage(event.getMessage(), event.getGuildChannel(), event.getMember(), repliedMessage, repliedMessageAuthor);
                 textToBeSent.add(relayMessageText);
             }
 
@@ -152,7 +151,7 @@ public class DiscordBot extends ListenerAdapter {
 
             List<MutableText> textToBeSent = new ArrayList<>();
             if(!messageContent.isEmpty()) {
-                MutableText formattedMessage = entry.message.getDiscordDeletedMessage(message.getContentDisplay(), event.getGuildChannel(), member);
+                MutableText formattedMessage = entry.message.getDiscordDeletedMessage(message, event.getGuildChannel(), member);
                 textToBeSent.add(formattedMessage);
             }
 
@@ -180,7 +179,7 @@ public class DiscordBot extends ListenerAdapter {
 
             List<MutableText> textToBeSent = new ArrayList<>();
             if(!messageContent.isEmpty()) {
-                MutableText formattedMessage = entry.message.getReactionRemoveMessage(emoji, event.getGuildChannel(), event.getMember(), messageAuthor, reactedMessage.getContentDisplay());
+                MutableText formattedMessage = entry.message.getReactionRemoveMessage(emoji, event.getGuildChannel(), event.getMember(), messageAuthor, reactedMessage);
                 textToBeSent.add(formattedMessage);
             }
 
@@ -207,7 +206,7 @@ public class DiscordBot extends ListenerAdapter {
 
             List<MutableText> textToBeSent = new ArrayList<>();
             if(!messageContent.isEmpty()) {
-                MutableText formattedMessage = entry.message.getReactionAddMessage(emoji, event.getGuildChannel(), event.getMember(), messageAuthor, reactedMessage.getContentDisplay());
+                MutableText formattedMessage = entry.message.getReactionAddMessage(emoji, event.getGuildChannel(), event.getMember(), messageAuthor, reactedMessage);
                 textToBeSent.add(formattedMessage);
             }
 
@@ -216,7 +215,7 @@ public class DiscordBot extends ListenerAdapter {
     }
 
     public static void sendUniversalMessage(String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji) {
-        if(!BotConfig.getOutboundEnabled()) return;
+        if(!BotConfig.getOutboundEnabled() || template == null) return;
 
         ArrayList<MessageEmbed> embedToBeSent = new ArrayList<>();
         Matcher matcher = embedPattern.matcher(template);

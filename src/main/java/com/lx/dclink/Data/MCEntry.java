@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MCEntry {
-    public List<ContentType> contentType = new ArrayList<>();
     public List<String> channelID = new ArrayList<>();
     public List<String> sendDimension = new ArrayList<>();
     public MinecraftMessages message = new MinecraftMessages();

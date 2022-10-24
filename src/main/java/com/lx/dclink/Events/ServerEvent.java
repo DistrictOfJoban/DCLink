@@ -3,12 +3,13 @@ package com.lx.dclink.Events;
 import com.lx.dclink.Config.BotConfig;
 import com.lx.dclink.Config.DiscordConfig;
 import com.lx.dclink.DCLink;
-import com.lx.dclink.Data.ContentType;
 import com.lx.dclink.Data.DCEntry;
+import com.lx.dclink.Data.MinecraftPlaceholder;
 import com.lx.dclink.Data.Placeholder;
 import com.lx.dclink.DiscordBot;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.crash.CrashReport;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 
 public class ServerEvent {
     public static long serverStartingTimestamp;
@@ -22,7 +23,6 @@ public class ServerEvent {
         DiscordBot.load(BotConfig.getToken(), BotConfig.getIntents());
 
         for(DCEntry entry : DiscordConfig.entries) {
-            if(!entry.contentType.contains(ContentType.SERVER)) continue;
             DiscordBot.sendUniversalMessage(entry.message.serverStarting, null, entry.channelID, entry.allowMention, entry.enableEmoji);
         }
     }
@@ -31,8 +31,8 @@ public class ServerEvent {
         serverStartedTimestamp = System.currentTimeMillis();
         DCLink.server = server;
         for(DCEntry entry : DiscordConfig.entries) {
-            if(!entry.contentType.contains(ContentType.SERVER)) continue;
-            Placeholder placeholder = Placeholder.getDefaultPlaceholder(null, server, null, serverStartedTimestamp - serverStartingTimestamp, null);
+            Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
+            placeholder.addPlaceholder("time", formatDate(serverStartedTimestamp - serverStartingTimestamp));
             DiscordBot.sendUniversalMessage(entry.message.serverStarted, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
         }
     }
@@ -42,15 +42,14 @@ public class ServerEvent {
         DCLink.server = null;
 
         for(DCEntry entry : DiscordConfig.entries) {
-            if(!entry.contentType.contains(ContentType.SERVER)) continue;
-            Placeholder placeholder = Placeholder.getDefaultPlaceholder(null, server, null, serverStoppingTimestamp - serverStartedTimestamp, null);
+            Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
+            placeholder.addPlaceholder("time", formatDate(serverStoppingTimestamp - serverStartedTimestamp));
             DiscordBot.sendUniversalMessage(entry.message.serverStopping, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
         }
     }
 
     public static void serverStopped(MinecraftServer server) {
         for(DCEntry entry : DiscordConfig.entries) {
-            if(!entry.contentType.contains(ContentType.SERVER)) continue;
             DiscordBot.sendUniversalMessage(entry.message.serverStopped, null, entry.channelID, entry.allowMention, entry.enableEmoji);
         }
         DiscordBot.disconnect();
@@ -58,10 +57,13 @@ public class ServerEvent {
 
     public static void serverCrashed(CrashReport report) {
         for(DCEntry entry : DiscordConfig.entries) {
-            if(!entry.contentType.contains(ContentType.SERVER)) continue;
-            Placeholder placeholder = new Placeholder();
+            Placeholder placeholder = new MinecraftPlaceholder();
             placeholder.addPlaceholder("reason", report.getMessage());
             DiscordBot.sendUniversalMessage(entry.message.serverCrashed, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
         }
+    }
+
+    private static String formatDate(long time) {
+        return DurationFormatUtils.formatDuration(time, "HH:mm:ss");
     }
 }

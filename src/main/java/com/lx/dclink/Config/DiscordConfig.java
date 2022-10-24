@@ -1,10 +1,10 @@
 package com.lx.dclink.Config;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lx.dclink.DCLink;
-import com.lx.dclink.Data.ContentType;
 import com.lx.dclink.Data.DCEntry;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -14,44 +14,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DiscordConfig {
+    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("discord.json");
     public static List<DCEntry> entries = new ArrayList<>();
-    private static final Path ConfigFile = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("discord.json");
 
     public static boolean load() {
         entries.clear();
-        if(!Files.exists(ConfigFile)) {
+        if(!Files.exists(CONFIG_PATH)) {
             DCLink.LOGGER.warn("Cannot find the Discord config file (MC -> DC)!");
             return false;
         }
 
         try {
-            final JsonArray jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(ConfigFile))).getAsJsonArray();
+            final JsonArray jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(CONFIG_PATH))).getAsJsonArray();
             jsonConfig.forEach(jsonElement -> {
                 DCEntry entry = new DCEntry();
                 JsonObject jsonEntry = jsonElement.getAsJsonObject();
-                if(jsonEntry.has("channelID")) {
+                JsonElement channelID = jsonEntry.get("channelID");
+                JsonElement dimensions = jsonEntry.get("dimensions");
+                if(channelID != null && !channelID.isJsonNull()) {
                     jsonEntry.get("channelID").getAsJsonArray().forEach(id -> {
                         entry.channelID.add(id.getAsString());
                     });
                 }
 
-                if(jsonEntry.has("dimensions")) {
-                    jsonEntry.get("dimensions").getAsJsonArray().forEach(worldId -> {
+                if(dimensions != null && !dimensions.isJsonNull()) {
+                    dimensions.getAsJsonArray().forEach(worldId -> {
                         entry.allowedDimension.add(worldId.getAsString());
                     });
-                }
-
-                if(jsonEntry.has("contentType")) {
-                    jsonEntry.get("contentType").getAsJsonArray().forEach(content -> {
-                        try {
-                            String typeString = content.getAsString();
-                            ContentType type = ContentType.valueOf(typeString);
-                            entry.contentType.add(type);
-                        } catch (IllegalArgumentException ignored) {
-                        }
-                    });
-                } else {
-                    entry.contentType.add(ContentType.CHAT);
                 }
 
                 if(jsonEntry.has("allowMention")) {
@@ -62,48 +51,19 @@ public class DiscordConfig {
                     entry.enableEmoji = jsonEntry.get("enableEmoji").getAsBoolean();
                 }
 
-                if(jsonEntry.has("messages")) {
+                if(jsonEntry.has("messages") && jsonEntry.get("messages").isJsonObject()) {
                     JsonObject msg = jsonEntry.get("messages").getAsJsonObject();
-
-                    if(msg.has("relay")) {
-                        entry.message.relay = msg.get("relay").getAsString();
-                    }
-
-                    if(msg.has("serverStarting")) {
-                        entry.message.serverStarting = msg.get("serverStarting").getAsString();
-                    }
-
-                    if(msg.has("serverStarted")) {
-                        entry.message.serverStarted = msg.get("serverStarted").getAsString();
-                    }
-
-                    if(msg.has("serverStopping")) {
-                        entry.message.serverStopping = msg.get("serverStopping").getAsString();
-                    }
-
-                    if(msg.has("serverStopped")) {
-                        entry.message.serverStopped = msg.get("serverStopped").getAsString();
-                    }
-
-                    if(msg.has("serverCrashed")) {
-                        entry.message.serverCrashed = msg.get("serverCrashed").getAsString();
-                    }
-
-                    if(msg.has("playerJoin")) {
-                        entry.message.playerJoin = msg.get("playerJoin").getAsString();
-                    }
-
-                    if(msg.has("playerLeft")) {
-                        entry.message.playerLeft = msg.get("playerLeft").getAsString();
-                    }
-
-                    if(msg.has("playerDeath")) {
-                        entry.message.playerDeath = msg.get("playerDeath").getAsString();
-                    }
-
-                    if(msg.has("changeDimension")) {
-                        entry.message.changeDimension = msg.get("changeDimension").getAsString();
-                    }
+                    entry.message.relay = getString(msg.get("relay"));
+                    entry.message.relayCommand = getString(msg.get("relayCommand"));
+                    entry.message.serverStarting = getString(msg.get("serverStarting"));
+                    entry.message.serverStarted = getString(msg.get("serverStarted"));
+                    entry.message.serverStopping = getString(msg.get("serverStopping"));
+                    entry.message.serverStopped = getString(msg.get("serverStopped"));
+                    entry.message.serverCrashed = getString(msg.get("serverCrashed"));
+                    entry.message.playerJoin = getString(msg.get("playerJoin"));
+                    entry.message.playerLeft = getString(msg.get("playerLeft"));
+                    entry.message.playerDeath = getString(msg.get("playerDeath"));
+                    entry.message.changeDimension = getString(msg.get("changeDimension"));
                 }
 
                 if(jsonEntry.has("emojiMap")) {
@@ -123,5 +83,9 @@ public class DiscordConfig {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private static String getString(JsonElement element) {
+        return (element == null || element.isJsonNull()) ? null : element.getAsString();
     }
 }
