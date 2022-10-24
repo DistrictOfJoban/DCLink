@@ -1,9 +1,9 @@
 package com.lx.dclink.Data;
 
 import com.lx.dclink.Mappings;
-import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildChannel;
 import net.minecraft.text.*;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public class MinecraftMessages {
     public String reactionAdded = "{member.user.tag} reacted {emoji} to {message.content}";
     public String reactionRemoved = "{member.user.tag} removed reaction {emoji} to {message.content}";
 
-    public MutableText getDiscord2MCMessage(Message message, GuildMessageChannel channel, Member guildMember, Message repliedMessage, Member repliedAuthor)
+    public MutableText getDiscord2MCMessage(Message message, StandardGuildChannel channel, Member guildMember, Message repliedMessage, Member repliedAuthor)
     {
         DiscordPlaceholder placeholder = new DiscordPlaceholder(message, channel, guildMember, null);
 
@@ -29,13 +29,13 @@ public class MinecraftMessages {
         return toText(formatted);
     }
 
-    public MutableText getDiscordDeletedMessage(Message message, GuildMessageChannel channel, Member guildMember) {
+    public MutableText getDiscordDeletedMessage(Message message, StandardGuildChannel channel, Member guildMember) {
         DiscordPlaceholder placeholder = new DiscordPlaceholder(message, channel, guildMember, null);
         String formatted = placeholder.parse(relayDeleted);
         return toText(formatted);
     }
 
-    public List<MutableText> getAttachmentText(List<Message.Attachment> attachmentList, GuildMessageChannel channel, Member guildMember) {
+    public List<MutableText> getAttachmentText(List<Message.Attachment> attachmentList, StandardGuildChannel channel, Member guildMember) {
         List<MutableText> textList = new ArrayList<>();
         for(Message.Attachment attachment : attachmentList) {
             DiscordPlaceholder placeholder = new DiscordPlaceholder(null, channel, guildMember, attachment);
@@ -46,7 +46,7 @@ public class MinecraftMessages {
         return textList;
     }
 
-    public MutableText getReactionAddMessage(String emoji, GuildMessageChannel channel, Member reactMember, Member messageMember, Message reactedMessage) {
+    public MutableText getReactionAddMessage(String emoji, StandardGuildChannel channel, Member reactMember, Member messageMember, Message reactedMessage) {
         DiscordPlaceholder placeholder = new DiscordPlaceholder(reactedMessage, channel, reactMember, null);
         placeholder.addPlaceholder("emojiID", emoji);
         placeholder.addPlaceholder("emoji", emoji);
@@ -56,7 +56,7 @@ public class MinecraftMessages {
         return toText(formatted);
     }
 
-    public MutableText getReactionRemoveMessage(String emoji, GuildMessageChannel channel, Member reactMember, Member messageMember, Message reactedMessage) {
+    public MutableText getReactionRemoveMessage(String emoji, StandardGuildChannel channel, Member reactMember, Member messageMember, Message reactedMessage) {
         DiscordPlaceholder placeholder = new DiscordPlaceholder(reactedMessage, channel, reactMember, null);
         placeholder.addPlaceholder("emojiID", emoji);
         placeholder.addPlaceholder("emoji", emoji);

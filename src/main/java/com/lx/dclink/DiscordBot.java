@@ -7,21 +7,23 @@ import com.lx.dclink.Data.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
+import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.minecraft.text.MutableText;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
-import javax.security.auth.login.LoginException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,7 +63,7 @@ public class DiscordBot extends ListenerAdapter {
 
             stopStatus();
             startCyclingStatus();
-        } catch (LoginException | IllegalArgumentException ex) {
+        } catch (InvalidTokenException | IllegalArgumentException ex) {
             LOGGER.error(ex.getStackTrace());
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -119,11 +121,11 @@ public class DiscordBot extends ListenerAdapter {
 
             List<MutableText> textToBeSent = new ArrayList<>();
             if(!messageContent.isEmpty()) {
-                MutableText relayMessageText = entry.message.getDiscord2MCMessage(event.getMessage(), event.getGuildChannel(), event.getMember(), repliedMessage, repliedMessageAuthor);
+                MutableText relayMessageText = entry.message.getDiscord2MCMessage(event.getMessage(), event.getGuildChannel().asTextChannel(), event.getMember(), repliedMessage, repliedMessageAuthor);
                 textToBeSent.add(relayMessageText);
             }
 
-            textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel(), event.getMember()));
+            textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel().asTextChannel(), event.getMember()));
             DCLink.sendInGameMessage(textToBeSent, entry);
         }
     }
@@ -138,7 +140,6 @@ public class DiscordBot extends ListenerAdapter {
 
         Member member = message.getMember();
         if(member == null) return;
-
         /* Don't send if coming from self */
         if(member.getId().equals(client.getSelfUser().getId())) return;
         String messageContent = message.getContentDisplay();
@@ -151,11 +152,11 @@ public class DiscordBot extends ListenerAdapter {
 
             List<MutableText> textToBeSent = new ArrayList<>();
             if(!messageContent.isEmpty()) {
-                MutableText formattedMessage = entry.message.getDiscordDeletedMessage(message, event.getGuildChannel(), member);
+                MutableText formattedMessage = entry.message.getDiscordDeletedMessage(message, event.getGuildChannel().asTextChannel(), member);
                 textToBeSent.add(formattedMessage);
             }
 
-            textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel(), member));
+            textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel().asTextChannel(), member));
             DCLink.sendInGameMessage(textToBeSent, entry);
         }
     }
@@ -179,7 +180,7 @@ public class DiscordBot extends ListenerAdapter {
 
             List<MutableText> textToBeSent = new ArrayList<>();
             if(!messageContent.isEmpty()) {
-                MutableText formattedMessage = entry.message.getReactionRemoveMessage(emoji, event.getGuildChannel(), event.getMember(), messageAuthor, reactedMessage);
+                MutableText formattedMessage = entry.message.getReactionRemoveMessage(emoji, event.getGuildChannel().asTextChannel(), event.getMember(), messageAuthor, reactedMessage);
                 textToBeSent.add(formattedMessage);
             }
 
@@ -206,7 +207,7 @@ public class DiscordBot extends ListenerAdapter {
 
             List<MutableText> textToBeSent = new ArrayList<>();
             if(!messageContent.isEmpty()) {
-                MutableText formattedMessage = entry.message.getReactionAddMessage(emoji, event.getGuildChannel(), event.getMember(), messageAuthor, reactedMessage);
+                MutableText formattedMessage = entry.message.getReactionAddMessage(emoji, event.getGuildChannel().asTextChannel(), event.getMember(), messageAuthor, reactedMessage);
                 textToBeSent.add(formattedMessage);
             }
 
@@ -232,7 +233,7 @@ public class DiscordBot extends ListenerAdapter {
         String finalMessage = placeholder == null ? template : placeholder.parse(template);
 
         for(String channelId : channelList) {
-            GuildMessageChannel channel = client.getChannelById(GuildMessageChannel.class, channelId);
+            TextChannel channel = client.getChannelById(TextChannel.class, channelId);
             if(channel == null) {
                 LOGGER.warn("Cannot find text channel: " + channelId);
                 continue;
@@ -264,7 +265,7 @@ public class DiscordBot extends ListenerAdapter {
             if(finalMessage.isEmpty() && !embedToBeSent.isEmpty()) {
                 channel.sendMessageEmbeds(embedToBeSent).queue();
             } else {
-                MessageAction action = channel.sendMessage(finalMessage);
+                MessageCreateAction action = channel.sendMessage(finalMessage);
                 action.setEmbeds(embedToBeSent);
                 action.queue();
             }

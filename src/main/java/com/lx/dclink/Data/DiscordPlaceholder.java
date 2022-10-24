@@ -2,10 +2,12 @@ package com.lx.dclink.Data;
 
 import com.lx.dclink.Utils;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildChannel;
 
 public class DiscordPlaceholder extends Placeholder {
 
-    public DiscordPlaceholder(Message message, GuildMessageChannel channel, Member member, Message.Attachment attachment) {
+    public DiscordPlaceholder(Message message, StandardGuildChannel channel, Member member, Message.Attachment attachment) {
         if(channel != null) {
             setChannel("channel", channel);
             setGuild("guild", channel.getGuild());
@@ -43,7 +45,7 @@ public class DiscordPlaceholder extends Placeholder {
         addPlaceholder(objName + "." + "avatarURL", user.getAvatarUrl() == null ? "" : user.getAvatarUrl());
     }
 
-    public void setChannel(String objName, GuildMessageChannel channel) {
+    public void setChannel(String objName, StandardGuildChannel channel) {
         addPlaceholder(objName + "." + "name", channel.getName());
         addPlaceholder(objName + "." + "id", channel.getId());
 

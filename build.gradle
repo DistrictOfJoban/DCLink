@@ -33,22 +33,18 @@ dependencies {
 	minecraft "com.mojang:minecraft:${minecraft_version}"
 	mappings "net.fabricmc:yarn:${yarn_version}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	implementation include("net.dv8tion:JDA:${project.jda_version}") {
+	include implementation("net.dv8tion:JDA:${project.jda_version}") {
 		exclude module: 'opus-java'
 	}
 
 	/* JDA Dependencies */
-	include "com.fasterxml.jackson.core:jackson-databind:2.10.1"
-	include "com.fasterxml.jackson.core:jackson-annotations:2.10.1"
-	include "com.fasterxml.jackson.core:jackson-core:2.10.1"
-	modImplementation "com.fasterxml.jackson.core:jackson-databind:2.10.1"
-	modImplementation "com.fasterxml.jackson.core:jackson-annotations:2.10.1"
-	modImplementation "com.fasterxml.jackson.core:jackson-core:2.10.1"
-
-	include group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
-	include "com.squareup.okio:okio:1.13.0"
+	include 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2'
+	include 'com.fasterxml.jackson.core:jackson-annotations:2.13.4'
+	include 'com.fasterxml.jackson.core:jackson-core:2.13.4'
+	include "org.apache.commons:commons-collections4:4.4"
+	include 'com.squareup.okio:okio:1.17.2'
 	include "com.neovisionaries:nv-websocket-client:2.14"
-	include "com.squareup.okhttp3:okhttp:3.13.0"
+	include 'com.squareup.okhttp3:okhttp:3.13.0'
 	include "net.sf.trove4j:trove4j:3.0.3"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
