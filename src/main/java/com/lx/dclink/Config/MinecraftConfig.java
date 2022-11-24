@@ -47,6 +47,10 @@ public class MinecraftConfig {
                         entry.message.relay = msg.get("relay").getAsString();
                     }
 
+                    if(msg.has("relayEdited")) {
+                        entry.message.relayEdited = msg.get("relayEdited").getAsString();
+                    }
+
                     if(msg.has("relayReply")) {
                         entry.message.relayReplied = msg.get("relayReply").getAsString();
                     }

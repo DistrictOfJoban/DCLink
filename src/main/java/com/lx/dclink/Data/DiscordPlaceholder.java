@@ -9,43 +9,43 @@ public class DiscordPlaceholder extends Placeholder {
 
     public DiscordPlaceholder(Message message, StandardGuildChannel channel, Member member, Message.Attachment attachment) {
         if(channel != null) {
-            setChannel("channel", channel);
-            setGuild("guild", channel.getGuild());
+            setData("channel", channel);
+            setData("guild", channel.getGuild());
         }
 
         if(member != null) {
-            setMember("member", member);
+            setData("member", member);
         }
 
         if(attachment != null) {
-            setAttachment("attachment", attachment);
+            setData("attachment", attachment);
         }
 
         if(message != null) {
-            setMessage("message", message);
+            setData("message", message);
         }
     }
 
-    public void setAttachment(String objName, Message.Attachment attachment) {
+    public void setData(String objName, Message.Attachment attachment) {
         addPlaceholder(objName + "." + "name", attachment.getFileName());
         addPlaceholder(objName + "." + "ext", attachment.getFileExtension() == null ? "" : attachment.getFileExtension());
         addPlaceholder(objName + "." + "url", attachment.getUrl());
         addPlaceholder(objName + "." + "size", Utils.formatFileSize(attachment.getSize()));
     }
 
-    public void setMember(String objName, Member member) {
+    public void setData(String objName, Member member) {
         addPlaceholder(objName + "." + "nickOrUsername", member.getEffectiveName());
-        setUser(objName + "." + "user", member.getUser());
+        setData(objName + "." + "user", member.getUser());
     }
 
-    public void setUser(String objName, User user) {
+    public void setData(String objName, User user) {
         addPlaceholder(objName + "." + "username", user.getName());
         addPlaceholder(objName + "." + "tag", user.getAsTag());
         addPlaceholder(objName + "." + "id", user.getId());
         addPlaceholder(objName + "." + "avatarURL", user.getAvatarUrl() == null ? "" : user.getAvatarUrl());
     }
 
-    public void setChannel(String objName, StandardGuildChannel channel) {
+    public void setData(String objName, StandardGuildChannel channel) {
         addPlaceholder(objName + "." + "name", channel.getName());
         addPlaceholder(objName + "." + "id", channel.getId());
 
@@ -55,13 +55,13 @@ public class DiscordPlaceholder extends Placeholder {
         }
     }
 
-    public void setGuild(String objName, Guild guild) {
+    public void setData(String objName, Guild guild) {
         addPlaceholder(objName + "." + "memberCount", guild.getMemberCount());
         addPlaceholder(objName + "." + "iconURL", guild.getIconUrl());
         addPlaceholder(objName + "." + "name", guild.getName());
 
         if(guild.getOwner() != null) {
-            setMember(objName + "." + "owner", guild.getOwner());
+            setData(objName + "." + "owner", guild.getOwner());
         }
 
         if(guild.getBannerUrl() != null) {
@@ -69,13 +69,13 @@ public class DiscordPlaceholder extends Placeholder {
         }
     }
 
-    public void setMessage(String objName, Message message) {
+    public void setData(String objName, Message message) {
         addPlaceholder(objName + "." + "content", message.getContentDisplay());
         addPlaceholder(objName + "." + "jumpURL", message.getJumpUrl());
         if(message.getMember() != null) {
-            setMember(objName + "." + "author", message.getMember());
+            setData(objName + "." + "author", message.getMember());
         } else {
-            setUser(objName + "." + "author" + "." + "user", message.getAuthor());
+            setData(objName + "." + "author" + "." + "user", message.getAuthor());
         }
     }
 }

@@ -12,20 +12,29 @@ import java.util.List;
 public class MinecraftMessages {
     public String attachments = "{member.user.tag} sent a attachment. ({attachment.size})";
     public String relay = "{member.user.tag}: {message.content}";
+    public String relayEdited = "{member.user.tag}: {oldMessage.content}\n{newMessage.content}";
     public String relayReplied = "<To: {repliedAuthor.user.tag} {repliedMessage.content}> {member.tag}: {message.content}";
     public String relayDeleted = "~~{member.user.tag}: {message.content}~~";
     public String reactionAdded = "{member.user.tag} reacted {emoji} to {message.content}";
     public String reactionRemoved = "{member.user.tag} removed reaction {emoji} to {message.content}";
 
-    public MutableText getDiscord2MCMessage(Message message, StandardGuildChannel channel, Member guildMember, Message repliedMessage, Member repliedAuthor)
+    public MutableText getDiscordRelayMessage(Message message, StandardGuildChannel channel, Member guildMember, Message repliedMessage, Member repliedAuthor)
     {
         DiscordPlaceholder placeholder = new DiscordPlaceholder(message, channel, guildMember, null);
 
         if(repliedMessage != null) {
-            placeholder.setMessage("repliedMessage", repliedMessage);
+            placeholder.setData("repliedMessage", repliedMessage);
         }
 
         String formatted = placeholder.parse(repliedMessage != null ? relayReplied : relay);
+        return toText(formatted);
+    }
+
+    public MutableText getDiscordEditedMessage(Message oldMessage, Message newMessage, StandardGuildChannel channel, Member guildMember) {
+        DiscordPlaceholder placeholder = new DiscordPlaceholder(null, channel, guildMember, null);
+        placeholder.setData("oldMessage", oldMessage);
+        placeholder.setData("newMessage", newMessage);
+        String formatted = placeholder.parse(relayEdited);
         return toText(formatted);
     }
 
@@ -50,7 +59,7 @@ public class MinecraftMessages {
         DiscordPlaceholder placeholder = new DiscordPlaceholder(reactedMessage, channel, reactMember, null);
         placeholder.addPlaceholder("emojiID", emoji);
         placeholder.addPlaceholder("emoji", emoji);
-        placeholder.setMember("author", messageMember);
+        placeholder.setData("author", messageMember);
         String formatted = placeholder.parse(reactionAdded);
 
         return toText(formatted);
@@ -60,7 +69,7 @@ public class MinecraftMessages {
         DiscordPlaceholder placeholder = new DiscordPlaceholder(reactedMessage, channel, reactMember, null);
         placeholder.addPlaceholder("emojiID", emoji);
         placeholder.addPlaceholder("emoji", emoji);
-        placeholder.setMember("author", messageMember);
+        placeholder.setData("author", messageMember);
         String formatted = placeholder.parse(reactionRemoved);
 
         return toText(formatted);

@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
@@ -121,11 +122,38 @@ public class DiscordBot extends ListenerAdapter {
 
             List<MutableText> textToBeSent = new ArrayList<>();
             if(!messageContent.isEmpty()) {
-                MutableText relayMessageText = entry.message.getDiscord2MCMessage(event.getMessage(), event.getGuildChannel().asTextChannel(), event.getMember(), repliedMessage, repliedMessageAuthor);
+                MutableText relayMessageText = entry.message.getDiscordRelayMessage(event.getMessage(), event.getGuildChannel().asTextChannel(), event.getMember(), repliedMessage, repliedMessageAuthor);
                 textToBeSent.add(relayMessageText);
             }
 
             textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel().asTextChannel(), event.getMember()));
+            DCLink.sendInGameMessage(textToBeSent, entry);
+        }
+    }
+
+    @Override
+    public void onMessageUpdate(MessageUpdateEvent event)
+    {
+        if (event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInboundEnabled()) return;
+
+        Message newMessage = event.getMessage();
+        Message oldMessage = messageCache.get(event.getMessageIdLong());
+
+        if(oldMessage == null) return;
+
+        Member member = newMessage.getMember();
+        if(member == null) return;
+        /* Don't send if coming from self */
+        if(member.getId().equals(client.getSelfUser().getId())) return;
+
+        for(MCEntry entry : MinecraftConfig.entries) {
+            if(!entry.channelID.contains(event.getGuildChannel().getId())) {
+                continue;
+            }
+
+            List<MutableText> textToBeSent = new ArrayList<>();
+            MutableText formattedMessage = entry.message.getDiscordEditedMessage(oldMessage, newMessage, event.getGuildChannel().asTextChannel(), member);
+            textToBeSent.add(formattedMessage);
             DCLink.sendInGameMessage(textToBeSent, entry);
         }
     }
