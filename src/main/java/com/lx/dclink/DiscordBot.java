@@ -296,12 +296,16 @@ public class DiscordBot extends ListenerAdapter {
                 }
             }
 
-            if(finalMessage.isEmpty() && !embedToBeSent.isEmpty()) {
-                channel.sendMessageEmbeds(embedToBeSent).queue();
-            } else {
-                MessageCreateAction action = channel.sendMessage(finalMessage);
-                action.setEmbeds(embedToBeSent);
-                action.queue();
+            try {
+                if(finalMessage.isEmpty() && !embedToBeSent.isEmpty()) {
+                    channel.sendMessageEmbeds(embedToBeSent).queue();
+                } else {
+                    MessageCreateAction action = channel.sendMessage(finalMessage);
+                    action.setEmbeds(embedToBeSent);
+                    action.queue();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
