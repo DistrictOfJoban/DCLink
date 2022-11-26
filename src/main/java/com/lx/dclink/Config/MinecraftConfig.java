@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MinecraftConfig {
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("minecraft.json");
+    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("dclink").resolve("minecraft.json");
     public static List<MCEntry> entries = new ArrayList<>();
 
     public static boolean load() {

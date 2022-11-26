@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 
 public class DiscordConfig {
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("discord.json");
+    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("dclink").resolve("discord.json");
     static final HashMap<String, JsonArray> customEmbedsList = new HashMap<>();
-    static final Path CUSTOM_DC_EMBED_PATH = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("embeds");
+    static final Path CUSTOM_DC_EMBED_PATH = FabricLoader.getInstance().getConfigDir().resolve("dclink").resolve("embeds");
     public static List<DCEntry> entries = new ArrayList<>();
 
     public static boolean load() {

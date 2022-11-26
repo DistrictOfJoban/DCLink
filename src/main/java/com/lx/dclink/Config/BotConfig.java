@@ -22,7 +22,7 @@ public class BotConfig {
     private static boolean outboundEnabled = true;
     private static boolean inboundEnabled = true;
     private static final Collection<String> intents = new ArrayList<>();
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("config.json");
+    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("dclink").resolve("config.json");
     public static final List<String> sendChannel = new ArrayList<>();
     public static final List<String> statuses = new ArrayList<>();
 
