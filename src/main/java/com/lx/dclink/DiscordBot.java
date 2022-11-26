@@ -73,11 +73,13 @@ public class DiscordBot extends ListenerAdapter {
     }
 
     public static void disconnect() {
-        client.shutdown();
+        if(client != null) {
+            client.shutdown();
+        }
     }
 
     public static void startCyclingStatus() {
-        if(!BotConfig.statuses.isEmpty()) {
+        if(!BotConfig.statuses.isEmpty() && client != null) {
             Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.server, null, null);
 
             timer = new Timer();
@@ -99,7 +101,10 @@ public class DiscordBot extends ListenerAdapter {
             timer.cancel();
             timer.purge();
         }
-        client.getPresence().setActivity(null);
+
+        if(client != null) {
+            client.getPresence().setActivity(null);
+        }
     }
 
     @Override
@@ -245,7 +250,7 @@ public class DiscordBot extends ListenerAdapter {
     }
 
     public static void sendUniversalMessage(String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji) {
-        if(!BotConfig.getOutboundEnabled() || template == null) return;
+        if(!BotConfig.getOutboundEnabled() || template == null || client == null) return;
 
         ArrayList<MessageEmbed> embedToBeSent = new ArrayList<>();
         Matcher matcher = embedPattern.matcher(template);
