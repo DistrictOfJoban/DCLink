@@ -1,10 +1,10 @@
 package com.lx.dclink;
 
 import com.google.gson.JsonArray;
-import com.lx.dclink.Config.BotConfig;
-import com.lx.dclink.Config.DiscordConfig;
-import com.lx.dclink.Config.MinecraftConfig;
-import com.lx.dclink.Data.*;
+import com.lx.dclink.config.BotConfig;
+import com.lx.dclink.config.DiscordConfig;
+import com.lx.dclink.config.MinecraftConfig;
+import com.lx.dclink.data.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -24,14 +24,14 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.minecraft.text.MutableText;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DiscordBot extends ListenerAdapter {
-    public static final Logger LOGGER = (Logger) LogManager.getLogger("DCLinkClient");
+    public static final Logger LOGGER = LogManager.getLogger("DCLinkClient");
     public static JDA client;
     public static Map<String, List<RichCustomEmoji>> emojiMap = new HashMap<>();
     public static Map<Long, Message> messageCache = new HashMap<>();

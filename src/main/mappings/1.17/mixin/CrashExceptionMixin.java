@@ -1,6 +1,6 @@
 package com.lx.dclink.mixin;
 
-import com.lx.dclink.Events.ServerEvent;
+import com.lx.dclink.events.ServerEvent;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import org.spongepowered.asm.mixin.Mixin;

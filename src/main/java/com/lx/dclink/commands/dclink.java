@@ -1,6 +1,6 @@
-package com.lx.dclink.Commands;
+package com.lx.dclink.commands;
 
-import com.lx.dclink.Config.BotConfig;
+import com.lx.dclink.config.BotConfig;
 import com.lx.dclink.DCLink;
 import com.lx.dclink.DiscordBot;
 import com.lx.dclink.Mappings;

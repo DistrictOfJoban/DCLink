@@ -1,4 +1,4 @@
-package com.lx.dclink.Config;
+package com.lx.dclink.config;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

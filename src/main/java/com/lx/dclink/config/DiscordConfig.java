@@ -1,9 +1,9 @@
-package com.lx.dclink.Config;
+package com.lx.dclink.config;
 
 import com.google.gson.*;
 import com.lx.dclink.DCLink;
-import com.lx.dclink.Data.DCEntry;
-import com.lx.dclink.Data.EmbedGenerator;
+import com.lx.dclink.data.DCEntry;
+import com.lx.dclink.data.EmbedGenerator;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.io.FilenameUtils;

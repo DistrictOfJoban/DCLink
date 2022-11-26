@@ -1,4 +1,4 @@
-package com.lx.dclink.Data;
+package com.lx.dclink.data;
 
 import com.lx.dclink.Mappings;
 import net.dv8tion.jda.api.entities.Member;

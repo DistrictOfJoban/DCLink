@@ -1,6 +1,6 @@
 package com.lx.dclink.mixin;
 
-import com.lx.dclink.Events.PlayerEvent;
+import com.lx.dclink.events.PlayerEvent;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.advancement.PlayerAdvancementTracker;

@@ -1,4 +1,4 @@
-package com.lx.dclink.Data;
+package com.lx.dclink.data;
 
 public class DiscordMessages {
     public String serverStarting = ":clock10: Loading world...";

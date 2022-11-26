@@ -1,12 +1,12 @@
 package com.lx.dclink;
 
-import com.lx.dclink.Commands.*;
-import com.lx.dclink.Config.DiscordConfig;
-import com.lx.dclink.Config.MinecraftConfig;
-import com.lx.dclink.Config.BotConfig;
-import com.lx.dclink.Data.MCEntry;
-import com.lx.dclink.Events.PlayerEvent;
-import com.lx.dclink.Events.ServerEvent;
+import com.lx.dclink.commands.*;
+import com.lx.dclink.config.DiscordConfig;
+import com.lx.dclink.config.MinecraftConfig;
+import com.lx.dclink.config.BotConfig;
+import com.lx.dclink.data.MCEntry;
+import com.lx.dclink.events.PlayerEvent;
+import com.lx.dclink.events.ServerEvent;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;

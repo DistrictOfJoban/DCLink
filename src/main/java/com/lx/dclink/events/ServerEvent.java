@@ -1,13 +1,12 @@
-package com.lx.dclink.Events;
+package com.lx.dclink.events;
 
-import com.lx.dclink.Config.BotConfig;
-import com.lx.dclink.Config.DiscordConfig;
+import com.lx.dclink.config.BotConfig;
+import com.lx.dclink.config.DiscordConfig;
 import com.lx.dclink.DCLink;
-import com.lx.dclink.Data.DCEntry;
-import com.lx.dclink.Data.MinecraftPlaceholder;
-import com.lx.dclink.Data.Placeholder;
+import com.lx.dclink.data.DCEntry;
+import com.lx.dclink.data.MinecraftPlaceholder;
+import com.lx.dclink.data.Placeholder;
 import com.lx.dclink.DiscordBot;
-import com.lx.dclink.Utils;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.crash.CrashReport;
 

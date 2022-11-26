@@ -1,10 +1,10 @@
-package com.lx.dclink.Config;
+package com.lx.dclink.config;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lx.dclink.DCLink;
-import com.lx.dclink.Data.MCEntry;
+import com.lx.dclink.data.MCEntry;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
