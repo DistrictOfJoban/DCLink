@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 public class BotConfig {
@@ -23,38 +22,18 @@ public class BotConfig {
     private static boolean outboundEnabled = true;
     private static boolean inboundEnabled = true;
     private static final Collection<String> intents = new ArrayList<>();
-    private static final HashMap<String, JsonArray> customEmbedsList = new HashMap<>();
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("config.json");
-    private static final Path CUSTOM_DC_EMBED_PATH = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("embeds");
     public static final List<String> sendChannel = new ArrayList<>();
     public static final List<String> statuses = new ArrayList<>();
 
     public static boolean load() {
-        boolean loadSuccessful = false;
         sendChannel.clear();
         intents.clear();
         statuses.clear();
-        customEmbedsList.clear();
-
-        if (Files.exists(CUSTOM_DC_EMBED_PATH)) {
-            try {
-                File[] files = CUSTOM_DC_EMBED_PATH.toFile().listFiles();
-                if (files != null) {
-                    for (File file : files) {
-                        String fileName = FilenameUtils.getBaseName(file.getName());
-                        final JsonArray json = new JsonParser().parse(String.join("", Files.readAllLines(file.toPath()))).getAsJsonArray();
-                        customEmbedsList.put(fileName, json);
-                    }
-                }
-                loadSuccessful = true;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
 
         if(!Files.exists(CONFIG_PATH)) {
             DCLink.LOGGER.warn("Cannot find the main bot config file!");
-            loadSuccessful = false;
+            return false;
         } else {
             try {
                 final JsonObject jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(CONFIG_PATH))).getAsJsonObject();
@@ -93,10 +72,10 @@ public class BotConfig {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                loadSuccessful = false;
+                return false;
             }
         }
-        return loadSuccessful;
+        return true;
     }
 
     public static String getToken() {
@@ -138,12 +117,5 @@ public class BotConfig {
         }
 
         return intentCollection;
-    }
-
-    public static JsonArray getEmbedJson(String key) {
-        if(customEmbedsList.containsKey(key)) {
-            return customEmbedsList.get(key);
-        }
-        return null;
     }
 }

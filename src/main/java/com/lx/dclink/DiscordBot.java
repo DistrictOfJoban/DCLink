@@ -2,6 +2,7 @@ package com.lx.dclink;
 
 import com.google.gson.JsonArray;
 import com.lx.dclink.Config.BotConfig;
+import com.lx.dclink.Config.DiscordConfig;
 import com.lx.dclink.Config.MinecraftConfig;
 import com.lx.dclink.Data.*;
 import net.dv8tion.jda.api.JDA;
@@ -252,7 +253,7 @@ public class DiscordBot extends ListenerAdapter {
         if(matcher.find()) {
             template = template.replace(matcher.group(0), "");
             String embedName = matcher.group(0).replace("<<<", "").replace(">>>", "");
-            JsonArray embedJson = BotConfig.getEmbedJson(embedName);
+            JsonArray embedJson = DiscordConfig.getEmbedJson(embedName);
             if(embedJson != null) {
                 embedToBeSent.addAll(EmbedGenerator.fromJson(placeholder, embedJson));
             }

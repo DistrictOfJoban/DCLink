@@ -7,21 +7,42 @@ import com.google.gson.JsonParser;
 import com.lx.dclink.DCLink;
 import com.lx.dclink.Data.DCEntry;
 import net.fabricmc.loader.api.FabricLoader;
+import org.apache.commons.io.FilenameUtils;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class DiscordConfig {
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("discord.json");
+    static final HashMap<String, JsonArray> customEmbedsList = new HashMap<>();
+    static final Path CUSTOM_DC_EMBED_PATH = FabricLoader.getInstance().getConfigDir().resolve("DCLink").resolve("embeds");
     public static List<DCEntry> entries = new ArrayList<>();
 
     public static boolean load() {
         entries.clear();
+        customEmbedsList.clear();
         if(!Files.exists(CONFIG_PATH)) {
             DCLink.LOGGER.warn("Cannot find the Discord config file (MC -> DC)!");
             return false;
+        }
+
+        if (Files.exists(DiscordConfig.CUSTOM_DC_EMBED_PATH)) {
+            try {
+                File[] files = DiscordConfig.CUSTOM_DC_EMBED_PATH.toFile().listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        String fileName = FilenameUtils.getBaseName(file.getName());
+                        final JsonArray json = new JsonParser().parse(String.join("", Files.readAllLines(file.toPath()))).getAsJsonArray();
+                        DiscordConfig.customEmbedsList.put(fileName, json);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         try {
@@ -87,5 +108,12 @@ public class DiscordConfig {
 
     private static String getString(JsonElement element) {
         return (element == null || element.isJsonNull()) ? null : element.getAsString();
+    }
+
+    public static JsonArray getEmbedJson(String key) {
+        if(customEmbedsList.containsKey(key)) {
+            return customEmbedsList.get(key);
+        }
+        return null;
     }
 }
