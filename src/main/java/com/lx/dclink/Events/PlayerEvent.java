@@ -24,8 +24,8 @@ public class PlayerEvent {
         ServerPlayerEntity player = Mappings.getPlayer(handler);
         ServerWorld world = Mappings.getServerWorld(player);
         String worldId = world.getRegistryKey().getValue().toString();
-        for(DCEntry entry : DiscordConfig.entries) {
-            if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) continue;
+        for (DCEntry entry : DiscordConfig.entries) {
+            if (!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) continue;
 
             Placeholder placeholder = new MinecraftPlaceholder(player, server, world, null);
 

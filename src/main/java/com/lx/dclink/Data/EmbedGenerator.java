@@ -78,6 +78,91 @@ public class EmbedGenerator {
         return embeds;
     }
 
+    public static JsonArray toJson(MessageEmbed... embeds) {
+        JsonArray returnArray = new JsonArray();
+
+        for (MessageEmbed embed : embeds) {
+            try {
+                JsonObject embedJson = new JsonObject();
+                if(embed.getTitle() != null) {
+                    embedJson.addProperty("title", embed.getTitle());
+                }
+
+                if(embed.getDescription() != null) {
+                    embedJson.addProperty("description", embed.getDescription());
+                }
+
+                if(embed.getColorRaw() != 0) {
+                    embedJson.addProperty("color", embed.getColorRaw());
+                }
+
+                if(embed.getFooter() != null) {
+                    JsonObject footerJson = new JsonObject();
+                    if(embed.getFooter().getText() != null) {
+                        footerJson.addProperty("text", embed.getFooter().getText());
+                    }
+                    if(embed.getFooter().getIconUrl() != null) {
+                        footerJson.addProperty("icon_url", embed.getFooter().getIconUrl());
+                    }
+                    embedJson.add("footer", footerJson);
+                }
+
+                if(embed.getImage() != null) {
+                    JsonObject imageJson = new JsonObject();
+                    if(embed.getImage().getUrl() != null) {
+                        imageJson.addProperty("url", embed.getImage().getUrl());
+                    }
+                    embedJson.add("image", imageJson);
+                }
+
+                if(embed.getThumbnail() != null) {
+                    JsonObject thumbnailJson = new JsonObject();
+                    if(embed.getThumbnail().getUrl() != null) {
+                        thumbnailJson.addProperty("url", embed.getThumbnail().getUrl());
+                    }
+                    embedJson.add("thumbnail", thumbnailJson);
+                }
+
+                if(embed.getAuthor() != null) {
+                    JsonObject authorJson = new JsonObject();
+                    if(embed.getAuthor().getName() != null) {
+                        authorJson.addProperty("name", embed.getAuthor().getName());
+                    }
+                    if(embed.getAuthor().getUrl() != null) {
+                        authorJson.addProperty("url", embed.getAuthor().getUrl());
+                    }
+                    if(embed.getAuthor().getIconUrl() != null) {
+                        authorJson.addProperty("icon_url", embed.getAuthor().getIconUrl());
+                    }
+                    embedJson.add("author", authorJson);
+                }
+
+                if(!embed.getFields().isEmpty()) {
+                    JsonArray fieldsJson = new JsonArray();
+                    for(MessageEmbed.Field field : embed.getFields()) {
+                        JsonObject fieldJson = new JsonObject();
+                        if(field.getName() != null) {
+                            fieldJson.addProperty("name", field.getName());
+                        }
+                        if(field.getValue() != null) {
+                            fieldJson.addProperty("value", field.getValue());
+                        }
+                        fieldJson.addProperty("inline", field.isInline());
+
+                        fieldsJson.add(fieldJson);
+                    }
+
+                    embedJson.add("fields", fieldsJson);
+                }
+
+                returnArray.add(embedJson);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return returnArray;
+    }
+
     private static String getString(Placeholder placeholder, String key, JsonObject jsonObject) {
         if(jsonObject.has(key)) {
             String value = jsonObject.get(key).getAsString();

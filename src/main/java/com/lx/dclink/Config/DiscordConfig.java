@@ -1,48 +1,35 @@
 package com.lx.dclink.Config;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.lx.dclink.DCLink;
 import com.lx.dclink.Data.DCEntry;
-import net.fabricmc.loader.api.FabricLoader;
+import com.lx.dclink.Data.EmbedGenerator;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class DiscordConfig {
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("dclink").resolve("discord.json");
-    static final HashMap<String, JsonArray> customEmbedsList = new HashMap<>();
-    static final Path CUSTOM_DC_EMBED_PATH = FabricLoader.getInstance().getConfigDir().resolve("dclink").resolve("embeds");
+public class DiscordConfig extends BaseConfig {
+    private static final Path CONFIG_PATH = CONFIG_ROOT.resolve("discord.json");
+    public static final Path CUSTOM_DC_EMBED_PATH = CONFIG_ROOT.resolve("embeds");
+    public static final HashMap<String, JsonArray> customEmbedsList = new HashMap<>();
     public static List<DCEntry> entries = new ArrayList<>();
 
     public static boolean load() {
         entries.clear();
-        customEmbedsList.clear();
+        loadCustomEmbeds();
         if(!Files.exists(CONFIG_PATH)) {
             DCLink.LOGGER.warn("Cannot find the Discord config file (MC -> DC)!");
             return false;
-        }
-
-        if (Files.exists(DiscordConfig.CUSTOM_DC_EMBED_PATH)) {
-            try {
-                File[] files = DiscordConfig.CUSTOM_DC_EMBED_PATH.toFile().listFiles();
-                if (files != null) {
-                    for (File file : files) {
-                        String fileName = FilenameUtils.getBaseName(file.getName());
-                        final JsonArray json = new JsonParser().parse(String.join("", Files.readAllLines(file.toPath()))).getAsJsonArray();
-                        DiscordConfig.customEmbedsList.put(fileName, json);
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
 
         try {
@@ -108,6 +95,83 @@ public class DiscordConfig {
 
     private static String getString(JsonElement element) {
         return (element == null || element.isJsonNull()) ? null : element.getAsString();
+    }
+
+    private static void loadCustomEmbeds() {
+        customEmbedsList.clear();
+
+        if (Files.exists(DiscordConfig.CUSTOM_DC_EMBED_PATH)) {
+            try {
+                File[] files = DiscordConfig.CUSTOM_DC_EMBED_PATH.toFile().listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        String fileName = FilenameUtils.getBaseName(file.getName());
+                        final JsonArray json = new JsonParser().parse(String.join("", Files.readAllLines(file.toPath()))).getAsJsonArray();
+                        DiscordConfig.customEmbedsList.put(fileName, json);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            DCLink.LOGGER.info("Message Embeds does not exist, generating them...");
+            try {
+                CONFIG_ROOT.resolve("embeds").toFile().mkdirs();
+            } catch (Exception e) {
+                DCLink.LOGGER.error("Failed to create embeds folder! Please check the config folder permission.");
+                return;
+            }
+
+            HashMap<String, MessageEmbed> defaultEmbeds = new HashMap<>();
+            defaultEmbeds.put("serverStarting",
+                    new EmbedBuilder()
+                    .setDescription(":clock10: Server starting...")
+                            .build()
+            );
+            defaultEmbeds.put("serverStarted",
+                    new EmbedBuilder()
+                            .setDescription(":white_check_mark: Server started (Took **{time}**)")
+                            .build()
+            );
+            defaultEmbeds.put("serverStopping",
+                    new EmbedBuilder()
+                            .setDescription(":warning: Server is stopping (Was up for **{time|HH:mm:ss}**)")
+                            .build()
+            );
+            defaultEmbeds.put("serverStopped",
+                    new EmbedBuilder()
+                            .setDescription(":x: Server no longer linked with Discord")
+                            .build()
+            );
+            defaultEmbeds.put("playerJoined",
+                    new EmbedBuilder()
+                            .setDescription("{player.name} has joined the game.")
+                            .setThumbnail("https://minotar.net/avatar/{player.name}/16")
+                            .setFooter("{server.totalPlayerCount}/{server.maxPlayerCount} online.")
+                            .build()
+            );
+            defaultEmbeds.put("playerLeft",
+                    new EmbedBuilder()
+                            .setDescription("{player.name} left the game. {reason}")
+                            .setThumbnail("https://minotar.net/avatar/{player.name}/16")
+                            .setFooter("{server.totalPlayerCount}/{server.maxPlayerCount} online.")
+                            .build()
+            );
+
+            for(Map.Entry<String, MessageEmbed> entry : defaultEmbeds.entrySet()) {
+                String fileName = entry.getKey() + ".json";
+                MessageEmbed embed = entry.getValue();
+                JsonArray fileContent = EmbedGenerator.toJson(embed);
+
+                try (Writer writer = new FileWriter(CUSTOM_DC_EMBED_PATH.resolve(fileName).toString())) {
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    gson.toJson(fileContent, writer);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            loadCustomEmbeds();
+        }
     }
 
     public static JsonArray getEmbedJson(String key) {

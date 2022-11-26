@@ -5,15 +5,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lx.dclink.DCLink;
 import com.lx.dclink.Data.MCEntry;
-import net.fabricmc.loader.api.FabricLoader;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MinecraftConfig {
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("dclink").resolve("minecraft.json");
+public class MinecraftConfig extends BaseConfig {
+    private static final Path CONFIG_PATH = CONFIG_ROOT.resolve("minecraft.json");
     public static List<MCEntry> entries = new ArrayList<>();
 
     public static boolean load() {

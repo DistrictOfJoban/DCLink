@@ -5,24 +5,20 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lx.dclink.DCLink;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.fabricmc.loader.api.FabricLoader;
-import org.apache.commons.io.FilenameUtils;
-
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class BotConfig {
+public class BotConfig extends BaseConfig {
+    private static final Path CONFIG_PATH = CONFIG_ROOT.resolve("config.json");
     private static String token;
     private static boolean cacheMember;
     private static int statusRefreshInterval;
     private static boolean outboundEnabled = true;
     private static boolean inboundEnabled = true;
     private static final Collection<String> intents = new ArrayList<>();
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("dclink").resolve("config.json");
     public static final List<String> sendChannel = new ArrayList<>();
     public static final List<String> statuses = new ArrayList<>();
 
