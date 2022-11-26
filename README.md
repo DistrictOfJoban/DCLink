@@ -18,7 +18,7 @@ What a brilliant idea!
 - Support bot activities
 - Support custom guild emoji (Minecraft to Discord)
 - Allow silencing from Minecraft to Discord, or the other way round
-- Customizable Discord embed
+- Fully customizable Discord embed
 
 ### Supported Server Events to be relayed to Discord
 - Server starting / started / stopping / stopped
@@ -34,6 +34,7 @@ What a brilliant idea!
 
 ### Supported Discord events relayed to Minecraft
 - Message Send/Reply
+- Message Edit
 - Message Delete
 - Message Reaction Add/Remove
 
