@@ -80,7 +80,13 @@ task setupMappings() {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = minecraft_major_version == 16 ? 8 : 16
+	if(minecraft_major_version == 16) {
+		it.options.release = 8
+	} else if(minecraft_major_version == 17) {
+		it.options.release = 16
+	} else {
+		it.options.release = 17
+	}
 }
 
 java {

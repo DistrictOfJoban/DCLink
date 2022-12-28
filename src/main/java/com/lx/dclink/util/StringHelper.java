@@ -1,11 +1,11 @@
-package com.lx.dclink;
+package com.lx.dclink.util;
 
 import net.minecraft.world.World;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.text.DecimalFormat;
 
-public class Utils {
+public class StringHelper {
     public static String getWorldName(World world) {
         if (world.getRegistryKey() == World.OVERWORLD) {
             return "Overworld";

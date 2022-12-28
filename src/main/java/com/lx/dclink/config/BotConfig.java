@@ -6,33 +6,45 @@ import com.google.gson.JsonParser;
 import com.lx.dclink.DCLink;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class BotConfig extends BaseConfig {
-    private static final Path CONFIG_PATH = CONFIG_ROOT.resolve("config.json");
-    private static String token;
-    private static boolean cacheMember;
-    private static int statusRefreshInterval;
-    private static boolean outboundEnabled = true;
-    private static boolean inboundEnabled = true;
-    private static final Collection<String> intents = new ArrayList<>();
-    public static final List<String> sendChannel = new ArrayList<>();
-    public static final List<String> statuses = new ArrayList<>();
+    private static BotConfig instance;
+//    private final Path CONFIG_PATH = CONFIG_ROOT.resolve("config.json");
+    private final Collection<String> intents = new ArrayList<>();
+    private String token;
+    private boolean cacheMember;
+    private int statusRefreshInterval;
+    public boolean outboundEnabled = true;
+    public boolean inboundEnabled = true;
 
-    public static boolean load() {
+    public final List<String> sendChannel = new ArrayList<>();
+    public final List<String> statuses = new ArrayList<>();
+
+    public BotConfig() {
+        super(CONFIG_ROOT.resolve("config.json"));
+    }
+
+    public static BotConfig getInstance() {
+        if(instance == null) {
+            instance = new BotConfig();
+        }
+        return instance;
+    }
+
+    public boolean load() {
         sendChannel.clear();
         intents.clear();
         statuses.clear();
 
-        if(!Files.exists(CONFIG_PATH)) {
+        if(!Files.exists(configFile)) {
             DCLink.LOGGER.warn("Cannot find the main bot config file!");
             return false;
         } else {
             try {
-                final JsonObject jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(CONFIG_PATH))).getAsJsonObject();
+                final JsonObject jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(configFile))).getAsJsonObject();
                 if(jsonConfig.has("token")) {
                     token = jsonConfig.get("token").getAsString();
                 }
@@ -74,35 +86,23 @@ public class BotConfig extends BaseConfig {
         return true;
     }
 
-    public static String getToken() {
+    public boolean save() {
+        return false;
+    }
+
+    public String getToken() {
         return token;
     }
 
-    public static boolean getCacheMember() {
+    public boolean getCacheMember() {
         return cacheMember;
     }
 
-    public static boolean getOutboundEnabled() {
-        return outboundEnabled;
-    }
-
-    public static boolean getInboundEnabled() {
-        return inboundEnabled;
-    }
-
-    public static void setOutboundEnabled(boolean outbound) {
-        outboundEnabled = outbound;
-    }
-
-    public static void setInboundEnabled(boolean inbound) {
-        inboundEnabled = inbound;
-    }
-
-    public static int getStatusRefreshInterval() {
+    public int getStatusRefreshInterval() {
         return statusRefreshInterval;
     }
 
-    public static Collection<GatewayIntent> getIntents() {
+    public Collection<GatewayIntent> getIntents() {
         Collection<GatewayIntent> intentCollection = new ArrayList<>();
 
         for(String intentString : intents) {

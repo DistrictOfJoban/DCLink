@@ -1,8 +1,9 @@
-package com.lx.dclink.data;
+package com.lx.dclink.util;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.lx.dclink.data.Placeholder;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
@@ -10,7 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmbedGenerator {
+public class EmbedParser {
     public static List<MessageEmbed> fromJson(Placeholder placeholder, JsonArray jsonArray) {
         ArrayList<MessageEmbed> embeds = new ArrayList<>();
         for (JsonElement jsonElement : jsonArray) {

@@ -1,6 +1,6 @@
 package com.lx.dclink.data;
 
-import com.lx.dclink.Utils;
+import com.lx.dclink.util.StringHelper;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,7 +27,7 @@ public abstract class Placeholder {
 
             while(matcher.find()) {
                 String timePlaceholder = matcher.group();
-                String time = Utils.formatDate(entry.getValue(), timePlaceholder);
+                String time = StringHelper.formatDate(entry.getValue(), timePlaceholder);
                 original = original.replace(timePlaceholder, time);
             }
         }

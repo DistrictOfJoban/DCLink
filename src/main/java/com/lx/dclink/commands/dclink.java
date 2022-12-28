@@ -46,10 +46,10 @@ public class dclink {
         MutableText failedMessage = Mappings.literalText("DCLink Config Reload Failed, please check console for detail.").formatted(Formatting.RED);
         context.getSource().sendFeedback(success ? successMessage : failedMessage, false);
 
-        /* Re-login if successful*/
+        /* Re-login if successful */
         if(success) {
             DiscordBot.disconnect();
-            DiscordBot.load(BotConfig.getToken(), BotConfig.getIntents());
+            DiscordBot.load(BotConfig.getInstance().getToken(), BotConfig.getInstance().getIntents());
         }
 
         return 1;
@@ -58,42 +58,48 @@ public class dclink {
     private static int status(CommandContext<ServerCommandSource> context) {
         MutableText onlineText = Mappings.literalText("Online").formatted(Formatting.GREEN);
         MutableText offlineText = Mappings.literalText("Offline").formatted(Formatting.RED);
+        MutableText clientAccount = DiscordBot.isReady ? Mappings.literalText(DiscordBot.client.getSelfUser().getAsTag() + " (" + DiscordBot.client.getSelfUser().getId() + ")").formatted(Formatting.GREEN) : null;
         MutableText enabledText = Mappings.literalText("Enabled").formatted(Formatting.GREEN);
         MutableText disabledText = Mappings.literalText("Disabled").formatted(Formatting.RED);
 
-        MutableText outBound = getPair("Outbound Messages", BotConfig.getOutboundEnabled() ? enabledText : disabledText);
-        MutableText inBound = getPair("Inbound Messages", BotConfig.getInboundEnabled() ? enabledText : disabledText);
+        MutableText clientStatus = getPair("Client Status", DiscordBot.isReady ? onlineText : offlineText);
+        MutableText loggedInAccount = getPair("Logged in as", clientAccount);
+        MutableText outBound = getPair("Outbound Messages", BotConfig.getInstance().outboundEnabled ? enabledText : disabledText);
+        MutableText inBound = getPair("Inbound Messages", BotConfig.getInstance().inboundEnabled ? enabledText : disabledText);
 
+        context.getSource().sendFeedback(clientStatus, false);
+        if(DiscordBot.isReady) context.getSource().sendFeedback(loggedInAccount, false);
         context.getSource().sendFeedback(outBound, false);
         context.getSource().sendFeedback(inBound, false);
         return 1;
     }
 
     public static MutableText getPair(String key, MutableText value) {
+        if(value == null) return null;
         MutableText keyText = Mappings.literalText(key + ": ").formatted(Formatting.GOLD);
         return keyText.append(value);
     }
 
     public static int enableOutbound(CommandContext<ServerCommandSource> context) {
-        BotConfig.setOutboundEnabled(true);
+        BotConfig.getInstance().outboundEnabled = true;
         context.getSource().sendFeedback(Mappings.literalText("Outbound messages (MC -> DC) Enabled").formatted(Formatting.GREEN), false);
         return 1;
     }
 
     public static int enableInbound(CommandContext<ServerCommandSource> context) {
-        BotConfig.setInboundEnabled(true);
+        BotConfig.getInstance().inboundEnabled = true;
         context.getSource().sendFeedback(Mappings.literalText("Inbound messages (DC -> MC) Enabled").formatted(Formatting.GREEN), false);
         return 1;
     }
 
     public static int disableOutbound(CommandContext<ServerCommandSource> context) {
-        BotConfig.setOutboundEnabled(false);
+        BotConfig.getInstance().outboundEnabled = false;
         context.getSource().sendFeedback(Mappings.literalText("Outbound messages (MC -> DC) Disabled").formatted(Formatting.GOLD), false);
         return 1;
     }
 
     public static int disableInbound(CommandContext<ServerCommandSource> context) {
-        BotConfig.setInboundEnabled(false);
+        BotConfig.getInstance().inboundEnabled = false;
         context.getSource().sendFeedback(Mappings.literalText("Inbound messages (DC -> MC) Disabled").formatted(Formatting.GOLD), false);
         return 1;
     }

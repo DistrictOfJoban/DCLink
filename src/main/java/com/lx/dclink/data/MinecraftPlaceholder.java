@@ -1,6 +1,6 @@
 package com.lx.dclink.data;
 
-import com.lx.dclink.Utils;
+import com.lx.dclink.util.StringHelper;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -46,7 +46,7 @@ public class MinecraftPlaceholder extends Placeholder {
         placeholders.put(objName + ".difficulty", world.getDifficulty().getName());
         placeholders.put(objName + ".time", String.valueOf(world.getTimeOfDay()));
         placeholders.put(objName + ".playerCount", String.valueOf(world.getPlayers().size()));
-        placeholders.put(objName + ".name", Utils.getWorldName(world));
+        placeholders.put(objName + ".name", StringHelper.getWorldName(world));
     }
 
     private void setPlayerPlaceholder(String objName, ServerPlayerEntity player) {

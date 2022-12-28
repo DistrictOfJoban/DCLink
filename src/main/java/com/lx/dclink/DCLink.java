@@ -4,7 +4,7 @@ import com.lx.dclink.commands.*;
 import com.lx.dclink.config.DiscordConfig;
 import com.lx.dclink.config.MinecraftConfig;
 import com.lx.dclink.config.BotConfig;
-import com.lx.dclink.data.MCEntry;
+import com.lx.dclink.data.MinecraftEntry;
 import com.lx.dclink.events.PlayerEvent;
 import com.lx.dclink.events.ServerEvent;
 import net.fabricmc.api.ModInitializer;
@@ -27,9 +27,10 @@ public class DCLink implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		LOGGER.info("[DCLink] Loading Config");
-		BotConfig.load();
-		DiscordConfig.load();
-		MinecraftConfig.load();
+		boolean allConfigLoaded = loadAllConfig();
+		if(!allConfigLoaded) {
+			LOGGER.warn("[DCLink] Not all config are loaded! Please check console for error.");
+		}
 
 		ServerLifecycleEvents.SERVER_STARTING.register((ServerEvent::serverStarting));
 		ServerLifecycleEvents.SERVER_STARTED.register((ServerEvent::serverStarted));
@@ -45,21 +46,22 @@ public class DCLink implements ModInitializer {
 	}
 
 	public static boolean loadAllConfig() {
-		return BotConfig.load() && MinecraftConfig.load() && DiscordConfig.load();
+		return BotConfig.getInstance().load() && MinecraftConfig.getInstance().load() && DiscordConfig.getInstance().load();
 	}
 
-	public static void sendInGameMessage(List<MutableText> textToBeSent, MCEntry entry) {
+	public static void sendInGameMessage(List<MutableText> textToBeSent, MinecraftEntry entry) {
 		if(server == null) return;
 
 		List<String> dimensions = new ArrayList<>(entry.sendDimension);
 
 		if(dimensions.isEmpty()) {
+			//Send to all
 			sendMessage(server.getPlayerManager().getPlayerList(), textToBeSent);
 		} else {
-			for(String dimensionKey : dimensions) {
+			for(String worldKeyConfig : dimensions) {
 				for(ServerWorld world : server.getWorlds()) {
 					String worldKey = world.getRegistryKey().getValue().toString();
-					if(dimensionKey.equals(worldKey)) {
+					if(worldKeyConfig.equals(worldKey)) {
 						sendMessage(world.getPlayers(), textToBeSent);
 					}
 				}

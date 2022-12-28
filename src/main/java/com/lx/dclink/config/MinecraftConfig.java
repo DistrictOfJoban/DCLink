@@ -1,82 +1,54 @@
 package com.lx.dclink.config;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lx.dclink.DCLink;
-import com.lx.dclink.data.MCEntry;
+import com.lx.dclink.data.MinecraftEntry;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MinecraftConfig extends BaseConfig {
-    private static final Path CONFIG_PATH = CONFIG_ROOT.resolve("minecraft.json");
-    public static List<MCEntry> entries = new ArrayList<>();
+//    private static final Path CONFIG_PATH = ;
+    private static MinecraftConfig instance;
+    public static List<MinecraftEntry> entries = new ArrayList<>();
 
-    public static boolean load() {
+    public MinecraftConfig() {
+        super(CONFIG_ROOT.resolve("minecraft.json"));
+    }
+
+    public static MinecraftConfig getInstance() {
+        if(instance == null) {
+            instance = new MinecraftConfig();
+        }
+        return instance;
+    }
+
+    public boolean load() {
         entries.clear();
-        if(!Files.exists(CONFIG_PATH)) {
+        if(!Files.exists(configFile)) {
             DCLink.LOGGER.warn("Cannot find the Minecraft config file (DC -> MC)!");
             return false;
         }
 
         try {
-            final JsonArray jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(CONFIG_PATH))).getAsJsonArray();
+            final JsonArray jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(configFile))).getAsJsonArray();
             jsonConfig.forEach(jsonElement -> {
-                MCEntry entry = new MCEntry();
-                JsonObject jsonEntry = jsonElement.getAsJsonObject();
-                if(jsonEntry.has("channelID")) {
-                    jsonEntry.get("channelID").getAsJsonArray().forEach(id -> {
-                        entry.channelID.add(id.getAsString());
-                    });
+                MinecraftEntry entry = MinecraftEntry.fromJson(jsonElement);
+                if(entry != null) {
+                    entries.add(entry);
                 }
-
-                if(jsonEntry.has("dimensions")) {
-                    jsonEntry.get("dimensions").getAsJsonArray().forEach(worldId -> {
-                        entry.sendDimension.add(worldId.getAsString());
-                    });
-                }
-
-                if(jsonEntry.has("messages")) {
-                    JsonObject msg = jsonEntry.get("messages").getAsJsonObject();
-
-                    if(msg.has("relay")) {
-                        entry.message.relay = msg.get("relay").getAsString();
-                    }
-
-                    if(msg.has("relayEdited")) {
-                        entry.message.relayEdited = msg.get("relayEdited").getAsString();
-                    }
-
-                    if(msg.has("relayReply")) {
-                        entry.message.relayReplied = msg.get("relayReply").getAsString();
-                    }
-
-                    if(msg.has("relayDeleted")) {
-                        entry.message.relayDeleted = msg.get("relayDeleted").getAsString();
-                    }
-
-                    if(msg.has("reactionAdd")) {
-                        entry.message.reactionAdded = msg.get("reactionAdd").getAsString();
-                    }
-
-                    if(msg.has("reactionRemove")) {
-                        entry.message.reactionRemoved = msg.get("reactionRemove").getAsString();
-                    }
-
-                    if(msg.has("attachments")) {
-                        entry.message.attachments = msg.get("attachments").getAsString();
-                    }
-                }
-
-                entries.add(entry);
             });
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public boolean save() {
+        return false;
     }
 }

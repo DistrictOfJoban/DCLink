@@ -1,6 +1,6 @@
 package com.lx.dclink.data;
 
-import com.lx.dclink.Utils;
+import com.lx.dclink.util.StringHelper;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildChannel;
@@ -30,7 +30,7 @@ public class DiscordPlaceholder extends Placeholder {
         addPlaceholder(objName + "." + "name", attachment.getFileName());
         addPlaceholder(objName + "." + "ext", attachment.getFileExtension() == null ? "" : attachment.getFileExtension());
         addPlaceholder(objName + "." + "url", attachment.getUrl());
-        addPlaceholder(objName + "." + "size", Utils.formatFileSize(attachment.getSize()));
+        addPlaceholder(objName + "." + "size", StringHelper.formatFileSize(attachment.getSize()));
     }
 
     public void setData(String objName, Member member) {

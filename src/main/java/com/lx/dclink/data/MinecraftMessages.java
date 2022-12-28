@@ -10,13 +10,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MinecraftMessages {
-    public String attachments = "{member.user.tag} sent a attachment. ({attachment.size})";
-    public String relay = "{member.user.tag}: {message.content}";
-    public String relayEdited = "{member.user.tag}: {oldMessage.content}\n{newMessage.content}";
-    public String relayReplied = "<To: {repliedAuthor.user.tag} {repliedMessage.content}> {member.tag}: {message.content}";
-    public String relayDeleted = "~~{member.user.tag}: {message.content}~~";
-    public String reactionAdded = "{member.user.tag} reacted {emoji} to {message.content}";
-    public String reactionRemoved = "{member.user.tag} removed reaction {emoji} to {message.content}";
+    public String attachments;
+    public String relay;
+    public String relayEdited;
+    public String relayReplied;
+    public String relayDeleted;
+    public String reactionAdded;
+    public String reactionRemoved;
+
+    public MinecraftMessages() {
+        /* Initialize default message */
+        attachments = "{member.user.tag} sent a attachment. ({attachment.size})";
+        relay = "{member.user.tag}: {message.content}";
+        relayEdited = "{member.user.tag}: {oldMessage.content}\n{newMessage.content}";
+        relayReplied = "<To: {repliedAuthor.user.tag} {repliedMessage.content}> {member.tag}: {message.content}";
+        relayDeleted = "~~{member.user.tag}: {message.content}~~";
+        reactionAdded = "{member.user.tag} reacted {emoji} to {message.content}";
+        reactionRemoved = "{member.user.tag} removed reaction {emoji} to {message.content}";
+    }
 
     public MutableText getDiscordRelayMessage(Message message, StandardGuildChannel channel, Member guildMember, Message repliedMessage, Member repliedAuthor)
     {

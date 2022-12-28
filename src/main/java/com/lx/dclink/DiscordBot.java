@@ -5,6 +5,7 @@ import com.lx.dclink.config.BotConfig;
 import com.lx.dclink.config.DiscordConfig;
 import com.lx.dclink.config.MinecraftConfig;
 import com.lx.dclink.data.*;
+import com.lx.dclink.util.EmbedParser;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -16,6 +17,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -31,55 +33,61 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DiscordBot extends ListenerAdapter {
-    public static final Logger LOGGER = LogManager.getLogger("DCLinkClient");
+    private static final Pattern EMBED_PATTERN = Pattern.compile("(<<<.+>>>)");
+    private static Timer timer;
+    private static int currentStatus;
+    public static boolean isReady = false;
+    public static final Logger LOGGER = LogManager.getLogger("DCLinkDiscord");
     public static JDA client;
     public static Map<String, List<RichCustomEmoji>> emojiMap = new HashMap<>();
     public static Map<Long, Message> messageCache = new HashMap<>();
-    private static Timer timer;
-    private static int currentStatus;
-    private static final Pattern embedPattern = Pattern.compile("(<<<.+>>>)");
 
     public static void load(String token, Collection<GatewayIntent> intents) {
-        if(token == null) {
-            LOGGER.warn("[DCLink] Cannot log in to Discord: No token provided!");
+        isReady = false;
+        if(token == null || token.trim().isEmpty()) {
+            LOGGER.warn("[DCLink] Cannot log in to Discord: No token provided/Token is empty!");
             return;
         }
 
         try {
-            ChunkingFilter chunkingFilter = BotConfig.getCacheMember() ? ChunkingFilter.ALL : ChunkingFilter.NONE;
-            MemberCachePolicy memberCachePolicy = BotConfig.getCacheMember() ? MemberCachePolicy.ALL : MemberCachePolicy.NONE;
+            ChunkingFilter chunkingFilter = BotConfig.getInstance().getCacheMember() ? ChunkingFilter.ALL : ChunkingFilter.NONE;
+            MemberCachePolicy memberCachePolicy = BotConfig.getInstance().getCacheMember() ? MemberCachePolicy.ALL : MemberCachePolicy.NONE;
             client = JDABuilder.createDefault(token)
                     .addEventListeners(new DiscordBot())
                     .setAutoReconnect(true)
                     .setMemberCachePolicy(memberCachePolicy)
                     .enableIntents(intents)
                     .setChunkingFilter(chunkingFilter)
-                    .build()
-                    .awaitReady();
+                    .build();
 
-            client.getGuildCache().forEach(guild -> {
-                emojiMap.put(guild.getId(), guild.getEmojis());
-            });
-
-            LOGGER.info("[DCLink] Logged in as: " + client.getSelfUser().getAsTag());
-
-            stopStatus();
-            startCyclingStatus();
         } catch (InvalidTokenException | IllegalArgumentException ex) {
             LOGGER.error(ex.getStackTrace());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error("[DCLink] An invalid token has been provided! Please ensure the token is valid.");
         }
+    }
+
+    @Override
+    public void onReady(ReadyEvent event) {
+        client.getGuildCache().forEach(guild -> {
+            emojiMap.put(guild.getId(), guild.getEmojis());
+        });
+
+        LOGGER.info("[DCLink] Logged in as: " + client.getSelfUser().getAsTag());
+        isReady = true;
+
+        stopStatus();
+        startCyclingStatus();
     }
 
     public static void disconnect() {
         if(client != null) {
+            isReady = false;
             client.shutdown();
         }
     }
 
     public static void startCyclingStatus() {
-        if(!BotConfig.statuses.isEmpty() && client != null) {
+        if(isReady && !BotConfig.getInstance().statuses.isEmpty() && client != null) {
             Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.server, null, null);
 
             timer = new Timer();
@@ -88,11 +96,11 @@ public class DiscordBot extends ListenerAdapter {
                 @Override
                 public void run() {
                     if(DCLink.server == null) return;
-                    String status = BotConfig.statuses.get(currentStatus++ % BotConfig.statuses.size());
+                    String status = BotConfig.getInstance().statuses.get(currentStatus++ % BotConfig.getInstance().statuses.size());
                     String formattedStatus = placeholder.parse(status);
                     client.getPresence().setActivity(Activity.playing(formattedStatus));
                 }
-            }, 0, BotConfig.getStatusRefreshInterval() * 1000L);
+            }, 0, BotConfig.getInstance().getStatusRefreshInterval() * 1000L);
         }
     }
 
@@ -102,7 +110,7 @@ public class DiscordBot extends ListenerAdapter {
             timer.purge();
         }
 
-        if(client != null) {
+        if(isReady && client != null) {
             client.getPresence().setActivity(null);
         }
     }
@@ -110,7 +118,7 @@ public class DiscordBot extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
-        if (event.isFromType(ChannelType.PRIVATE) || event.getMember() == null || !BotConfig.getInboundEnabled()) return;
+        if (!isReady || event.isFromType(ChannelType.PRIVATE) || event.getMember() == null || !BotConfig.getInstance().inboundEnabled) return;
 
         messageCache.put(event.getMessageIdLong(), event.getMessage());
 
@@ -121,7 +129,7 @@ public class DiscordBot extends ListenerAdapter {
         Member repliedMessageAuthor = repliedMessage == null ? null : repliedMessage.getMember();
         List<Message.Attachment> attachments = event.getMessage().getAttachments();
 
-        for(MCEntry entry : MinecraftConfig.entries) {
+        for(MinecraftEntry entry : MinecraftConfig.entries) {
             if(!entry.channelID.contains(event.getGuildChannel().getId())) {
                 continue;
             }
@@ -140,7 +148,7 @@ public class DiscordBot extends ListenerAdapter {
     @Override
     public void onMessageUpdate(MessageUpdateEvent event)
     {
-        if (event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInboundEnabled()) return;
+        if (!isReady || event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInstance().inboundEnabled) return;
 
         Message newMessage = event.getMessage();
         Message oldMessage = messageCache.get(event.getMessageIdLong());
@@ -152,7 +160,7 @@ public class DiscordBot extends ListenerAdapter {
         /* Don't send if coming from self */
         if(member.getId().equals(client.getSelfUser().getId())) return;
 
-        for(MCEntry entry : MinecraftConfig.entries) {
+        for(MinecraftEntry entry : MinecraftConfig.entries) {
             if(!entry.channelID.contains(event.getGuildChannel().getId())) {
                 continue;
             }
@@ -167,7 +175,7 @@ public class DiscordBot extends ListenerAdapter {
     @Override
     public void onMessageDelete(MessageDeleteEvent event)
     {
-        if (event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInboundEnabled()) return;
+        if (!isReady || event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInstance().inboundEnabled) return;
 
         Message message = messageCache.get(event.getMessageIdLong());
         if(message == null) return;
@@ -179,7 +187,7 @@ public class DiscordBot extends ListenerAdapter {
         String messageContent = message.getContentDisplay();
         List<Message.Attachment> attachments = message.getAttachments();
 
-        for(MCEntry entry : MinecraftConfig.entries) {
+        for(MinecraftEntry entry : MinecraftConfig.entries) {
             if(!entry.channelID.contains(event.getGuildChannel().getId())) {
                 continue;
             }
@@ -198,7 +206,7 @@ public class DiscordBot extends ListenerAdapter {
     @Override
     public void onMessageReactionRemove(MessageReactionRemoveEvent event)
     {
-        if (event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInboundEnabled()) return;
+        if (!isReady || event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInstance().inboundEnabled) return;
 
         Message reactedMessage = messageCache.get(event.getMessageIdLong());
         if(reactedMessage == null) return;
@@ -209,7 +217,7 @@ public class DiscordBot extends ListenerAdapter {
         String messageContent = reactedMessage.getContentDisplay();
         String emoji = event.getEmoji().getFormatted();
 
-        for(MCEntry entry : MinecraftConfig.entries) {
+        for(MinecraftEntry entry : MinecraftConfig.entries) {
             if(!entry.channelID.contains(event.getGuildChannel().getId())) continue;
 
             List<MutableText> textToBeSent = new ArrayList<>();
@@ -225,7 +233,7 @@ public class DiscordBot extends ListenerAdapter {
     @Override
     public void onMessageReactionAdd(MessageReactionAddEvent event)
     {
-        if (event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInboundEnabled()) return;
+        if (!isReady || event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInstance().inboundEnabled) return;
 
         Message reactedMessage = messageCache.get(event.getMessageIdLong());
         if(reactedMessage == null) return;
@@ -236,7 +244,7 @@ public class DiscordBot extends ListenerAdapter {
         String messageContent = reactedMessage.getContentDisplay();
         String emoji = event.getEmoji().getFormatted();
 
-        for(MCEntry entry : MinecraftConfig.entries) {
+        for(MinecraftEntry entry : MinecraftConfig.entries) {
             if(!entry.channelID.contains(event.getGuildChannel().getId())) continue;
 
             List<MutableText> textToBeSent = new ArrayList<>();
@@ -250,17 +258,17 @@ public class DiscordBot extends ListenerAdapter {
     }
 
     public static void sendUniversalMessage(String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji) {
-        if(!BotConfig.getOutboundEnabled() || template == null || client == null) return;
+        if(!isReady || !BotConfig.getInstance().inboundEnabled || template == null || client == null) return;
 
         ArrayList<MessageEmbed> embedToBeSent = new ArrayList<>();
-        Matcher matcher = embedPattern.matcher(template);
+        Matcher matcher = EMBED_PATTERN.matcher(template);
 
         if(matcher.find()) {
             template = template.replace(matcher.group(0), "");
             String embedName = matcher.group(0).replace("<<<", "").replace(">>>", "");
-            JsonArray embedJson = DiscordConfig.getEmbedJson(embedName);
+            JsonArray embedJson = DiscordConfig.getInstance().getEmbedJson(embedName);
             if(embedJson != null) {
-                embedToBeSent.addAll(EmbedGenerator.fromJson(placeholder, embedJson));
+                embedToBeSent.addAll(EmbedParser.fromJson(placeholder, embedJson));
             }
         }
 
