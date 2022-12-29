@@ -55,7 +55,6 @@ public class DiscordEntry {
 
         if(jsonEntry.has("messages") && jsonEntry.get("messages").isJsonObject()) {
             discordEntry.message = DiscordMessages.fromJson(jsonEntry.get("messages"));
-            System.out.println(discordEntry.message.serverStopped);
         }
 
         if(jsonEntry.has("emojiMap")) {
