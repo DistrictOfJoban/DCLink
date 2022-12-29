@@ -43,10 +43,10 @@ public class MinecraftPlaceholder extends Placeholder {
     }
 
     private void setWorldPlaceholder(String objName, World world) {
-        placeholders.put(objName + ".difficulty", world.getDifficulty().getName());
-        placeholders.put(objName + ".time", String.valueOf(world.getTimeOfDay()));
-        placeholders.put(objName + ".playerCount", String.valueOf(world.getPlayers().size()));
-        placeholders.put(objName + ".name", StringHelper.getWorldName(world));
+        addPlaceholder(objName, "difficulty", world.getDifficulty().getName());
+        addPlaceholder(objName, "time", String.valueOf(world.getTimeOfDay()));
+        addPlaceholder(objName, "playerCount", String.valueOf(world.getPlayers().size()));
+        addPlaceholder(objName, "name", StringHelper.getWorldName(world));
     }
 
     private void setPlayerPlaceholder(String objName, ServerPlayerEntity player) {
@@ -55,33 +55,33 @@ public class MinecraftPlaceholder extends Placeholder {
             setTeamPlaceholder(objName + ".team", team);
         }
 
-        placeholders.put(objName + ".name", player.getGameProfile().getName());
-        placeholders.put(objName + ".ping", String.valueOf(player.pingMilliseconds));
-        placeholders.put(objName + ".gamemode", player.interactionManager.getGameMode() == GameMode.CREATIVE ? "Creative" : player.interactionManager.getGameMode() == GameMode.SURVIVAL ? "Survival" : player.interactionManager.getGameMode() == GameMode.ADVENTURE ? "Adventure" : "Spectator");
-        placeholders.put(objName + ".x", String.valueOf(Math.round(player.getX())));
-        placeholders.put(objName + ".y", String.valueOf(Math.round(player.getY())));
-        placeholders.put(objName + ".z", String.valueOf(Math.round(player.getZ())));
-        placeholders.put(objName + ".hp", String.valueOf(Math.round(player.getHealth())));
-        placeholders.put(objName + ".heart", String.valueOf(new DecimalFormat("##.#").format(player.getHealth() / 2.0)));
+        addPlaceholder(objName, "name", player.getGameProfile().getName());
+        addPlaceholder(objName, "ping", String.valueOf(player.pingMilliseconds));
+        addPlaceholder(objName, "gamemode", player.interactionManager.getGameMode() == GameMode.CREATIVE ? "Creative" : player.interactionManager.getGameMode() == GameMode.SURVIVAL ? "Survival" : player.interactionManager.getGameMode() == GameMode.ADVENTURE ? "Adventure" : "Spectator");
+        addPlaceholder(objName, "x", String.valueOf(Math.round(player.getX())));
+        addPlaceholder(objName, "y", String.valueOf(Math.round(player.getY())));
+        addPlaceholder(objName, "z", String.valueOf(Math.round(player.getZ())));
+        addPlaceholder(objName, "hp", String.valueOf(Math.round(player.getHealth())));
+        addPlaceholder(objName, "heart", String.valueOf(new DecimalFormat("##.#").format(player.getHealth() / 2.0)));
     }
 
     private void setServerPlaceholder(String objName, MinecraftServer server) {
-        placeholders.put(objName + ".totalPlayerCount", String.valueOf(server.getCurrentPlayerCount()));
-        placeholders.put(objName + ".version", server.getVersion());
-        placeholders.put(objName + ".maxPlayerCount", String.valueOf(server.getMaxPlayerCount()));
+        addPlaceholder(objName, "totalPlayerCount", String.valueOf(server.getCurrentPlayerCount()));
+        addPlaceholder(objName, "version", server.getVersion());
+        addPlaceholder(objName, "maxPlayerCount", String.valueOf(server.getMaxPlayerCount()));
     }
 
     private void setTeamPlaceholder(String objName, Team team) {
         if(team == null) {
-            placeholders.put(objName + "." + "name", "");
-            placeholders.put(objName + "." + "prefix", "");
-            placeholders.put(objName + "." + "suffix", "");
-            placeholders.put(objName + "." + "displayName", "");
+            addPlaceholder(objName, "name", null);
+            addPlaceholder(objName, "prefix", null);
+            addPlaceholder(objName, "suffix", null);
+            addPlaceholder(objName, "displayName", null);
         } else {
-            placeholders.put(objName + "." + "name", team.getName());
-            placeholders.put(objName + "." + "prefix", team.getPrefix().getString());
-            placeholders.put(objName + "." + "suffix", team.getSuffix().getString());
-            placeholders.put(objName + "." + "displayName", team.getDisplayName().getString());
+            addPlaceholder(objName, "name", team.getName());
+            addPlaceholder(objName, "prefix", team.getPrefix().getString());
+            addPlaceholder(objName, "suffix", team.getSuffix().getString());
+            addPlaceholder(objName, "displayName", team.getDisplayName().getString());
         }
     }
 }

@@ -36,14 +36,14 @@ public abstract class Placeholder {
     }
 
     public void addPlaceholder(String key, String value) {
-        placeholders.put(key, value);
+        placeholders.put(key, value == null ? "" : value);
+    }
+
+    public void addPlaceholder(String key, String property, String value) {
+        addPlaceholder(key + "." + property, value);
     }
 
     public void addTimePlaceholder(String key, long ms) {
         timePlaceholders.put(key, ms);
-    }
-
-    public void addPlaceholder(String key, int value) {
-        placeholders.put(key, String.valueOf(value));
     }
 }
