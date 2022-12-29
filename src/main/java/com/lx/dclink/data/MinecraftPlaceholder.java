@@ -50,17 +50,12 @@ public class MinecraftPlaceholder extends Placeholder {
     }
 
     private void setPlayerPlaceholder(String objName, ServerPlayerEntity player) {
-        String playerTeam = "";
-
         if(player.world != null) {
             Team team = player.world.getScoreboard().getPlayerTeam(player.getGameProfile().getName());
-            if(team != null && team.getPrefix() != null) {
-                playerTeam = team.getPrefix().getString();
-            }
+            setTeamPlaceholder(objName + ".team", team);
         }
 
         placeholders.put(objName + ".name", player.getGameProfile().getName());
-        placeholders.put(objName + ".team", playerTeam);
         placeholders.put(objName + ".ping", String.valueOf(player.pingMilliseconds));
         placeholders.put(objName + ".gamemode", player.interactionManager.getGameMode() == GameMode.CREATIVE ? "Creative" : player.interactionManager.getGameMode() == GameMode.SURVIVAL ? "Survival" : player.interactionManager.getGameMode() == GameMode.ADVENTURE ? "Adventure" : "Spectator");
         placeholders.put(objName + ".x", String.valueOf(Math.round(player.getX())));
@@ -74,5 +69,19 @@ public class MinecraftPlaceholder extends Placeholder {
         placeholders.put(objName + ".totalPlayerCount", String.valueOf(server.getCurrentPlayerCount()));
         placeholders.put(objName + ".version", server.getVersion());
         placeholders.put(objName + ".maxPlayerCount", String.valueOf(server.getMaxPlayerCount()));
+    }
+
+    private void setTeamPlaceholder(String objName, Team team) {
+        if(team == null) {
+            placeholders.put(objName + "." + "name", "");
+            placeholders.put(objName + "." + "prefix", "");
+            placeholders.put(objName + "." + "suffix", "");
+            placeholders.put(objName + "." + "displayName", "");
+        } else {
+            placeholders.put(objName + "." + "name", team.getName());
+            placeholders.put(objName + "." + "prefix", team.getPrefix().getString());
+            placeholders.put(objName + "." + "suffix", team.getSuffix().getString());
+            placeholders.put(objName + "." + "displayName", team.getDisplayName().getString());
+        }
     }
 }

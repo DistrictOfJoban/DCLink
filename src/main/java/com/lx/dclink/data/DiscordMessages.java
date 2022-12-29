@@ -27,14 +27,14 @@ public class DiscordMessages {
         serverStopping = ":warning: Server is stopping (It was up for **{time}**)";
         serverStopped = ":x: Server no longer linked with Discord";
         serverCrashed = ":warning: **Crash Exception Detected!\n```{reason}```**";
-        relay = "**<{player.team}{player.name}>** {message}";
-        relayCommand = "**{player.team}{player.name}**: {message}";
-        playerJoin = "**{player.team}{player.name}** has joined the game.";
-        playerLeft = "**{player.team}{player.name}** left the game.";
+        relay = "**<{player.team.prefix}{player.name}>** {message}";
+        relayCommand = "**{player.team.prefix}{player.name}**: {message}";
+        playerJoin = "**{player.team.prefix}{player.name}** has joined the game.";
+        playerLeft = "**{player.team.prefix}{player.name}** left the game.";
         playerDisconnectReason = "({reason})";
-        changeDimension = "**{player.team}{player.name}** has warped to {world.name}";
-        playerDeath = ":skull: **{player.team}{player.name}** {reason}";
-        playerAdvancement = ":medal: **{player.team}{player.name}** has achieved **{advancement}**! (*{advancementDetails}*)";
+        changeDimension = "**{player.team.prefix}{player.name}** has warped to {world.name}";
+        playerDeath = ":skull: **{player.team.prefix}{player.name}** {reason}";
+        playerAdvancement = ":medal: **{player.team.prefix}{player.name}** has achieved **{advancement}**! (*{advancementDetails}*)";
     }
 
     public static DiscordMessages fromJson(JsonElement jsonElement) {
