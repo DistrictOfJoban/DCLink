@@ -32,6 +32,7 @@ public class DiscordEntry {
         DiscordEntry discordEntry = new DiscordEntry();
         JsonElement channelID = jsonEntry.get("channelID");
         JsonElement dimensions = jsonEntry.get("dimensions");
+
         if(channelID != null && !channelID.isJsonNull()) {
             jsonEntry.get("channelID").getAsJsonArray().forEach(id -> {
                 discordEntry.channelID.add(id.getAsString());
@@ -53,18 +54,8 @@ public class DiscordEntry {
         }
 
         if(jsonEntry.has("messages") && jsonEntry.get("messages").isJsonObject()) {
-            JsonObject msg = jsonEntry.get("messages").getAsJsonObject();
-            discordEntry.message.relay = JsonHelper.getString(msg.get("relay"));
-            discordEntry.message.relayCommand = JsonHelper.getString(msg.get("relayCommand"));
-            discordEntry.message.serverStarting = JsonHelper.getString(msg.get("serverStarting"));
-            discordEntry.message.serverStarted = JsonHelper.getString(msg.get("serverStarted"));
-            discordEntry.message.serverStopping = JsonHelper.getString(msg.get("serverStopping"));
-            discordEntry.message.serverStopped = JsonHelper.getString(msg.get("serverStopped"));
-            discordEntry.message.serverCrashed = JsonHelper.getString(msg.get("serverCrashed"));
-            discordEntry.message.playerJoin = JsonHelper.getString(msg.get("playerJoin"));
-            discordEntry.message.playerLeft = JsonHelper.getString(msg.get("playerLeft"));
-            discordEntry.message.playerDeath = JsonHelper.getString(msg.get("playerDeath"));
-            discordEntry.message.changeDimension = JsonHelper.getString(msg.get("changeDimension"));
+            discordEntry.message = DiscordMessages.fromJson(jsonEntry.get("messages"));
+            System.out.println(discordEntry.message.serverStopped);
         }
 
         if(jsonEntry.has("emojiMap")) {
@@ -77,5 +68,32 @@ public class DiscordEntry {
             });
         }
         return discordEntry;
+    }
+
+    public static JsonObject toJson(DiscordEntry entry) {
+        JsonObject rootObject = new JsonObject();
+        JsonArray channelIDs = new JsonArray();
+        JsonArray allowedDimension = new JsonArray();
+        JsonArray emojiMap = new JsonArray();
+        for(String channelId : entry.channelID) {
+            channelIDs.add(channelId);
+        }
+        for(String dimension : entry.allowedDimension) {
+            allowedDimension.add(dimension);
+        }
+        for(Map.Entry<String, String> emoji : entry.emojiMap.entrySet()) {
+            JsonObject emojiObj = new JsonObject();
+            emojiObj.addProperty("name", emoji.getKey());
+            emojiObj.addProperty("id", emoji.getValue());
+            emojiMap.add(emoji.getValue());
+        }
+        rootObject.add("channelID", channelIDs);
+        rootObject.add("dimensions", allowedDimension);
+        rootObject.addProperty("allowMention", entry.allowMention);
+        rootObject.addProperty("enableEmoji", entry.enableEmoji);
+        rootObject.add("messages", DiscordMessages.toJson(entry.message));
+        rootObject.add("emojiMap", emojiMap);
+
+        return rootObject;
     }
 }

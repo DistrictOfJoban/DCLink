@@ -4,6 +4,8 @@ import com.lx.dclink.config.BotConfig;
 import com.lx.dclink.DCLink;
 import com.lx.dclink.DiscordBot;
 import com.lx.dclink.Mappings;
+import com.lx.dclink.config.DiscordConfig;
+import com.lx.dclink.config.MinecraftConfig;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.CommandManager;
@@ -20,6 +22,9 @@ public class dclink {
                 )
                 .then(CommandManager.literal("status")
                         .executes(dclink::status)
+                )
+                .then(CommandManager.literal("save")
+                        .executes(dclink::saveConfig)
                 )
                 .then(CommandManager.literal("enable")
                         .then(CommandManager.literal("outbound")
@@ -52,6 +57,14 @@ public class dclink {
             DiscordBot.load(BotConfig.getInstance().getToken(), BotConfig.getInstance().getIntents());
         }
 
+        return 1;
+    }
+
+    private static int saveConfig(CommandContext<ServerCommandSource> context) {
+        BotConfig.getInstance().save();
+        DiscordConfig.getInstance().save();
+        MinecraftConfig.getInstance().save();
+        context.getSource().sendFeedback(Mappings.literalText("Config saved.").formatted(Formatting.GREEN), false);
         return 1;
     }
 

@@ -1,10 +1,14 @@
 package com.lx.dclink.config;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lx.dclink.DCLink;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+
+import java.io.FileWriter;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +16,6 @@ import java.util.List;
 
 public class BotConfig extends BaseConfig {
     private static BotConfig instance;
-//    private final Path CONFIG_PATH = CONFIG_ROOT.resolve("config.json");
     private final Collection<String> intents = new ArrayList<>();
     private String token;
     private boolean cacheMember;
@@ -20,7 +23,6 @@ public class BotConfig extends BaseConfig {
     public boolean outboundEnabled = true;
     public boolean inboundEnabled = true;
 
-    public final List<String> sendChannel = new ArrayList<>();
     public final List<String> statuses = new ArrayList<>();
 
     public BotConfig() {
@@ -34,27 +36,23 @@ public class BotConfig extends BaseConfig {
         return instance;
     }
 
+    @Override
     public boolean load() {
-        sendChannel.clear();
         intents.clear();
         statuses.clear();
 
         if(!Files.exists(configFile)) {
-            DCLink.LOGGER.warn("Cannot find the main bot config file!");
-            return false;
+            boolean saved = save();
+            if(saved) {
+                return load();
+            } else {
+                return false;
+            }
         } else {
             try {
                 final JsonObject jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(configFile))).getAsJsonObject();
                 if(jsonConfig.has("token")) {
                     token = jsonConfig.get("token").getAsString();
-                }
-
-                if(jsonConfig.has("sendChannel")) {
-                    JsonArray channels = jsonConfig.get("sendChannel").getAsJsonArray();
-                    channels.forEach(jsonElement -> {
-                        String channelId = jsonElement.getAsString();
-                        sendChannel.add(channelId);
-                    });
                 }
 
                 if(jsonConfig.has("intents")) {
@@ -86,8 +84,31 @@ public class BotConfig extends BaseConfig {
         return true;
     }
 
+    @Override
     public boolean save() {
-        return false;
+        JsonObject jsonObject = new JsonObject();
+        JsonArray statusesArray = new JsonArray();
+        JsonArray intentsArray = new JsonArray();
+        for(String status : statuses) {
+            statusesArray.add(status);
+        }
+        for(String intent : intents) {
+            intentsArray.add(intent);
+        }
+        jsonObject.addProperty("token", token);
+        jsonObject.add("status", statusesArray);
+        jsonObject.addProperty("statusRefreshInterval", statusRefreshInterval);
+        jsonObject.add("intents", intentsArray);
+        jsonObject.addProperty("cacheMember", cacheMember);
+        Gson gson = new Gson();
+        try (Writer writer = new FileWriter(configFile.toString())) {
+            gson.toJson(jsonObject, writer);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
 
     public String getToken() {

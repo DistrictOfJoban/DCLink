@@ -1,16 +1,19 @@
 package com.lx.dclink.config;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import com.lx.dclink.DCLink;
 import com.lx.dclink.data.MinecraftEntry;
 
+import java.io.FileWriter;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MinecraftConfig extends BaseConfig {
-//    private static final Path CONFIG_PATH = ;
     private static MinecraftConfig instance;
     public static List<MinecraftEntry> entries = new ArrayList<>();
 
@@ -25,11 +28,16 @@ public class MinecraftConfig extends BaseConfig {
         return instance;
     }
 
+    @Override
     public boolean load() {
         entries.clear();
         if(!Files.exists(configFile)) {
-            DCLink.LOGGER.warn("Cannot find the Minecraft config file (DC -> MC)!");
-            return false;
+            boolean saved = save();
+            if(saved) {
+                return load();
+            } else {
+                return false;
+            }
         }
 
         try {
@@ -49,6 +57,18 @@ public class MinecraftConfig extends BaseConfig {
 
     @Override
     public boolean save() {
-        return false;
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+        JsonArray jsonArray = new JsonArray();
+        for(MinecraftEntry entry : entries) {
+            jsonArray.add(MinecraftEntry.toJson(entry));
+        }
+
+        try (Writer writer = new FileWriter(configFile.toString())) {
+            gson.toJson(jsonArray, writer);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 }

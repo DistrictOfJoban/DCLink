@@ -34,13 +34,13 @@ import java.util.regex.Pattern;
 
 public class DiscordBot extends ListenerAdapter {
     private static final Pattern EMBED_PATTERN = Pattern.compile("(<<<.+>>>)");
-    private static Timer timer;
-    private static int currentStatus;
-    public static boolean isReady = false;
     public static final Logger LOGGER = LogManager.getLogger("DCLinkDiscord");
     public static JDA client;
     public static Map<String, List<RichCustomEmoji>> emojiMap = new HashMap<>();
     public static Map<Long, Message> messageCache = new HashMap<>();
+    private static Timer timer;
+    private static int currentStatus;
+    public static boolean isReady = false;
 
     public static void load(String token, Collection<GatewayIntent> intents) {
         isReady = false;
@@ -122,7 +122,7 @@ public class DiscordBot extends ListenerAdapter {
 
         messageCache.put(event.getMessageIdLong(), event.getMessage());
 
-        /* Don't send if coming from self */
+        /* Ignore if coming from self */
         if(event.getMember().getId().equals(client.getSelfUser().getId())) return;
         String messageContent = event.getMessage().getContentDisplay();
         Message repliedMessage = event.getMessage().getReferencedMessage();

@@ -1,5 +1,10 @@
 package com.lx.dclink.data;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.lx.dclink.util.JsonHelper;
+
 public class DiscordMessages {
     public String serverStarting;
     public String serverStarted;
@@ -29,7 +34,17 @@ public class DiscordMessages {
         playerDisconnectReason = "({reason})";
         changeDimension = "**{player.team}{player.name}** has warped to {world.name}";
         playerDeath = ":skull: **{player.team}{player.name}** {reason}";
-        playerAdvancement = ":medal: **{player.team}{player.name}** has achieved **{advancement}**!\n*{advancementDetails}*";
+        playerAdvancement = ":medal: **{player.team}{player.name}** has achieved **{advancement}**! (*{advancementDetails}*)";
+    }
+
+    public static DiscordMessages fromJson(JsonElement jsonElement) {
+        Gson g = new Gson();
+        return g.fromJson(jsonElement, DiscordMessages.class);
+    }
+
+    public static JsonElement toJson(DiscordMessages discordMessages) {
+        Gson g = new Gson();
+        return g.toJsonTree(discordMessages, DiscordMessages.class);
     }
 
     public String getPlayerDisconnectReason(String reason) {

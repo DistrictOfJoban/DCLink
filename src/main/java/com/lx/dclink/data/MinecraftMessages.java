@@ -1,5 +1,7 @@
 package com.lx.dclink.data;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.lx.dclink.Mappings;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -92,5 +94,15 @@ public class MinecraftMessages {
         } catch (Exception e) {
             return Mappings.literalText(str);
         }
+    }
+
+    public static MinecraftMessages fromJson(JsonElement jsonElement) {
+        Gson g = new Gson();
+        return g.fromJson(jsonElement, MinecraftMessages.class);
+    }
+
+    public static JsonElement toJson(MinecraftMessages minecraftMessages) {
+        Gson g = new Gson();
+        return g.toJsonTree(minecraftMessages, MinecraftMessages.class);
     }
 }

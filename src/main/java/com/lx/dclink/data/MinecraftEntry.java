@@ -1,5 +1,6 @@
 package com.lx.dclink.data;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lx.dclink.util.JsonHelper;
@@ -36,36 +37,25 @@ public class MinecraftEntry {
         }
 
         if(jsonEntry.has("messages")) {
-            JsonObject msg = jsonEntry.get("messages").getAsJsonObject();
-
-            if(msg.has("relay")) {
-                minecraftEntry.message.relay = msg.get("relay").getAsString();
-            }
-
-            if(msg.has("relayEdited")) {
-                minecraftEntry.message.relayEdited = msg.get("relayEdited").getAsString();
-            }
-
-            if(msg.has("relayReply")) {
-                minecraftEntry.message.relayReplied = msg.get("relayReply").getAsString();
-            }
-
-            if(msg.has("relayDeleted")) {
-                minecraftEntry.message.relayDeleted = msg.get("relayDeleted").getAsString();
-            }
-
-            if(msg.has("reactionAdd")) {
-                minecraftEntry.message.reactionAdded = msg.get("reactionAdd").getAsString();
-            }
-
-            if(msg.has("reactionRemove")) {
-                minecraftEntry.message.reactionRemoved = msg.get("reactionRemove").getAsString();
-            }
-
-            if(msg.has("attachments")) {
-                minecraftEntry.message.attachments = msg.get("attachments").getAsString();
-            }
+            minecraftEntry.message = MinecraftMessages.fromJson(jsonEntry.getAsJsonObject("messages"));
         }
         return minecraftEntry;
+    }
+
+    public static JsonElement toJson(MinecraftEntry entry) {
+        JsonObject rootObject = new JsonObject();
+        JsonArray channelID = new JsonArray();
+        JsonArray allowedDimension = new JsonArray();
+
+        for(String id : entry.channelID) {
+            channelID.add(id);
+        }
+        for(String dimension : entry.sendDimension) {
+            allowedDimension.add(dimension);
+        }
+        rootObject.add("channelID", channelID);
+        rootObject.add("dimensions", allowedDimension);
+        rootObject.add("messages", MinecraftMessages.toJson(entry.message));
+        return rootObject;
     }
 }
