@@ -160,6 +160,16 @@ public class DiscordConfig extends BaseConfig {
                         .setFooter("{server.totalPlayerCount}/{server.maxPlayerCount} online.")
                         .build()
         );
+        defaultEmbeds.put("changeDimension",
+                new EmbedBuilder()
+                        .setDescription(":cyclone: **{player.name}** has warped to **{world.name}**")
+                        .build()
+        );
+        defaultEmbeds.put("playerAdvancement",
+                new EmbedBuilder()
+                        .setDescription(":medal: **{player.name}** has achieved **{advancement}**! (*{advancementDetails}*")
+                        .build()
+        );
 
         for(Map.Entry<String, MessageEmbed> entry : defaultEmbeds.entrySet()) {
             String fileName = entry.getKey() + ".json";
