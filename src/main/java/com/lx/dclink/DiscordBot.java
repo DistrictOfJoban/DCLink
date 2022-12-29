@@ -45,7 +45,7 @@ public class DiscordBot extends ListenerAdapter {
 
     public static void load(String token, Collection<GatewayIntent> intents) {
         isReady = false;
-        if(token == null || token.trim().isEmpty()) {
+        if(StringHelper.notValidString(token)) {
             LOGGER.warn("[DCLink] Cannot log in to Discord: No token provided/Token is empty!");
             return;
         }
