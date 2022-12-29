@@ -40,4 +40,8 @@ public class StringHelper {
         }
         return DurationFormatUtils.formatDuration(time, timeFormat);
     }
+
+    public static boolean notValidString(String str) {
+        return str == null || str.isBlank();
+    }
 }
