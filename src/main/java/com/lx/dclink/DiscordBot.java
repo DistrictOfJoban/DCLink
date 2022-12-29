@@ -82,6 +82,7 @@ public class DiscordBot extends ListenerAdapter {
     public static void disconnect() {
         if(client != null) {
             isReady = false;
+            client.cancelRequests();
             client.shutdown();
         }
     }
