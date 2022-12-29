@@ -42,6 +42,6 @@ public class StringHelper {
     }
 
     public static boolean notValidString(String str) {
-        return str == null || str.isBlank();
+        return str == null || str.trim().length() == 0;
     }
 }
