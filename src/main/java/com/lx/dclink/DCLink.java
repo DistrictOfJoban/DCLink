@@ -37,9 +37,6 @@ public class DCLink implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STOPPING.register((ServerEvent::serverStopping));
 		ServerLifecycleEvents.SERVER_STOPPED.register((ServerEvent::serverStopped));
 
-		ServerPlayConnectionEvents.JOIN.register(PlayerEvent::playerJoin);
-		ServerPlayConnectionEvents.DISCONNECT.register(PlayerEvent::playerLeft);
-
 		CommandManager.registerCommand((dispatcher) -> {
 			dclink.register(dispatcher);
 		});

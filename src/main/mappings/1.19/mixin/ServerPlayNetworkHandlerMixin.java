@@ -3,6 +3,7 @@ package com.lx.dclink.mixin;
 import com.lx.dclink.events.PlayerEvent;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,5 +20,10 @@ public abstract class ServerPlayNetworkHandlerMixin {
     public void sendMessage(ChatMessageC2SPacket packet, CallbackInfo ci) {
         String message = StringUtils.normalizeSpace(packet.chatMessage());
         PlayerEvent.sendMessage(message, player);
+    }
+
+    @Inject(method = "onDisconnected", at = @At("TAIL"))
+    public void onDisconnected(Text reason, CallbackInfo ci) {
+        PlayerEvent.playerLeft(reason, player);
     }
 }

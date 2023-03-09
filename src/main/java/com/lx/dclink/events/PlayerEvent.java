@@ -7,10 +7,10 @@ import com.lx.dclink.data.MinecraftPlaceholder;
 import com.lx.dclink.data.Placeholder;
 import com.lx.dclink.DiscordBot;
 import com.lx.dclink.Mappings;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.network.ClientConnection;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -20,14 +20,13 @@ import net.minecraft.world.World;
 
 public class PlayerEvent {
 
-    public static void playerJoin(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
-        ServerPlayerEntity player = Mappings.getPlayer(handler);
+    public static void playerJoin(ClientConnection handler, ServerPlayerEntity player) {
         ServerWorld world = Mappings.getServerWorld(player);
         String worldId = world.getRegistryKey().getValue().toString();
         for (DiscordEntry entry : DiscordConfig.getInstance().entries) {
             if (!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) continue;
 
-            Placeholder placeholder = new MinecraftPlaceholder(player, server, world, null);
+            Placeholder placeholder = new MinecraftPlaceholder(player, DCLink.server, world, null);
 
             DiscordBot.sendUniversalMessage(
                     entry.message.playerJoin,
@@ -39,15 +38,13 @@ public class PlayerEvent {
         }
     }
 
-    public static void playerLeft(ServerPlayNetworkHandler handler, MinecraftServer server) {
-        ServerPlayerEntity player = Mappings.getPlayer(handler);
+    public static void playerLeft(Text disconnectReasonText, ServerPlayerEntity player) {
         ServerWorld world = Mappings.getServerWorld(player);
         String worldId = world.getRegistryKey().getValue().toString();
-        Text disconnectReasonText = handler.getConnection().getDisconnectReason();
         for(DiscordEntry entry : DiscordConfig.getInstance().entries) {
             if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) continue;
             String disconnectReason = disconnectReasonText == null ? "" : entry.message.getPlayerDisconnectReason(disconnectReasonText.getString());
-            Placeholder placeholder = new MinecraftPlaceholder(player, server, world, null);
+            Placeholder placeholder = new MinecraftPlaceholder(player, DCLink.server, world, null);
             placeholder.addPlaceholder("reason", disconnectReason);
 
             DiscordBot.sendUniversalMessage(entry.message.playerLeft, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
