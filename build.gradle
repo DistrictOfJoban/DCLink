@@ -57,7 +57,11 @@ processResources {
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": project.version, "java": getJavaVersion(minecraft_major_version), "mc_version": "1.${minecraft_major_version}.x"
+	}
+
+	filesMatching("dclink.mixin.json") {
+		expand "java": getJavaVersion(minecraft_major_version)
 	}
 }
 
@@ -80,13 +84,7 @@ task setupMappings() {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	if(minecraft_major_version == 16) {
-		it.options.release = 8
-	} else if(minecraft_major_version == 17) {
-		it.options.release = 16
-	} else {
-		it.options.release = 17
-	}
+	it.options.release = getJavaVersion(minecraft_major_version)
 }
 
 java {
@@ -126,5 +124,15 @@ allprojects {
 				task.dependsOn rootProject.tasks.setupMappings
 			}
 		}
+	}
+}
+
+static def getJavaVersion(mc_version) {
+	if(mc_version == 16) {
+		return 8
+	} else if(mc_version == 17) {
+		return 16
+	} else {
+		return 17
 	}
 }

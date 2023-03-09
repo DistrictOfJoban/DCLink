@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.lx.dclink.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_${java}",
   "mixins": [
     "CrashExceptionMixin",
     "PlayerAdvancementTrackerMixin",
