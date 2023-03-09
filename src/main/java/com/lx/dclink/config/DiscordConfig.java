@@ -40,7 +40,7 @@ public class DiscordConfig extends BaseConfig {
         entries.clear();
         loadCustomEmbeds();
         if(!Files.exists(configFile)) {
-            boolean saved = save();
+            boolean saved = generate();
             if(saved) {
                 return load();
             } else {
@@ -64,7 +64,16 @@ public class DiscordConfig extends BaseConfig {
     }
 
     @Override
+    public boolean generate() {
+        DiscordEntry defaultEntry = new DiscordEntry();
+        defaultEntry.allowedDimension.add("minecraft:overworld");
+        entries.add(defaultEntry);
+        return save();
+    }
+
+    @Override
     public boolean save() {
+        ensureRootFolderExist();
         Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         JsonArray jsonArray = new JsonArray();
         for(DiscordEntry entry : entries) {

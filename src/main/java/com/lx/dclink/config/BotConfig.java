@@ -1,10 +1,6 @@
 package com.lx.dclink.config;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.lx.dclink.DCLink;
+import com.google.gson.*;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.io.FileWriter;
@@ -17,9 +13,9 @@ import java.util.List;
 public class BotConfig extends BaseConfig {
     private static BotConfig instance;
     private final Collection<String> intents = new ArrayList<>();
-    private String token;
+    private String token = "";
     private boolean cacheMember;
-    private int statusRefreshInterval;
+    private int statusRefreshInterval = 20;
     public boolean outboundEnabled = true;
     public boolean inboundEnabled = true;
 
@@ -63,8 +59,8 @@ public class BotConfig extends BaseConfig {
                     });
                 }
 
-                if(jsonConfig.has("status")) {
-                    jsonConfig.get("status").getAsJsonArray().forEach(jsonElement -> {
+                if(jsonConfig.has("statuses")) {
+                    jsonConfig.get("statuses").getAsJsonArray().forEach(jsonElement -> {
                         statuses.add(jsonElement.getAsString());
                     });
                 }
@@ -85,7 +81,13 @@ public class BotConfig extends BaseConfig {
     }
 
     @Override
+    public boolean generate() {
+        return save();
+    }
+
+    @Override
     public boolean save() {
+        ensureRootFolderExist();
         JsonObject jsonObject = new JsonObject();
         JsonArray statusesArray = new JsonArray();
         JsonArray intentsArray = new JsonArray();
@@ -96,11 +98,11 @@ public class BotConfig extends BaseConfig {
             intentsArray.add(intent);
         }
         jsonObject.addProperty("token", token);
-        jsonObject.add("status", statusesArray);
+        jsonObject.add("statuses", statusesArray);
         jsonObject.addProperty("statusRefreshInterval", statusRefreshInterval);
         jsonObject.add("intents", intentsArray);
         jsonObject.addProperty("cacheMember", cacheMember);
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try (Writer writer = new FileWriter(configFile.toString())) {
             gson.toJson(jsonObject, writer);
         } catch (Exception e) {

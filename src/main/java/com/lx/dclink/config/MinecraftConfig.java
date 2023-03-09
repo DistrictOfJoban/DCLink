@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
-import com.lx.dclink.DCLink;
 import com.lx.dclink.data.MinecraftEntry;
 
 import java.io.FileWriter;
@@ -32,7 +31,7 @@ public class MinecraftConfig extends BaseConfig {
     public boolean load() {
         entries.clear();
         if(!Files.exists(configFile)) {
-            boolean saved = save();
+            boolean saved = generate();
             if(saved) {
                 return load();
             } else {
@@ -56,7 +55,16 @@ public class MinecraftConfig extends BaseConfig {
     }
 
     @Override
+    public boolean generate() {
+        MinecraftEntry defaultEntry = new MinecraftEntry();
+        defaultEntry.sendDimension.add("minecraft:overworld");
+        entries.add(defaultEntry);
+        return save();
+    }
+
+    @Override
     public boolean save() {
+        ensureRootFolderExist();
         Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         JsonArray jsonArray = new JsonArray();
         for(MinecraftEntry entry : entries) {

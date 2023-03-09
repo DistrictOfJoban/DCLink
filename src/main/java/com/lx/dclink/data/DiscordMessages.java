@@ -22,15 +22,15 @@ public class DiscordMessages {
 
     public DiscordMessages() {
         /* Initialize default message */
-        serverStarting = ":clock10: Loading world...";
-        serverStarted = ":white_check_mark: Server started (**{time}** elapsed)";
-        serverStopping = ":warning: Server is stopping (It was up for **{time}**)";
-        serverStopped = ":x: Server no longer linked with Discord";
+        serverStarting = "<<<serverStarting>>>";
+        serverStarted = "<<<serverStarted>>>";
+        serverStopping = "<<<serverStopping>>>";
+        serverStopped = "<<<serverStopped>>>";
         serverCrashed = ":warning: **Crash Exception Detected!\n```{reason}```**";
         relay = "**<{player.team.prefix}{player.name}>** {message}";
         relayCommand = "**{player.team.prefix}{player.name}**: {message}";
-        playerJoin = "**{player.team.prefix}{player.name}** has joined the game.";
-        playerLeft = "**{player.team.prefix}{player.name}** left the game.";
+        playerJoin = "<<<playerJoined>>>";
+        playerLeft = "<<<playerLeft>>>";
         playerDisconnectReason = "({reason})";
         changeDimension = "**{player.team.prefix}{player.name}** has warped to {world.name}";
         playerDeath = ":skull: **{player.team.prefix}{player.name}** {reason}";
