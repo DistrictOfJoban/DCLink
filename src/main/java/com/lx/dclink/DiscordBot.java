@@ -266,7 +266,7 @@ public class DiscordBot extends ListenerAdapter {
     }
 
     public static void sendUniversalMessage(String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji) {
-        if(!isReady || !BotConfig.getInstance().inboundEnabled || StringHelper.notValidString(template) || client == null) return;
+        if(!isReady || !BotConfig.getInstance().outboundEnabled || StringHelper.notValidString(template) || client == null) return;
 
         ArrayList<MessageEmbed> embedToBeSent = new ArrayList<>();
         Matcher matcher = EMBED_PATTERN.matcher(template);
