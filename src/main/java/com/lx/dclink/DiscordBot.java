@@ -25,6 +25,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.minecraft.text.MutableText;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,6 +55,7 @@ public class DiscordBot extends ListenerAdapter {
             ChunkingFilter chunkingFilter = BotConfig.getInstance().getCacheMember() ? ChunkingFilter.ALL : ChunkingFilter.NONE;
             MemberCachePolicy memberCachePolicy = BotConfig.getInstance().getCacheMember() ? MemberCachePolicy.ALL : MemberCachePolicy.NONE;
             client = JDABuilder.createDefault(token)
+                    .disableCache(CacheFlag.VOICE_STATE, CacheFlag.FORUM_TAGS)
                     .addEventListeners(new DiscordBot())
                     .setAutoReconnect(true)
                     .setMemberCachePolicy(memberCachePolicy)
@@ -61,9 +63,13 @@ public class DiscordBot extends ListenerAdapter {
                     .setChunkingFilter(chunkingFilter)
                     .build();
 
+            client.awaitReady();
+
         } catch (InvalidTokenException | IllegalArgumentException ex) {
             LOGGER.error(ex.getStackTrace());
             LOGGER.error("[DCLink] An invalid token has been provided! Please ensure the token is valid.");
+        } catch (InterruptedException e) {
+            LOGGER.error("[DCLink] Interrupted.");
         }
     }
 
