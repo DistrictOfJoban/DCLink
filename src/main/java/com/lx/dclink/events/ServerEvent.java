@@ -35,7 +35,6 @@ public class ServerEvent {
 
     public static void serverStopping(MinecraftServer server) {
         long serverStoppingTimestamp = System.currentTimeMillis();
-        DCLink.server = null;
 
         for(DiscordEntry entry : DiscordConfig.getInstance().entries) {
             Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
@@ -48,6 +47,7 @@ public class ServerEvent {
         for(DiscordEntry entry : DiscordConfig.getInstance().entries) {
             DCLink.bot.sendMessage(entry.message.serverStopped, null, entry.channelID, entry.allowMention, entry.enableEmoji);
         }
+        DCLink.server = null;
         DCLink.bot.disconnect();
     }
 
