@@ -85,7 +85,8 @@ public class Discord extends ListenerAdapter implements Bridger {
     public void disconnect() {
         if(client != null) {
             isReady = false;
-            client.shutdownNow();
+            client.cancelRequests();
+            client.shutdown();
         }
     }
 
