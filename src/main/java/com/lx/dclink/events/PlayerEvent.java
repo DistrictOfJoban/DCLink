@@ -40,7 +40,7 @@ public class PlayerEvent {
         String worldId = world.getRegistryKey().getValue().toString();
         for(DiscordEntry entry : DiscordConfig.getInstance().entries) {
             if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) continue;
-            String disconnectReason = disconnectReasonText == null ? "" : entry.message.getPlayerDisconnectReason(disconnectReasonText.getString());
+            String disconnectReason = entry.message.getPlayerDisconnectReason(disconnectReasonText.getString());
             Placeholder placeholder = new MinecraftPlaceholder(player, DCLink.server, world, null);
             placeholder.addPlaceholder("reason", disconnectReason);
 

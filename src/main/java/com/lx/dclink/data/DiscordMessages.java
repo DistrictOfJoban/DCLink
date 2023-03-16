@@ -48,7 +48,9 @@ public class DiscordMessages {
     }
 
     public String getPlayerDisconnectReason(String reason) {
-        if(reason.equals("Disconnected")) return "";
-        return playerDisconnectReason.replace("reason", reason);
+        if(reason == null || reason.equals("Disconnected")) {
+            return "";
+        }
+        return playerDisconnectReason.replace("{reason}", reason);
     }
 }
