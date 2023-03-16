@@ -26,7 +26,7 @@ public class DiscordMessages {
         serverStarted = "<<<serverStarted>>>";
         serverStopping = "<<<serverStopping>>>";
         serverStopped = "<<<serverStopped>>>";
-        serverCrashed = ":warning: **Crash Exception Detected!\n```{reason}```**";
+        serverCrashed = "<<<serverCrashed>>>";
         relay = "**<{player.team.prefix}{player.name}>** {message}";
         relayCommand = "**{player.team.prefix}{player.name}**: {message}";
         playerJoin = "<<<playerJoined>>>";

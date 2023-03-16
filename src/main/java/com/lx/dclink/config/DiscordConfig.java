@@ -155,6 +155,12 @@ public class DiscordConfig extends BaseConfig {
                         .setDescription(":x: Server no longer linked with Discord")
                         .build()
         );
+        defaultEmbeds.put("serverCrashed",
+                new EmbedBuilder()
+                    .setTitle(":warning: Crash Exception Detected!")
+                    .setDescription("`{reason}`")
+                    .build()
+        );
         defaultEmbeds.put("playerJoined",
                 new EmbedBuilder()
                         .setDescription("{player.name} has joined the game.")
