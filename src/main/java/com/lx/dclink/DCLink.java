@@ -1,15 +1,14 @@
 package com.lx.dclink;
 
+import com.lx.dclink.bridges.Discord;
 import com.lx.dclink.commands.*;
 import com.lx.dclink.config.DiscordConfig;
 import com.lx.dclink.config.MinecraftConfig;
 import com.lx.dclink.config.BotConfig;
 import com.lx.dclink.data.MinecraftEntry;
-import com.lx.dclink.events.PlayerEvent;
 import com.lx.dclink.events.ServerEvent;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -23,6 +22,7 @@ import java.util.List;
 public class DCLink implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger("dclink");
 	public static MinecraftServer server = null;
+	public static Discord bot;
 
 	@Override
 	public void onInitialize() {
@@ -31,6 +31,8 @@ public class DCLink implements ModInitializer {
 		if(!allConfigLoaded) {
 			LOGGER.warn("[DCLink] Not all config are loaded! Please check console for error.");
 		}
+
+		bot = new Discord(BotConfig.getInstance().getToken(), BotConfig.getInstance().getIntents());
 
 		ServerLifecycleEvents.SERVER_STARTING.register((ServerEvent::serverStarting));
 		ServerLifecycleEvents.SERVER_STARTED.register((ServerEvent::serverStarted));

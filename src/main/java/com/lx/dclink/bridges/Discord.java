@@ -1,6 +1,7 @@
-package com.lx.dclink;
+package com.lx.dclink.bridges;
 
 import com.google.gson.JsonArray;
+import com.lx.dclink.DCLink;
 import com.lx.dclink.config.BotConfig;
 import com.lx.dclink.config.DiscordConfig;
 import com.lx.dclink.config.MinecraftConfig;
@@ -34,17 +35,24 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DiscordBot extends ListenerAdapter {
+public class Discord extends ListenerAdapter implements Bridger {
     private static final Pattern EMBED_PATTERN = Pattern.compile("(<<<.+>>>)");
-    public static final Logger LOGGER = LogManager.getLogger("DCLinkDiscord");
-    public static JDA client;
-    public static Map<String, List<RichCustomEmoji>> emojiMap = new HashMap<>();
-    public static Map<Long, Message> messageCache = new HashMap<>();
-    private static Timer timer;
-    private static int currentStatus;
-    public static boolean isReady = false;
+    private static final Logger LOGGER = LogManager.getLogger("DCLinkDiscord");
+    public JDA client;
+    public Map<String, List<RichCustomEmoji>> emojiMap = new HashMap<>();
+    public Map<Long, Message> messageCache = new HashMap<>();
+    private boolean isReady = false;
+    private Timer timer;
+    private int currentStatus;
+    private final String token;
+    private final Collection<GatewayIntent> intents;
 
-    public static void load(String token, Collection<GatewayIntent> intents) {
+    public Discord(String token, Collection<GatewayIntent> intents) {
+        this.token = token;
+        this.intents = intents;
+    }
+
+    public void login() {
         isReady = false;
         if(StringHelper.notValidString(token)) {
             LOGGER.warn("[DCLink] Cannot log in to Discord: No token provided/Token is empty!");
@@ -56,10 +64,11 @@ public class DiscordBot extends ListenerAdapter {
             MemberCachePolicy memberCachePolicy = BotConfig.getInstance().getCacheMember() ? MemberCachePolicy.ALL : MemberCachePolicy.NONE;
             client = JDABuilder.createDefault(token)
                     .disableCache(CacheFlag.VOICE_STATE, CacheFlag.FORUM_TAGS)
-                    .addEventListeners(new DiscordBot())
+                    .addEventListeners(this)
                     .setAutoReconnect(true)
                     .setMemberCachePolicy(memberCachePolicy)
                     .enableIntents(intents)
+                    .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                     .setChunkingFilter(chunkingFilter)
                     .build();
 
@@ -73,28 +82,14 @@ public class DiscordBot extends ListenerAdapter {
         }
     }
 
-    @Override
-    public void onReady(ReadyEvent event) {
-        client.getGuildCache().forEach(guild -> {
-            emojiMap.put(guild.getId(), guild.getEmojis());
-        });
-
-        LOGGER.info("[DCLink] Logged in as: " + client.getSelfUser().getAsTag());
-        isReady = true;
-
-        stopStatus();
-        startCyclingStatus();
-    }
-
-    public static void disconnect() {
+    public void disconnect() {
         if(client != null) {
             isReady = false;
-            client.cancelRequests();
-            client.shutdown();
+            client.shutdownNow();
         }
     }
 
-    public static void startCyclingStatus() {
+    public void startCyclingStatus() {
         if(isReady && !BotConfig.getInstance().statuses.isEmpty() && client != null) {
             Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.server, null, null);
 
@@ -112,7 +107,7 @@ public class DiscordBot extends ListenerAdapter {
         }
     }
 
-    public static void stopStatus() {
+    public void stopStatus() {
         if(timer != null) {
             timer.cancel();
             timer.purge();
@@ -121,6 +116,19 @@ public class DiscordBot extends ListenerAdapter {
         if(isReady && client != null) {
             client.getPresence().setActivity(null);
         }
+    }
+
+    @Override
+    public void onReady(ReadyEvent event) {
+        client.getGuildCache().forEach(guild -> {
+            emojiMap.put(guild.getId(), guild.getEmojis());
+        });
+
+        LOGGER.info("[DCLink] Logged in as: " + client.getSelfUser().getAsTag());
+        isReady = true;
+
+        stopStatus();
+        startCyclingStatus();
     }
 
     @Override
@@ -265,7 +273,11 @@ public class DiscordBot extends ListenerAdapter {
         }
     }
 
-    public static void sendUniversalMessage(String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji) {
+    public boolean isReady() {
+        return isReady;
+    }
+
+    public void sendMessage(String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji) {
         if(!isReady || !BotConfig.getInstance().outboundEnabled || StringHelper.notValidString(template) || client == null) return;
 
         ArrayList<MessageEmbed> embedToBeSent = new ArrayList<>();

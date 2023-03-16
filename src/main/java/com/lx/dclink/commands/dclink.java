@@ -2,7 +2,7 @@ package com.lx.dclink.commands;
 
 import com.lx.dclink.config.BotConfig;
 import com.lx.dclink.DCLink;
-import com.lx.dclink.DiscordBot;
+import com.lx.dclink.bridges.Discord;
 import com.lx.dclink.Mappings;
 import com.lx.dclink.config.DiscordConfig;
 import com.lx.dclink.config.MinecraftConfig;
@@ -53,8 +53,9 @@ public class dclink {
 
         /* Re-login if successful */
         if(success) {
-            DiscordBot.disconnect();
-            DiscordBot.load(BotConfig.getInstance().getToken(), BotConfig.getInstance().getIntents());
+            DCLink.bot.disconnect();
+            DCLink.bot = new Discord(BotConfig.getInstance().getToken(), BotConfig.getInstance().getIntents());
+            DCLink.bot.login();
         }
 
         return 1;
@@ -71,17 +72,17 @@ public class dclink {
     private static int status(CommandContext<ServerCommandSource> context) {
         MutableText onlineText = Mappings.literalText("Online").formatted(Formatting.GREEN);
         MutableText offlineText = Mappings.literalText("Offline").formatted(Formatting.RED);
-        MutableText clientAccount = DiscordBot.isReady ? Mappings.literalText(DiscordBot.client.getSelfUser().getAsTag() + " (" + DiscordBot.client.getSelfUser().getId() + ")").formatted(Formatting.GREEN) : null;
+        MutableText clientAccount = DCLink.bot.isReady() ? Mappings.literalText(DCLink.bot.client.getSelfUser().getAsTag() + " (" + DCLink.bot.client.getSelfUser().getId() + ")").formatted(Formatting.GREEN) : null;
         MutableText enabledText = Mappings.literalText("Enabled").formatted(Formatting.GREEN);
         MutableText disabledText = Mappings.literalText("Disabled").formatted(Formatting.RED);
 
-        MutableText clientStatus = getPair("Client Status", DiscordBot.isReady ? onlineText : offlineText);
+        MutableText clientStatus = getPair("Client Status", DCLink.bot.isReady() ? onlineText : offlineText);
         MutableText loggedInAccount = getPair("Logged in as", clientAccount);
         MutableText outBound = getPair("Outbound Messages", BotConfig.getInstance().outboundEnabled ? enabledText : disabledText);
         MutableText inBound = getPair("Inbound Messages", BotConfig.getInstance().inboundEnabled ? enabledText : disabledText);
 
         context.getSource().sendFeedback(clientStatus, false);
-        if(DiscordBot.isReady) context.getSource().sendFeedback(loggedInAccount, false);
+        if(DCLink.bot.isReady()) context.getSource().sendFeedback(loggedInAccount, false);
         context.getSource().sendFeedback(outBound, false);
         context.getSource().sendFeedback(inBound, false);
         return 1;
