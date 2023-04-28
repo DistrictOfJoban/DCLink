@@ -18,6 +18,9 @@ public class ServerEvent {
 
     public static void serverStarting(MinecraftServer server) {
         DCLink.server = server;
+
+        BridgeManager.clearBridges();
+        DCLink.loadBridges();
         BridgeManager.login();
 
         BridgeManager.forEach(bridge -> {

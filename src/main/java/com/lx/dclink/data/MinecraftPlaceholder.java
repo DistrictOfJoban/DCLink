@@ -66,9 +66,11 @@ public class MinecraftPlaceholder extends Placeholder {
     }
 
     private void setServerPlaceholder(String objName, MinecraftServer server) {
-        addPlaceholder(objName, "totalPlayerCount", String.valueOf(server.getCurrentPlayerCount()));
-        addPlaceholder(objName, "version", server.getVersion());
-        addPlaceholder(objName, "maxPlayerCount", String.valueOf(server.getMaxPlayerCount()));
+        if(server != null) {
+            addPlaceholder(objName, "totalPlayerCount", String.valueOf(server.getCurrentPlayerCount()));
+            addPlaceholder(objName, "version", server.getVersion());
+            addPlaceholder(objName, "maxPlayerCount", String.valueOf(server.getMaxPlayerCount()));
+        }
     }
 
     private void setTeamPlaceholder(String objName, Team team) {

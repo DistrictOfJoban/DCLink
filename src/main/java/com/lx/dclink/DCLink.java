@@ -35,9 +35,6 @@ public class DCLink implements ModInitializer {
 			LOGGER.warn("[DCLink] Not all config are loaded! Please check console for error.");
 		}
 
-		BridgeManager.clearBridges();
-		loadBridges();
-
 		ServerLifecycleEvents.SERVER_STARTING.register((ServerEvent::serverStarting));
 		ServerLifecycleEvents.SERVER_STARTED.register((ServerEvent::serverStarted));
 		ServerLifecycleEvents.SERVER_STOPPING.register((ServerEvent::serverStopping));
