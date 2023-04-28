@@ -18,17 +18,18 @@ import com.lx.dclink.util.EmbedParser;
 import com.lx.dclink.util.StringHelper;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
-import net.dv8tion.jda.api.events.session.ReadyEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RevoltBridge implements Bridge, RevoltListener {
     private static final Pattern EMBED_PATTERN = Pattern.compile("(<<<.+>>>)");
     private static final Logger LOGGER = LogManager.getLogger("DCLinkRevolt");
+    private final Collection<Runnable> queuedAction;
     public RevoltClient client;
     public Map<String, List<RichCustomEmoji>> emojiMap = new HashMap<>();
     public Map<Long, Message> messageCache = new HashMap<>();
@@ -43,6 +44,7 @@ public class RevoltBridge implements Bridge, RevoltListener {
         this.client = new RevoltClient(config.getToken());
         this.client.addListener(this);
         this.token = config.getToken();
+        this.queuedAction = new ArrayList<>();
     }
 
     @Override
@@ -100,20 +102,21 @@ public class RevoltBridge implements Bridge, RevoltListener {
     }
 
     public void startStatus() {
-        if(isReady && !BotConfig.getInstance().statuses.isEmpty() && client != null) {
+        if(!BotConfig.getInstance().statuses.isEmpty() && client != null) {
             Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.server, null, null);
+            executeOnReady(() -> {
+                timer = new Timer();
+                timer.schedule(new TimerTask() {
 
-            timer = new Timer();
-            timer.schedule(new TimerTask() {
-
-                @Override
-                public void run() {
-                    if(DCLink.server == null) return;
-                    String status = BotConfig.getInstance().statuses.get(currentStatus++ % BotConfig.getInstance().statuses.size());
-                    String formattedStatus = placeholder.parse(status);
-                    client.setStatus(StatusPresence.ONLINE, "Playing " + formattedStatus);
-                }
-            }, 0, BotConfig.getInstance().getStatusRefreshInterval() * 1000L);
+                    @Override
+                    public void run() {
+                        if(DCLink.server == null) return;
+                        String status = BotConfig.getInstance().statuses.get(currentStatus++ % BotConfig.getInstance().statuses.size());
+                        String formattedStatus = placeholder.parse(status);
+                        client.setStatus(StatusPresence.ONLINE, "Playing " + formattedStatus);
+                    }
+                }, 0, BotConfig.getInstance().getStatusRefreshInterval() * 1000L);
+            });
         }
     }
 
@@ -125,6 +128,14 @@ public class RevoltBridge implements Bridge, RevoltListener {
 
         if(isReady && client != null) {
             client.setStatus(null, null);
+        }
+    }
+
+    public void executeOnReady(Runnable callback) {
+        if(!isReady) {
+            queuedAction.add(callback);
+        } else {
+            callback.run();
         }
     }
 
@@ -145,8 +156,11 @@ public class RevoltBridge implements Bridge, RevoltListener {
         //        });
         LOGGER.info("[RevoltLink] Logged in as: " + info.getAccountName());
         isReady = true;
-        stopStatus();
-        startStatus();
+
+        for(Runnable callback : queuedAction) {
+            callback.run();
+        }
+        queuedAction.clear();
     }
 
     @Override

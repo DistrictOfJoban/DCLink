@@ -6,6 +6,7 @@ import com.lx.dclink.data.Placeholder;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 public interface Bridge {
     void sendMessage(String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji);
@@ -17,6 +18,7 @@ public interface Bridge {
     BridgeType getType();
     // TEMP
     UserInfo getUserInfo();
+    void executeOnReady(Runnable callback);
     void startStatus();
     void stopStatus();
 }

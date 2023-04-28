@@ -39,6 +39,7 @@ public class ServerEvent {
             for(BridgeEntry entry : bridge.getEntries()) {
                 bridge.sendMessage(entry.message.serverStarted, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
             }
+            bridge.startStatus();
         });
     }
 

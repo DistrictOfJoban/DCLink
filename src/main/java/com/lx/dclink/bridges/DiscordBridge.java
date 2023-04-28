@@ -33,6 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,6 +43,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     private final DiscordConfig config;
     private final Collection<GatewayIntent> intents;
     private Timer timer;
+    private final Collection<Runnable> queuedAction;
     private boolean isReady = false;
     private int currentStatus;
     public JDA client;
@@ -51,6 +53,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     public DiscordBridge(DiscordConfig config) {
         this.config = config;
         this.intents = config.getIntents();
+        this.queuedAction = new ArrayList<>();
     }
 
     public void login() {
@@ -91,21 +94,31 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
         }
     }
 
+    public void executeOnReady(Runnable callback) {
+        if(!isReady) {
+            queuedAction.add(callback);
+        } else {
+            callback.run();
+        }
+    }
+
     public void startStatus() {
-        if(isReady && !BotConfig.getInstance().statuses.isEmpty() && client != null) {
+        if(!BotConfig.getInstance().statuses.isEmpty() && client != null) {
             Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.server, null, null);
+            executeOnReady(() -> {
+                stopStatus();
+                timer = new Timer();
+                timer.schedule(new TimerTask() {
 
-            timer = new Timer();
-            timer.schedule(new TimerTask() {
-
-                @Override
-                public void run() {
-                    if(DCLink.server == null) return;
-                    String status = BotConfig.getInstance().statuses.get(currentStatus++ % BotConfig.getInstance().statuses.size());
-                    String formattedStatus = placeholder.parse(status);
-                    client.getPresence().setActivity(Activity.playing(formattedStatus));
-                }
-            }, 0, BotConfig.getInstance().getStatusRefreshInterval() * 1000L);
+                    @Override
+                    public void run() {
+                        if(DCLink.server == null) return;
+                        String status = BotConfig.getInstance().statuses.get(currentStatus++ % BotConfig.getInstance().statuses.size());
+                        String formattedStatus = placeholder.parse(status);
+                        client.getPresence().setActivity(Activity.playing(formattedStatus));
+                    }
+                }, 0, BotConfig.getInstance().getStatusRefreshInterval() * 1000L);
+            });
         }
     }
 
@@ -137,8 +150,10 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
         LOGGER.info("[DCLink] Logged in as: " + client.getSelfUser().getAsTag());
         isReady = true;
 
-        stopStatus();
-        startStatus();
+        for(Runnable callback : queuedAction) {
+            callback.run();
+        }
+        queuedAction.clear();
     }
 
     @Override

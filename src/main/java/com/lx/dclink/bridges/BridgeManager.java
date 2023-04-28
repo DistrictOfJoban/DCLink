@@ -29,6 +29,7 @@ public class BridgeManager {
 
     public static void logout() {
         for(Bridge bridge : bridges) {
+            bridge.stopStatus();
             bridge.disconnect();
         }
     }
