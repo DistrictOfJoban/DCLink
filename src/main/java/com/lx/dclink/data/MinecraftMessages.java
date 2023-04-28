@@ -33,7 +33,7 @@ public class MinecraftMessages {
 
     public MutableText getDiscordRelayMessage(Message message, StandardGuildChannel channel, Member guildMember, Message repliedMessage, Member repliedAuthor)
     {
-        DiscordPlaceholder placeholder = new DiscordPlaceholder(message, channel, guildMember, null);
+        BridgePlaceholder placeholder = new BridgePlaceholder(message, channel, guildMember, null);
 
         if(repliedMessage != null) {
             placeholder.setData("repliedMessage", repliedMessage);
@@ -44,7 +44,7 @@ public class MinecraftMessages {
     }
 
     public MutableText getDiscordEditedMessage(Message oldMessage, Message newMessage, StandardGuildChannel channel, Member guildMember) {
-        DiscordPlaceholder placeholder = new DiscordPlaceholder(null, channel, guildMember, null);
+        BridgePlaceholder placeholder = new BridgePlaceholder(null, channel, guildMember, null);
         placeholder.setData("oldMessage", oldMessage);
         placeholder.setData("newMessage", newMessage);
         String formatted = placeholder.parse(relayEdited);
@@ -52,7 +52,7 @@ public class MinecraftMessages {
     }
 
     public MutableText getDiscordDeletedMessage(Message message, StandardGuildChannel channel, Member guildMember) {
-        DiscordPlaceholder placeholder = new DiscordPlaceholder(message, channel, guildMember, null);
+        BridgePlaceholder placeholder = new BridgePlaceholder(message, channel, guildMember, null);
         String formatted = placeholder.parse(relayDeleted);
         return toText(formatted);
     }
@@ -60,7 +60,7 @@ public class MinecraftMessages {
     public List<MutableText> getAttachmentText(List<Message.Attachment> attachmentList, StandardGuildChannel channel, Member guildMember) {
         List<MutableText> textList = new ArrayList<>();
         for(Message.Attachment attachment : attachmentList) {
-            DiscordPlaceholder placeholder = new DiscordPlaceholder(null, channel, guildMember, attachment);
+            BridgePlaceholder placeholder = new BridgePlaceholder(null, channel, guildMember, attachment);
             String formatted = placeholder.parse(attachments);
 
             textList.add(toText(formatted));
@@ -69,7 +69,7 @@ public class MinecraftMessages {
     }
 
     public MutableText getReactionAddMessage(String emoji, StandardGuildChannel channel, Member reactMember, Member messageMember, Message reactedMessage) {
-        DiscordPlaceholder placeholder = new DiscordPlaceholder(reactedMessage, channel, reactMember, null);
+        BridgePlaceholder placeholder = new BridgePlaceholder(reactedMessage, channel, reactMember, null);
         placeholder.addPlaceholder("emojiID", emoji);
         placeholder.addPlaceholder("emoji", emoji);
         placeholder.setData("author", messageMember);
@@ -79,7 +79,7 @@ public class MinecraftMessages {
     }
 
     public MutableText getReactionRemoveMessage(String emoji, StandardGuildChannel channel, Member reactMember, Member messageMember, Message reactedMessage) {
-        DiscordPlaceholder placeholder = new DiscordPlaceholder(reactedMessage, channel, reactMember, null);
+        BridgePlaceholder placeholder = new BridgePlaceholder(reactedMessage, channel, reactMember, null);
         placeholder.addPlaceholder("emojiID", emoji);
         placeholder.addPlaceholder("emoji", emoji);
         placeholder.setData("author", messageMember);

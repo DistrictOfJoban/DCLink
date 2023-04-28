@@ -1,6 +1,7 @@
 package com.lx.dclink.bridges;
 
 import com.google.gson.JsonArray;
+import com.lx.RevoltAPI.data.UserInfo;
 import com.lx.dclink.DCLink;
 import com.lx.dclink.config.BotConfig;
 import com.lx.dclink.config.DiscordConfig;
@@ -35,26 +36,26 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Discord extends ListenerAdapter implements Bridger {
+public class DiscordBridge extends ListenerAdapter implements Bridge {
     private static final Pattern EMBED_PATTERN = Pattern.compile("(<<<.+>>>)");
     private static final Logger LOGGER = LogManager.getLogger("DCLinkDiscord");
+    private final DiscordConfig config;
+    private final Collection<GatewayIntent> intents;
+    private Timer timer;
+    private boolean isReady = false;
+    private int currentStatus;
     public JDA client;
     public Map<String, List<RichCustomEmoji>> emojiMap = new HashMap<>();
     public Map<Long, Message> messageCache = new HashMap<>();
-    private boolean isReady = false;
-    private Timer timer;
-    private int currentStatus;
-    private final String token;
-    private final Collection<GatewayIntent> intents;
 
-    public Discord(String token, Collection<GatewayIntent> intents) {
-        this.token = token;
-        this.intents = intents;
+    public DiscordBridge(DiscordConfig config) {
+        this.config = config;
+        this.intents = config.getIntents();
     }
 
     public void login() {
         isReady = false;
-        if(StringHelper.notValidString(token)) {
+        if(StringHelper.notValidString(config.getToken())) {
             LOGGER.warn("[DCLink] Cannot log in to Discord: No token provided/Token is empty!");
             return;
         }
@@ -62,7 +63,7 @@ public class Discord extends ListenerAdapter implements Bridger {
         try {
             ChunkingFilter chunkingFilter = BotConfig.getInstance().getCacheMember() ? ChunkingFilter.ALL : ChunkingFilter.NONE;
             MemberCachePolicy memberCachePolicy = BotConfig.getInstance().getCacheMember() ? MemberCachePolicy.ALL : MemberCachePolicy.NONE;
-            client = JDABuilder.createDefault(token)
+            client = JDABuilder.createDefault(config.getToken())
                     .disableCache(CacheFlag.VOICE_STATE, CacheFlag.FORUM_TAGS)
                     .addEventListeners(this)
                     .setAutoReconnect(true)
@@ -90,7 +91,7 @@ public class Discord extends ListenerAdapter implements Bridger {
         }
     }
 
-    public void startCyclingStatus() {
+    public void startStatus() {
         if(isReady && !BotConfig.getInstance().statuses.isEmpty() && client != null) {
             Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.server, null, null);
 
@@ -119,6 +120,14 @@ public class Discord extends ListenerAdapter implements Bridger {
         }
     }
 
+    public Collection<BridgeEntry> getEntries() {
+        return config.entries;
+    }
+
+    public boolean isValid() {
+        return !StringHelper.notValidString(config.getToken());
+    }
+
     @Override
     public void onReady(ReadyEvent event) {
         client.getGuildCache().forEach(guild -> {
@@ -129,7 +138,7 @@ public class Discord extends ListenerAdapter implements Bridger {
         isReady = true;
 
         stopStatus();
-        startCyclingStatus();
+        startStatus();
     }
 
     @Override
@@ -278,6 +287,14 @@ public class Discord extends ListenerAdapter implements Bridger {
         return isReady;
     }
 
+    public BridgeType getType() {
+        return BridgeType.DISCORD;
+    }
+
+    public UserInfo getUserInfo() {
+        return new UserInfo(client.getSelfUser().getId(), client.getSelfUser().getAsTag());
+    }
+
     public void sendMessage(String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji) {
         if(!isReady || !BotConfig.getInstance().outboundEnabled || StringHelper.notValidString(template) || client == null) return;
 
@@ -287,7 +304,7 @@ public class Discord extends ListenerAdapter implements Bridger {
         if(matcher.find()) {
             template = template.replace(matcher.group(0), "");
             String embedName = matcher.group(0).replace("<<<", "").replace(">>>", "");
-            JsonArray embedJson = DiscordConfig.getInstance().getEmbedJson(embedName);
+            JsonArray embedJson = config.getEmbedJson(embedName);
             if(embedJson != null) {
                 embedToBeSent.addAll(EmbedParser.fromJson(placeholder, embedJson));
             }
@@ -296,11 +313,13 @@ public class Discord extends ListenerAdapter implements Bridger {
         String finalMessage = placeholder == null ? template : placeholder.parse(template);
 
         for(String channelId : channelList) {
-            TextChannel channel = client.getChannelById(TextChannel.class, channelId);
-            if(channel == null) {
-                LOGGER.warn("Cannot find text channel: " + channelId);
+            try {
+                Long.parseLong(channelId);
+            } catch (Exception ignored) {
                 continue;
             }
+            TextChannel channel = client.getChannelById(TextChannel.class, channelId);
+            if(channel == null) continue;
 
             if(!channel.canTalk()) {
                 LOGGER.warn("No permission to send message in Text Channel #" + channel.getName());

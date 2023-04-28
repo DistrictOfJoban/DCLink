@@ -3,35 +3,34 @@ package com.lx.dclink.config;
 import com.google.gson.*;
 import com.lx.dclink.DCLink;
 import com.lx.dclink.data.BridgeEntry;
-import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-public class DiscordConfig extends BridgeConfig {
-    private static DiscordConfig instance;
+public class RevoltConfig extends BridgeConfig {
+    private static RevoltConfig instance;
     private String token = null;
-    private final Collection<String> intents = new ArrayList<>();
+
     public final HashMap<String, JsonArray> customEmbedsList = new HashMap<>();
 
-    public DiscordConfig() {
-        super(CONFIG_ROOT.resolve("discord.json"));
+    public RevoltConfig() {
+        super(CONFIG_ROOT.resolve("revolt.json"));
     }
 
-    public static DiscordConfig getInstance() {
+    public static RevoltConfig getInstance() {
         if(instance == null) {
-            instance = new DiscordConfig();
+            instance = new RevoltConfig();
         }
         return instance;
     }
 
     @Override
     public boolean load() {
-        intents.clear();
         entries.clear();
         loadCustomEmbeds();
         if(!Files.exists(configFile)) {
@@ -53,22 +52,13 @@ public class DiscordConfig extends BridgeConfig {
                 enabled = jsonConfig.get("enabled").getAsBoolean();
             }
 
-            if(jsonConfig.has("intents")) {
-                JsonArray channels = jsonConfig.get("intents").getAsJsonArray();
-                channels.forEach(jsonElement -> {
-                    String intent = jsonElement.getAsString();
-                    intents.add(intent);
-                });
-            }
-
-            if(jsonConfig.has("entries")) {
-                jsonConfig.get("entries").getAsJsonArray().forEach(jsonElement -> {
-                    BridgeEntry bridgeEntry = BridgeEntry.fromJson(jsonElement);
-                    if(bridgeEntry != null) {
-                        entries.add(bridgeEntry);
-                    }
-                });
-            }
+            final JsonArray entryList = jsonConfig.get("entries").getAsJsonArray();
+            entryList.forEach(jsonElement -> {
+                BridgeEntry bridgeEntry = BridgeEntry.fromJson(jsonElement);
+                if(bridgeEntry != null) {
+                    entries.add(bridgeEntry);
+                }
+            });
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -90,23 +80,17 @@ public class DiscordConfig extends BridgeConfig {
         Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         JsonObject jsonObject = new JsonObject();
         JsonArray jsonArray = new JsonArray();
-        JsonArray intentsArray = new JsonArray();
-        for(String intent : intents) {
-            intentsArray.add(intent);
-        }
         for(BridgeEntry entry : entries) {
             jsonArray.add(BridgeEntry.toJson(entry));
         }
 
         jsonObject.addProperty("enabled", enabled);
-        jsonObject.add("intents", intentsArray);
         jsonObject.add("entries", jsonArray);
 
         if(!Files.exists(CUSTOM_EMBED_PATH)) {
             DCLink.LOGGER.info("[DCLink] Message Embeds does not exist, generating...");
             generateDefaultEmbed();
         } else {
-            // Write embed
             for(Map.Entry<String, JsonArray> entry : customEmbedsList.entrySet()) {
                 String filename = entry.getKey();
                 try (Writer writer = new FileWriter(CUSTOM_EMBED_PATH.resolve(filename + ".json").toString())) {
@@ -158,18 +142,5 @@ public class DiscordConfig extends BridgeConfig {
             return customEmbedsList.get(key);
         }
         return null;
-    }
-
-    public Collection<GatewayIntent> getIntents() {
-        Collection<GatewayIntent> intentCollection = new ArrayList<>();
-
-        for(String intentString : intents) {
-            try {
-                intentCollection.add(GatewayIntent.valueOf(intentString));
-            } catch (Exception ignored) {
-            }
-        }
-
-        return intentCollection;
     }
 }

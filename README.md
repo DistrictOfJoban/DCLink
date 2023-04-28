@@ -1,24 +1,30 @@
 # DCLink
+A Fabric Minecraft Mod that allows relaying from Minecraft to Discord/Revolt(WIP)
+
 [![works badge](https://cdn.jsdelivr.net/gh/nikku/works-on-my-machine@v0.2.0/badge.svg)](https://github.com/nikku/works-on-my-machine)
 ![build status](https://github.com/Kenny-Hui/DCLink/actions/workflows/build.yml/badge.svg)
-## The story
+
+## The origin
 A server that I previously manages has been upgraded to 1.17.1.  
-Unfortunately, I can't find a decent Discord Chat Linking Bot that suits my need and runs on Fabric 1.17.1.
+Unfortunately, I can't find a decent Discord Chat Linking Bot that suits my need and runs on Fabric 1.17.1. (Which by now is fairly outdated, but hey stubborn players exists)
 
 [Chatter](https://github.com/axieum/chatter) is what I used to use before upgrading, but it's stuck on 1.16.5.  
 While a newer rewritten mod by the same author, [Minecord](https://github.com/axieum/minecord) is only available for 1.19.
 
-I don't have enough understanding of the code to port either of the mod to 1.17, so I made yet another Discord linking mod with a codebase 10x worse than others.
+I don't have enough understanding of the codebase to port either of the mod to 1.17, so I have to make another Discord linking mod just for a server I manages.
 
-What a brilliant idea!
+Eventually I tried making it a more proper project, (hopefully) implement bridging to services outside of only Discord.
+
+# REVOLT PROGRESS (Self-note)
+- 
 
 ## Features
 - Fabric 1.16.5 - 1.19.2
 - Config hot-reloadable
 - Support bot activities
 - Support custom guild emoji (Minecraft to Discord)
-- Allow silencing from Minecraft to Discord, or the other way round
-- Fully customizable Discord embed
+- Allow silencing relays from/to Minecraft
+- Fully customizable embed based on Discord's specification
 
 ### Supported Server Events to be relayed to Discord
 - Server starting / started / stopping / stopped
@@ -39,16 +45,17 @@ What a brilliant idea!
 - Message Reaction Add/Remove
 
 ## Future Goals
+- Bridge to services other than Discord, Revolt would be a good first step.
 - Relay more Discord events
-- Add Discord Commands
+- Add bridged commands
 - Touch some grass
 
 ## Downloads
-**This is not production ready yet, only use if you know what you are doing!**
+**This project is not yet considered finish nor stable, expect beta quality!**
 
 For downloading the latest build, please [click here](https://github.com/Kenny-Hui/DCLink/actions).
 
-However no support or mod usage will be provided at the moment. There's also no guarantee on compatibilities, given that this is still Work In Progress
+You're welcome to open an issue if you believe you've found a bug, however note that the config file format may change overtime without any documentation, please only use it if you can understand my semi-spegetti code :)
 
 ## Cross Version Mapping
 For easier development, all version-specific code is stored in `src/main/mappings`.

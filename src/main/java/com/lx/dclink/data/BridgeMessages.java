@@ -2,10 +2,8 @@ package com.lx.dclink.data;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.lx.dclink.util.JsonHelper;
 
-public class DiscordMessages {
+public class BridgeMessages {
     public String serverStarting;
     public String serverStarted;
     public String serverStopping;
@@ -20,7 +18,7 @@ public class DiscordMessages {
     public String playerDeath;
     public String playerAdvancement;
 
-    public DiscordMessages() {
+    public BridgeMessages() {
         /* Initialize default message */
         serverStarting = "<<<serverStarting>>>";
         serverStarted = "<<<serverStarted>>>";
@@ -37,14 +35,14 @@ public class DiscordMessages {
         playerAdvancement = ":medal: **{player.team.prefix}{player.name}** has achieved **{advancement}**! (*{advancementDetails}*)";
     }
 
-    public static DiscordMessages fromJson(JsonElement jsonElement) {
+    public static BridgeMessages fromJson(JsonElement jsonElement) {
         Gson g = new Gson();
-        return g.fromJson(jsonElement, DiscordMessages.class);
+        return g.fromJson(jsonElement, BridgeMessages.class);
     }
 
-    public static JsonElement toJson(DiscordMessages discordMessages) {
+    public static JsonElement toJson(BridgeMessages bridgeMessages) {
         Gson g = new Gson();
-        return g.toJsonTree(discordMessages, DiscordMessages.class);
+        return g.toJsonTree(bridgeMessages, BridgeMessages.class);
     }
 
     public String getPlayerDisconnectReason(String reason) {

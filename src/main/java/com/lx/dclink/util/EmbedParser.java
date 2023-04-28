@@ -3,8 +3,8 @@ package com.lx.dclink.util;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.lx.RevoltAPI.data.TextEmbed;
 import com.lx.dclink.data.Placeholder;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.text.SimpleDateFormat;
@@ -16,7 +16,7 @@ public class EmbedParser {
         ArrayList<MessageEmbed> embeds = new ArrayList<>();
         for (JsonElement jsonElement : jsonArray) {
             try {
-                EmbedBuilder embed = new EmbedBuilder();
+                net.dv8tion.jda.api.EmbedBuilder embed = new net.dv8tion.jda.api.EmbedBuilder();
                 JsonObject json = jsonElement.getAsJsonObject();
                 String title = getString(placeholder, "title", json);
                 String description = getString(placeholder, "description", json);
@@ -77,6 +77,11 @@ public class EmbedParser {
             }
         }
         return embeds;
+    }
+
+    public static List<TextEmbed> fromJsonToRevolt(Placeholder placeholder, JsonArray jsonArray) {
+        List<MessageEmbed> list = fromJson(placeholder, jsonArray);
+        return list.stream().map(e -> TextEmbed.fromJDAMessageEmbed(e)).toList();
     }
 
     public static JsonArray toJson(MessageEmbed... embeds) {
@@ -163,7 +168,6 @@ public class EmbedParser {
         }
         return returnArray;
     }
-
     private static String getString(Placeholder placeholder, String key, JsonObject jsonObject) {
         if(jsonObject.has(key)) {
             String value = jsonObject.get(key).getAsString();

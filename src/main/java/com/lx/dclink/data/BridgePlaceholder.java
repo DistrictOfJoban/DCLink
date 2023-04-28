@@ -5,9 +5,9 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildChannel;
 
-public class DiscordPlaceholder extends Placeholder {
+public class BridgePlaceholder extends Placeholder {
 
-    public DiscordPlaceholder(Message message, StandardGuildChannel channel, Member member, Message.Attachment attachment) {
+    public BridgePlaceholder(Message message, StandardGuildChannel channel, Member member, Message.Attachment attachment) {
         if(channel != null) {
             setData("channel", channel);
             setData("guild", channel.getGuild());

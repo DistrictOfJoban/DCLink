@@ -1,10 +1,14 @@
 package com.lx.dclink;
 
-import com.lx.dclink.bridges.Discord;
+import com.lx.dclink.bridges.Bridge;
+import com.lx.dclink.bridges.BridgeManager;
+import com.lx.dclink.bridges.DiscordBridge;
+import com.lx.dclink.bridges.RevoltBridge;
 import com.lx.dclink.commands.*;
 import com.lx.dclink.config.DiscordConfig;
 import com.lx.dclink.config.MinecraftConfig;
 import com.lx.dclink.config.BotConfig;
+import com.lx.dclink.config.RevoltConfig;
 import com.lx.dclink.data.MinecraftEntry;
 import com.lx.dclink.events.ServerEvent;
 import net.fabricmc.api.ModInitializer;
@@ -22,7 +26,6 @@ import java.util.List;
 public class DCLink implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger("dclink");
 	public static MinecraftServer server = null;
-	public static Discord bot;
 
 	@Override
 	public void onInitialize() {
@@ -32,7 +35,8 @@ public class DCLink implements ModInitializer {
 			LOGGER.warn("[DCLink] Not all config are loaded! Please check console for error.");
 		}
 
-		bot = new Discord(BotConfig.getInstance().getToken(), BotConfig.getInstance().getIntents());
+		BridgeManager.clearBridges();
+		loadBridges();
 
 		ServerLifecycleEvents.SERVER_STARTING.register((ServerEvent::serverStarting));
 		ServerLifecycleEvents.SERVER_STARTED.register((ServerEvent::serverStarted));
@@ -44,8 +48,15 @@ public class DCLink implements ModInitializer {
 		});
 	}
 
+	public static void loadBridges() {
+		Bridge discordBridge = new DiscordBridge(DiscordConfig.getInstance());
+		Bridge revoltBridge = new RevoltBridge(RevoltConfig.getInstance());
+		if(discordBridge.isValid()) BridgeManager.addBridge(discordBridge);
+		if(revoltBridge.isValid()) BridgeManager.addBridge(revoltBridge);
+	}
+
 	public static boolean loadAllConfig() {
-		return BotConfig.getInstance().load() && MinecraftConfig.getInstance().load() && DiscordConfig.getInstance().load();
+		return BotConfig.getInstance().load() && MinecraftConfig.getInstance().load() && DiscordConfig.getInstance().load() && RevoltConfig.getInstance().load();
 	}
 
 	public static void sendInGameMessage(List<MutableText> textToBeSent, MinecraftEntry entry) {

@@ -1,8 +1,8 @@
 package com.lx.dclink.events;
 
-import com.lx.dclink.config.DiscordConfig;
+import com.lx.dclink.bridges.BridgeManager;
 import com.lx.dclink.DCLink;
-import com.lx.dclink.data.DiscordEntry;
+import com.lx.dclink.data.BridgeEntry;
 import com.lx.dclink.data.MinecraftPlaceholder;
 import com.lx.dclink.data.Placeholder;
 import net.minecraft.server.MinecraftServer;
@@ -17,45 +17,58 @@ public class ServerEvent {
     }
 
     public static void serverStarting(MinecraftServer server) {
-        DCLink.bot.login();
-        for(DiscordEntry entry : DiscordConfig.getInstance().entries) {
-            DCLink.bot.sendMessage(entry.message.serverStarting, null, entry.channelID, entry.allowMention, entry.enableEmoji);
-        }
+        DCLink.server = server;
+        BridgeManager.login();
+
+        BridgeManager.forEach(bridge -> {
+            for(BridgeEntry entry : bridge.getEntries()) {
+                bridge.sendMessage(entry.message.serverStarting, null, entry.channelID, entry.allowMention, entry.enableEmoji);
+            }
+        });
     }
 
     public static void serverStarted(MinecraftServer server) {
         serverStartedTimestamp = System.currentTimeMillis();
-        DCLink.server = server;
-        for(DiscordEntry entry : DiscordConfig.getInstance().entries) {
-            Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
-            placeholder.addTimePlaceholder("time", serverStartedTimestamp - serverStartingTimestamp);
-            DCLink.bot.sendMessage(entry.message.serverStarted, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
-        }
+        Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
+        placeholder.addTimePlaceholder("time", serverStartedTimestamp - serverStartingTimestamp);
+
+        BridgeManager.forEach(bridge -> {
+            for(BridgeEntry entry : bridge.getEntries()) {
+                bridge.sendMessage(entry.message.serverStarted, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+            }
+        });
     }
 
     public static void serverStopping(MinecraftServer server) {
         long serverStoppingTimestamp = System.currentTimeMillis();
+        Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
+        placeholder.addTimePlaceholder("time", serverStoppingTimestamp - serverStartedTimestamp);
 
-        for(DiscordEntry entry : DiscordConfig.getInstance().entries) {
-            Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
-            placeholder.addTimePlaceholder("time", serverStoppingTimestamp - serverStartedTimestamp);
-            DCLink.bot.sendMessage(entry.message.serverStopping, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
-        }
+        BridgeManager.forEach(bridge -> {
+            for(BridgeEntry entry : bridge.getEntries()) {
+                bridge.sendMessage(entry.message.serverStopping, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+            }
+        });
     }
 
     public static void serverStopped(MinecraftServer server) {
-        for(DiscordEntry entry : DiscordConfig.getInstance().entries) {
-            DCLink.bot.sendMessage(entry.message.serverStopped, null, entry.channelID, entry.allowMention, entry.enableEmoji);
-        }
+        BridgeManager.forEach(bridge -> {
+            for(BridgeEntry entry : bridge.getEntries()) {
+                bridge.sendMessage(entry.message.serverStopped, null, entry.channelID, entry.allowMention, entry.enableEmoji);
+            }
+        });
         DCLink.server = null;
-        DCLink.bot.disconnect();
+        BridgeManager.logout();
     }
 
     public static void serverCrashed(CrashReport crashReport) {
-        for(DiscordEntry entry : DiscordConfig.getInstance().entries) {
-            Placeholder placeholder = new MinecraftPlaceholder();
-            placeholder.addPlaceholder("reason", crashReport.getMessage());
-            DCLink.bot.sendMessage(entry.message.serverCrashed, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
-        }
+        Placeholder placeholder = new MinecraftPlaceholder();
+        placeholder.addPlaceholder("reason", crashReport.getMessage());
+
+        BridgeManager.forEach(bridge -> {
+            for(BridgeEntry entry : bridge.getEntries()) {
+                bridge.sendMessage(entry.message.serverCrashed, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+            }
+        });
     }
 }

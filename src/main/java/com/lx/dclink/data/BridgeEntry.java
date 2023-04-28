@@ -10,51 +10,51 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DiscordEntry {
+public class BridgeEntry {
     public List<String> channelID;
     public List<String> allowedDimension;
     public Map<String, String> emojiMap;
-    public DiscordMessages message;
+    public BridgeMessages message;
     public boolean allowMention;
     public boolean enableEmoji;
 
-    public DiscordEntry() {
+    public BridgeEntry() {
         channelID = new ArrayList<>();
         allowedDimension = new ArrayList<>();
         emojiMap = new HashMap<>();
-        message = new DiscordMessages();
+        message = new BridgeMessages();
     }
 
-    public static DiscordEntry fromJson(JsonElement jsonElement) {
+    public static BridgeEntry fromJson(JsonElement jsonElement) {
         JsonObject jsonEntry = JsonHelper.getAsJsonObject(jsonElement);
         if(jsonEntry == null) return null;
 
-        DiscordEntry discordEntry = new DiscordEntry();
+        BridgeEntry bridgeEntry = new BridgeEntry();
         JsonElement channelID = jsonEntry.get("channelID");
         JsonElement dimensions = jsonEntry.get("dimensions");
 
         if(channelID != null && !channelID.isJsonNull()) {
             jsonEntry.get("channelID").getAsJsonArray().forEach(id -> {
-                discordEntry.channelID.add(id.getAsString());
+                bridgeEntry.channelID.add(id.getAsString());
             });
         }
 
         if(dimensions != null && !dimensions.isJsonNull()) {
             dimensions.getAsJsonArray().forEach(worldId -> {
-                discordEntry.allowedDimension.add(worldId.getAsString());
+                bridgeEntry.allowedDimension.add(worldId.getAsString());
             });
         }
 
         if(jsonEntry.has("allowMention")) {
-            discordEntry.allowMention = jsonEntry.get("allowMention").getAsBoolean();
+            bridgeEntry.allowMention = jsonEntry.get("allowMention").getAsBoolean();
         }
 
         if(jsonEntry.has("enableEmoji")) {
-            discordEntry.enableEmoji = jsonEntry.get("enableEmoji").getAsBoolean();
+            bridgeEntry.enableEmoji = jsonEntry.get("enableEmoji").getAsBoolean();
         }
 
         if(jsonEntry.has("messages") && jsonEntry.get("messages").isJsonObject()) {
-            discordEntry.message = DiscordMessages.fromJson(jsonEntry.get("messages"));
+            bridgeEntry.message = BridgeMessages.fromJson(jsonEntry.get("messages"));
         }
 
         if(jsonEntry.has("emojiMap")) {
@@ -62,14 +62,14 @@ public class DiscordEntry {
             emojiArray.forEach(jsonObject -> {
                 JsonObject emojiEntry = jsonObject.getAsJsonObject();
                 if(emojiEntry.has("name") && emojiEntry.has("id")) {
-                    discordEntry.emojiMap.put(emojiEntry.get("name").getAsString(), emojiEntry.get("id").getAsString());
+                    bridgeEntry.emojiMap.put(emojiEntry.get("name").getAsString(), emojiEntry.get("id").getAsString());
                 }
             });
         }
-        return discordEntry;
+        return bridgeEntry;
     }
 
-    public static JsonObject toJson(DiscordEntry entry) {
+    public static JsonObject toJson(BridgeEntry entry) {
         JsonObject rootObject = new JsonObject();
         JsonArray channelIDs = new JsonArray();
         JsonArray allowedDimension = new JsonArray();
@@ -90,7 +90,7 @@ public class DiscordEntry {
         rootObject.add("dimensions", allowedDimension);
         rootObject.addProperty("allowMention", entry.allowMention);
         rootObject.addProperty("enableEmoji", entry.enableEmoji);
-        rootObject.add("messages", DiscordMessages.toJson(entry.message));
+        rootObject.add("messages", BridgeMessages.toJson(entry.message));
         rootObject.add("emojiMap", emojiMap);
 
         return rootObject;

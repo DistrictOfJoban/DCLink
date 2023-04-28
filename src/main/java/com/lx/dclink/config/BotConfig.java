@@ -12,8 +12,6 @@ import java.util.List;
 
 public class BotConfig extends BaseConfig {
     private static BotConfig instance;
-    private final Collection<String> intents = new ArrayList<>();
-    private String token = "";
     private boolean cacheMember;
     private int statusRefreshInterval = 20;
     public boolean outboundEnabled = true;
@@ -34,7 +32,6 @@ public class BotConfig extends BaseConfig {
 
     @Override
     public boolean load() {
-        intents.clear();
         statuses.clear();
 
         if(!Files.exists(configFile)) {
@@ -47,17 +44,6 @@ public class BotConfig extends BaseConfig {
         } else {
             try {
                 final JsonObject jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(configFile))).getAsJsonObject();
-                if(jsonConfig.has("token")) {
-                    token = jsonConfig.get("token").getAsString();
-                }
-
-                if(jsonConfig.has("intents")) {
-                    JsonArray channels = jsonConfig.get("intents").getAsJsonArray();
-                    channels.forEach(jsonElement -> {
-                        String intent = jsonElement.getAsString();
-                        intents.add(intent);
-                    });
-                }
 
                 if(jsonConfig.has("statuses")) {
                     jsonConfig.get("statuses").getAsJsonArray().forEach(jsonElement -> {
@@ -94,10 +80,6 @@ public class BotConfig extends BaseConfig {
         for(String status : statuses) {
             statusesArray.add(status);
         }
-        for(String intent : intents) {
-            intentsArray.add(intent);
-        }
-        jsonObject.addProperty("token", token);
         jsonObject.add("statuses", statusesArray);
         jsonObject.addProperty("statusRefreshInterval", statusRefreshInterval);
         jsonObject.add("intents", intentsArray);
@@ -113,28 +95,11 @@ public class BotConfig extends BaseConfig {
         return true;
     }
 
-    public String getToken() {
-        return token;
-    }
-
     public boolean getCacheMember() {
         return cacheMember;
     }
 
     public int getStatusRefreshInterval() {
         return statusRefreshInterval;
-    }
-
-    public Collection<GatewayIntent> getIntents() {
-        Collection<GatewayIntent> intentCollection = new ArrayList<>();
-
-        for(String intentString : intents) {
-            try {
-                intentCollection.add(GatewayIntent.valueOf(intentString));
-            } catch (Exception ignored) {
-            }
-        }
-
-        return intentCollection;
     }
 }
