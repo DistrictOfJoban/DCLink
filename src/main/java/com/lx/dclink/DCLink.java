@@ -1,13 +1,9 @@
 package com.lx.dclink;
 
-import com.lx.dclink.bridges.Bridge;
-import com.lx.dclink.bridges.BridgeManager;
-import com.lx.dclink.bridges.DiscordBridge;
-import com.lx.dclink.bridges.RevoltBridge;
-import com.lx.dclink.commands.*;
+import com.lx.dclink.commands.dclink;
+import com.lx.dclink.config.BotConfig;
 import com.lx.dclink.config.DiscordConfig;
 import com.lx.dclink.config.MinecraftConfig;
-import com.lx.dclink.config.BotConfig;
 import com.lx.dclink.config.RevoltConfig;
 import com.lx.dclink.data.MinecraftEntry;
 import com.lx.dclink.events.ServerEvent;
@@ -44,14 +40,6 @@ public class DCLink implements ModInitializer {
 			dclink.register(dispatcher);
 		});
 	}
-
-	public static void loadBridges() {
-		Bridge discordBridge = new DiscordBridge(DiscordConfig.getInstance());
-		Bridge revoltBridge = new RevoltBridge(RevoltConfig.getInstance());
-		if(discordBridge.isValid()) BridgeManager.addBridge(discordBridge);
-		if(revoltBridge.isValid()) BridgeManager.addBridge(revoltBridge);
-	}
-
 	public static boolean loadAllConfig() {
 		return BotConfig.getInstance().load() && MinecraftConfig.getInstance().load() && DiscordConfig.getInstance().load() && RevoltConfig.getInstance().load();
 	}

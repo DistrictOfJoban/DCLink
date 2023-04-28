@@ -1,13 +1,11 @@
 package com.lx.dclink.config;
 
 import com.google.gson.*;
-import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.io.FileWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class BotConfig extends BaseConfig {
@@ -76,13 +74,11 @@ public class BotConfig extends BaseConfig {
         ensureRootFolderExist();
         JsonObject jsonObject = new JsonObject();
         JsonArray statusesArray = new JsonArray();
-        JsonArray intentsArray = new JsonArray();
         for(String status : statuses) {
             statusesArray.add(status);
         }
         jsonObject.add("statuses", statusesArray);
         jsonObject.addProperty("statusRefreshInterval", statusRefreshInterval);
-        jsonObject.add("intents", intentsArray);
         jsonObject.addProperty("cacheMember", cacheMember);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try (Writer writer = new FileWriter(configFile.toString())) {

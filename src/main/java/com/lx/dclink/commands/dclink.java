@@ -1,5 +1,6 @@
 package com.lx.dclink.commands;
 
+import com.lx.dclink.bridges.Bridge;
 import com.lx.dclink.bridges.BridgeManager;
 import com.lx.dclink.config.BotConfig;
 import com.lx.dclink.DCLink;
@@ -54,11 +55,10 @@ public class dclink {
         /* Re-login if successful */
         if(success) {
             BridgeManager.logout();
-
             BridgeManager.clearBridges();
-            DCLink.loadBridges();
-
+            BridgeManager.addDefaultBridges();
             BridgeManager.login();
+            BridgeManager.forEach(Bridge::startStatus);
         }
 
         return 1;

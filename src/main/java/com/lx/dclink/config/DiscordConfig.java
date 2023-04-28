@@ -49,10 +49,6 @@ public class DiscordConfig extends BridgeConfig {
                 token = jsonConfig.get("token").getAsString();
             }
 
-            if(jsonConfig.has("enabled")) {
-                enabled = jsonConfig.get("enabled").getAsBoolean();
-            }
-
             if(jsonConfig.has("intents")) {
                 JsonArray channels = jsonConfig.get("intents").getAsJsonArray();
                 channels.forEach(jsonElement -> {
@@ -98,7 +94,6 @@ public class DiscordConfig extends BridgeConfig {
             jsonArray.add(BridgeEntry.toJson(entry));
         }
 
-        jsonObject.addProperty("enabled", enabled);
         jsonObject.add("intents", intentsArray);
         jsonObject.add("entries", jsonArray);
 

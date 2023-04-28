@@ -19,7 +19,6 @@ import java.util.Map;
 
 public abstract class BridgeConfig extends BaseConfig {
     public final Path CUSTOM_EMBED_PATH = CONFIG_ROOT.resolve("embeds");
-    protected boolean enabled = false;
     public List<BridgeEntry> entries;
     public BridgeConfig(Path configFile) {
         super(configFile);

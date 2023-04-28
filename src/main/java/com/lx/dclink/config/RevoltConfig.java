@@ -48,10 +48,6 @@ public class RevoltConfig extends BridgeConfig {
                 token = jsonConfig.get("token").getAsString();
             }
 
-            if(jsonConfig.has("enabled")) {
-                enabled = jsonConfig.get("enabled").getAsBoolean();
-            }
-
             final JsonArray entryList = jsonConfig.get("entries").getAsJsonArray();
             entryList.forEach(jsonElement -> {
                 BridgeEntry bridgeEntry = BridgeEntry.fromJson(jsonElement);
@@ -84,7 +80,6 @@ public class RevoltConfig extends BridgeConfig {
             jsonArray.add(BridgeEntry.toJson(entry));
         }
 
-        jsonObject.addProperty("enabled", enabled);
         jsonObject.add("entries", jsonArray);
 
         if(!Files.exists(CUSTOM_EMBED_PATH)) {

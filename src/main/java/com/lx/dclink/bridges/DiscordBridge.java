@@ -33,7 +33,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,7 +81,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
             LOGGER.error(ex.getStackTrace());
             LOGGER.error("[DCLink] An invalid token has been provided! Please ensure the token is valid.");
         } catch (InterruptedException e) {
-            LOGGER.error("[DCLink] Interrupted.");
+            LOGGER.error("[DCLink] Thread interrupted.");
         }
     }
 
@@ -94,7 +93,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
         }
     }
 
-    public void executeOnReady(Runnable callback) {
+    public void executeWhenReady(Runnable callback) {
         if(!isReady) {
             queuedAction.add(callback);
         } else {
@@ -105,7 +104,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     public void startStatus() {
         if(!BotConfig.getInstance().statuses.isEmpty() && client != null) {
             Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.server, null, null);
-            executeOnReady(() -> {
+            executeWhenReady(() -> {
                 stopStatus();
                 timer = new Timer();
                 timer.schedule(new TimerTask() {

@@ -22,7 +22,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -104,7 +103,7 @@ public class RevoltBridge implements Bridge, RevoltListener {
     public void startStatus() {
         if(!BotConfig.getInstance().statuses.isEmpty() && client != null) {
             Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.server, null, null);
-            executeOnReady(() -> {
+            executeWhenReady(() -> {
                 timer = new Timer();
                 timer.schedule(new TimerTask() {
 
@@ -131,7 +130,7 @@ public class RevoltBridge implements Bridge, RevoltListener {
         }
     }
 
-    public void executeOnReady(Runnable callback) {
+    public void executeWhenReady(Runnable callback) {
         if(!isReady) {
             queuedAction.add(callback);
         } else {

@@ -1,11 +1,21 @@
 package com.lx.dclink.bridges;
 
+import com.lx.dclink.config.DiscordConfig;
+import com.lx.dclink.config.RevoltConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class BridgeManager {
     private static final List<Bridge> bridges = new ArrayList<>();
+
+    public static void addDefaultBridges() {
+        Bridge discordBridge = new DiscordBridge(DiscordConfig.getInstance());
+        Bridge revoltBridge = new RevoltBridge(RevoltConfig.getInstance());
+        if(discordBridge.isValid()) BridgeManager.addBridge(discordBridge);
+        if(revoltBridge.isValid()) BridgeManager.addBridge(revoltBridge);
+    }
 
     public static void clearBridges() {
         bridges.clear();

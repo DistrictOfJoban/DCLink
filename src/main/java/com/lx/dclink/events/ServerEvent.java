@@ -20,7 +20,7 @@ public class ServerEvent {
         DCLink.server = server;
 
         BridgeManager.clearBridges();
-        DCLink.loadBridges();
+        BridgeManager.addDefaultBridges();
         BridgeManager.login();
 
         BridgeManager.forEach(bridge -> {
