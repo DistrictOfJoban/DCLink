@@ -9,6 +9,7 @@ import com.lx.dclink.config.DiscordConfig;
 import com.lx.dclink.config.MinecraftConfig;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.MutableText;
@@ -44,6 +45,17 @@ public class dclink {
                         )
                 )
         );
+
+        if(FabricLoader.getInstance().isDevelopmentEnvironment()) {
+            dispatcher.register(CommandManager.literal("dclinkDebug")
+                    .requires(ctx -> ctx.hasPermissionLevel(2))
+                    .then(CommandManager.literal("crashServer")
+                            .executes(context -> {
+                                DCLink.crashServerOnTick = true;
+                                return 1;
+                            })
+                    ));
+        }
     }
 
     private static int reloadConfig(CommandContext<ServerCommandSource> context) {
@@ -60,6 +72,8 @@ public class dclink {
             BridgeManager.login();
             BridgeManager.forEach(Bridge::startStatus);
         }
+
+        DCLink.crashServerOnTick = true;
 
         return 1;
     }

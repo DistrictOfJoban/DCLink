@@ -4,10 +4,10 @@
   "package": "com.lx.dclink.mixin",
   "compatibilityLevel": "JAVA_${java}",
   "mixins": [
-    "CrashExceptionMixin",
+    "CrashReportMixin",
     "PlayerAdvancementTrackerMixin",
-    "ServerPlayerEntityMixin",
     "PlayerManagerMixin",
+    "ServerPlayerEntityMixin",
     "ServerPlayNetworkHandlerMixin"
   ],
   "client": [

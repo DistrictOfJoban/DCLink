@@ -9,6 +9,8 @@ import com.lx.dclink.data.MinecraftEntry;
 import com.lx.dclink.events.ServerEvent;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -22,6 +24,7 @@ import java.util.List;
 public class DCLink implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger("dclink");
 	public static MinecraftServer server = null;
+	public static boolean crashServerOnTick = false;
 
 	@Override
 	public void onInitialize() {
@@ -35,6 +38,11 @@ public class DCLink implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register((ServerEvent::serverStarted));
 		ServerLifecycleEvents.SERVER_STOPPING.register((ServerEvent::serverStopping));
 		ServerLifecycleEvents.SERVER_STOPPED.register((ServerEvent::serverStopped));
+		ServerTickEvents.START_SERVER_TICK.register(e -> {
+			if(crashServerOnTick) {
+				throw new RuntimeException("Manually triggered DCLink Debug crash.");
+			}
+		});
 
 		CommandManager.registerCommand((dispatcher) -> {
 			dclink.register(dispatcher);

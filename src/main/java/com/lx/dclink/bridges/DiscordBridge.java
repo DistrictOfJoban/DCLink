@@ -359,9 +359,11 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
             }
 
             try {
+                // Send Embed Only
                 if(finalMessage.isEmpty() && !embedToBeSent.isEmpty()) {
                     channel.sendMessageEmbeds(embedToBeSent).queue();
                 } else {
+                    // Send message with embed attached
                     MessageCreateAction action = channel.sendMessage(finalMessage);
                     action.setEmbeds(embedToBeSent);
                     action.queue();

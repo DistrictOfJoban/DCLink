@@ -65,7 +65,7 @@ public abstract class BridgeConfig extends BaseConfig {
         );
         defaultEmbeds.put("serverCrashed",
                 new EmbedBuilder()
-                        .setTitle(":warning: Crash Exception Detected!")
+                        .setTitle(":warning: Server crashed!")
                         .setDescription("`{reason}`")
                         .build()
         );

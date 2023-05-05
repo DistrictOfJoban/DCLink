@@ -18,11 +18,11 @@ public abstract class Placeholder {
 
     public String parse(String original) {
         for(Map.Entry<String, String> entry : placeholders.entrySet()) {
-            original = original.replaceAll("\\{" + entry.getKey() + "}", entry.getValue());
+            original = original.replaceAll("\\{" + Pattern.quote(entry.getKey()) + "}", Matcher.quoteReplacement(entry.getValue()));
         }
 
         for(Map.Entry<String, Long> entry : timePlaceholders.entrySet()) {
-            Pattern pattern = Pattern.compile("\\{" + entry.getKey() + ".*?}", Pattern.CASE_INSENSITIVE);
+            Pattern pattern = Pattern.compile("\\{" + Pattern.quote(entry.getKey()) + ".*?}", Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(original);
 
             while(matcher.find()) {

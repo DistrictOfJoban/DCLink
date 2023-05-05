@@ -68,6 +68,7 @@ public class ServerEvent {
     public static void serverCrashed(CrashReport crashReport) {
         Placeholder placeholder = new MinecraftPlaceholder();
         placeholder.addPlaceholder("reason", crashReport.getMessage());
+        placeholder.addPlaceholder("stacktrace", crashReport.getCauseAsString());
 
         BridgeManager.forEach(bridge -> {
             for(BridgeEntry entry : bridge.getEntries()) {
