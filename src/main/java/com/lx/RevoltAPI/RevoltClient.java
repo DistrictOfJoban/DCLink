@@ -2,50 +2,48 @@ package com.lx.RevoltAPI;
 
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.lx.RevoltAPI.data.APIResponse;
-import com.lx.RevoltAPI.data.Channel;
-import com.lx.RevoltAPI.data.UserInfo;
-import com.lx.RevoltAPI.data.type.StatusPresence;
+import com.lx.RevoltAPI.data.*;
+import com.lx.RevoltAPI.data.accounts.Member;
+import com.lx.RevoltAPI.data.accounts.User;
+import com.lx.RevoltAPI.data.StatusPresence;
+import com.lx.RevoltAPI.events.EventEmitter;
+import com.lx.RevoltAPI.managers.CacheManager;
+import com.lx.RevoltAPI.managers.FetchManager;
 import com.lx.dclink.util.StringHelper;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 
 public class RevoltClient {
     private final String token;
     private API api;
     private static final Logger LOGGER = LogManager.getLogger("RevoltAPI");
-    private List<RevoltListener> listeners = new ArrayList<>();
+    private EventEmitter eventEmitter;
 
     public RevoltClient(String token) {
-        this.api = new API();
+        this.api = new API("https://api.revolt.chat");
         this.api.setToken(token);
+        this.eventEmitter = new EventEmitter(token);
         this.token = token;
     }
 
     public void addListener(RevoltListener listener) {
-        listeners.add(listener);
+        eventEmitter.addListener(listener);
     }
 
-    public UserInfo getSelf() {
-        if(CacheManager.userInfo != null) return CacheManager.userInfo;
-
-        APIResponse data = api.executeGet("/users/@me");
-        if(data == null || !data.isSuccess()) return null;
-
-        JsonElement dataElement = new JsonParser().parse(data.getData());
-        JsonObject dataObject = dataElement.getAsJsonObject();
-        UserInfo info = new UserInfo(dataObject.get("_id").getAsString(), dataObject.get("username").getAsString());
-        CacheManager.userInfo = info;
-        return info;
+    public User getSelf() {
+        if(CacheManager.userInfo != null) {
+            return CacheManager.userInfo;
+        } else {
+            return FetchManager.getSelf(api);
+        }
     }
 
     public void setStatus(StatusPresence presence, String text) {
@@ -75,32 +73,58 @@ public class RevoltClient {
             throw new InvalidTokenException("No token provided/Token is empty!");
         }
 
-        UserInfo userInfo = getSelf();
+        User userInfo = getSelf();
         if(userInfo == null) {
             LOGGER.error("[RevoltAPI] Cannot get self user info, please ensure the token is valid.");
         } else {
             setStatus(StatusPresence.ONLINE, null);
-            for(RevoltListener listener : listeners) {
-                listener.onReady(userInfo);
-            }
+            eventEmitter.emitReadyEvent(userInfo);
         }
+
+        eventEmitter.startListeningWebSocket();
+    }
+
+    public void disconnect() {
+        setStatus(StatusPresence.INVISIBLE, null);
+    }
+
+    public void sendMessage(String message, String channelId, @Nullable Collection<TextEmbed> textEmbeds) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("content", message);
+        if(textEmbeds != null && !textEmbeds.isEmpty()) {
+            JsonArray jsonArray = new JsonArray();
+            for(TextEmbed embed : textEmbeds) {
+                jsonArray.add(embed.toJson());
+            }
+            jsonObject.add("embeds", jsonArray);
+        }
+        RequestBody requestBody = RequestBody.create(jsonObject.toString(), MediaType.parse("application/json; charset=utf-8"));
+        CompletableFuture.runAsync(() -> {
+            api.executePost("/channels/" + channelId + "/messages", requestBody);
+        });
     }
 
     public Channel getChannel(String id) {
         if(CacheManager.cachedChannel.containsKey(id)) {
             return CacheManager.cachedChannel.get(id);
         } else {
-            APIResponse data = api.executeGet("/channels/" + id);
-            if(data == null || !data.isSuccess()) return null;
-            JsonElement dataElement = new JsonParser().parse(data.getData());
-            JsonObject dataObject = dataElement.getAsJsonObject();
-            Channel channel = new Channel(api, id, dataObject.get("name").getAsString());
-            CacheManager.cachedChannel.put(id, channel);
-            return channel;
+            return FetchManager.getChannel(api, id);
         }
     }
 
-    public void disconnect() {
-        setStatus(StatusPresence.INVISIBLE, null);
+    public Member getMember(String serverId, String id) {
+        if(CacheManager.cachedMembers.containsKey(id)) {
+            return CacheManager.cachedMembers.get(id);
+        } else {
+            return FetchManager.getMember(api, serverId, id);
+        }
+    }
+
+    public User getUser(String id) {
+        if(CacheManager.cachedUsers.containsKey(id)) {
+            return CacheManager.cachedUsers.get(id);
+        } else {
+            return FetchManager.getUser(api, id);
+        }
     }
 }

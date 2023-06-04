@@ -1,24 +1,22 @@
 package com.lx.RevoltAPI.data;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.lx.RevoltAPI.API;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
+import com.lx.RevoltAPI.RevoltClient;
 
 import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
 
 public class Channel {
     private String channelType;
     private String id;
     private String name;
+    private String serverId;
     private String description;
     private API api;
 
-    public Channel(API api, String id, String name) {
+    public Channel(API api, String id, String serverId, String name) {
         this.api = api;
         this.id = id;
+        this.serverId = serverId;
         this.name = name;
     }
 
@@ -34,28 +32,16 @@ public class Channel {
         return description;
     }
 
-    public void sendMessage(String message) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("content", message);
-        RequestBody requestBody = RequestBody.create(jsonObject.toString(), MediaType.parse("application/json; charset=utf-8"));
-        CompletableFuture.runAsync(() -> {
-            api.executePost("channels/" + id + "/messages", requestBody);
-        });
+    // TODO: This is temp, create a server class
+    public String getServerId() {
+        return serverId;
     }
 
-    public void sendMessage(String message, Collection<TextEmbed> textEmbeds) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("content", message);
-        if(!textEmbeds.isEmpty()) {
-            JsonArray jsonArray = new JsonArray();
-            for(TextEmbed embed : textEmbeds) {
-                jsonArray.add(embed.toJson());
-            }
-            jsonObject.add("embeds", jsonArray);
-        }
-        RequestBody requestBody = RequestBody.create(jsonObject.toString(), MediaType.parse("application/json; charset=utf-8"));
-        CompletableFuture.runAsync(() -> {
-            api.executePost("/channels/" + id + "/messages", requestBody);
-        });
+    public void sendMessage(RevoltClient client, String message) {
+        client.sendMessage(message, id, null);
+    }
+
+    public void sendMessage(RevoltClient client, String message, Collection<TextEmbed> textEmbeds) {
+        client.sendMessage(message, id, textEmbeds);
     }
 }

@@ -1,6 +1,7 @@
 package com.lx.dclink.bridges;
 
 import com.lx.RevoltAPI.data.UserInfo;
+import com.lx.RevoltAPI.data.accounts.User;
 import com.lx.dclink.data.BridgeEntry;
 import com.lx.dclink.data.Placeholder;
 
@@ -16,7 +17,7 @@ public interface Bridge {
     boolean isReady();
     BridgeType getType();
     // TEMP
-    UserInfo getUserInfo();
+    User getUserInfo();
     void executeWhenReady(Runnable callback);
     void startStatus();
     void stopStatus();

@@ -2,12 +2,13 @@ package com.lx.dclink.bridges;
 
 import com.google.gson.JsonArray;
 import com.lx.RevoltAPI.RevoltListener;
+import com.lx.RevoltAPI.data.Message;
 import com.lx.RevoltAPI.data.TextEmbed;
+import com.lx.RevoltAPI.data.accounts.User;
 import com.lx.dclink.DCLink;
 import com.lx.RevoltAPI.RevoltClient;
 import com.lx.RevoltAPI.data.Channel;
-import com.lx.RevoltAPI.data.UserInfo;
-import com.lx.RevoltAPI.data.type.StatusPresence;
+import com.lx.RevoltAPI.data.StatusPresence;
 import com.lx.dclink.config.BotConfig;
 import com.lx.dclink.config.DiscordConfig;
 import com.lx.dclink.config.RevoltConfig;
@@ -16,7 +17,7 @@ import com.lx.dclink.data.MinecraftPlaceholder;
 import com.lx.dclink.data.Placeholder;
 import com.lx.dclink.util.EmbedParser;
 import com.lx.dclink.util.StringHelper;
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,7 +32,6 @@ public class RevoltBridge implements Bridge, RevoltListener {
     private final Collection<Runnable> queuedAction;
     public RevoltClient client;
     public Map<String, List<RichCustomEmoji>> emojiMap = new HashMap<>();
-    public Map<Long, Message> messageCache = new HashMap<>();
     private boolean isReady = false;
     private Timer timer;
     private int currentStatus;
@@ -66,7 +66,7 @@ public class RevoltBridge implements Bridge, RevoltListener {
         for(String channelId : channelList) {
             Channel channel = client.getChannel(channelId);
             if(channel == null) continue;
-            channel.sendMessage(finalMessage, embedToBeSent);
+            channel.sendMessage(client, finalMessage, embedToBeSent);
         }
     }
 
@@ -96,7 +96,7 @@ public class RevoltBridge implements Bridge, RevoltListener {
         return BridgeType.REVOLT;
     }
 
-    public UserInfo getUserInfo() {
+    public com.lx.RevoltAPI.data.accounts.User getUserInfo() {
         return client.getSelf();
     }
 
@@ -147,13 +147,13 @@ public class RevoltBridge implements Bridge, RevoltListener {
     }
 
     @Override
-    public void onReady(UserInfo info) {
-        //TODO: Implement guild and stuff so I can fetch emojis
+    public void onReady(User self) {
+        //TODO: Implement server and stuff so I can fetch emojis
 
         //        client.getGuildCache().forEach(guild -> {
         //            emojiMap.put(guild.getId(), guild.getEmojis());
         //        });
-        LOGGER.info("[RevoltLink] Logged in as: " + info.getAccountName());
+        LOGGER.info("[RevoltLink] Logged in as: @" + self.getUsername());
         isReady = true;
 
         for(Runnable callback : queuedAction) {
@@ -163,7 +163,11 @@ public class RevoltBridge implements Bridge, RevoltListener {
     }
 
     @Override
-    public void onMessage() {
+    public void onMessage(Message message) {
+//        if (!isReady || message.getAuthor(client) == null || !BotConfig.getInstance().inboundEnabled) return;
+//        if(message.getAuthor(client).getId().equals(client.getSelf().getId())) return;
+
+        System.out.println(message.getContent());
         //TODO: Receive incoming message from Revolt
     }
 }

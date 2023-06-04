@@ -1,4 +1,4 @@
-package com.lx.RevoltAPI.data.type;
+package com.lx.RevoltAPI.data;
 
 public enum StatusPresence {
     ONLINE("Online"),

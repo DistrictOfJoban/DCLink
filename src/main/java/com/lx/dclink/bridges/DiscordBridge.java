@@ -305,8 +305,8 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
         return BridgeType.DISCORD;
     }
 
-    public UserInfo getUserInfo() {
-        return new UserInfo(client.getSelfUser().getId(), client.getSelfUser().getAsTag());
+    public com.lx.RevoltAPI.data.accounts.User getUserInfo() {
+        return new com.lx.RevoltAPI.data.accounts.User(client.getSelfUser().getId(), client.getSelfUser().getAsTag());
     }
 
     public void sendMessage(String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji) {

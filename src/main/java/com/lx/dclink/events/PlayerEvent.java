@@ -98,7 +98,7 @@ public class PlayerEvent {
     public static void sendMessage(String content, ServerPlayerEntity player) {
         ServerWorld world = Mappings.getServerWorld(player);
         String worldId = world.getRegistryKey().getValue().toString();
-        Placeholder placeholder = new MinecraftPlaceholder(player, player.server, player.world, content);
+        Placeholder placeholder = new MinecraftPlaceholder(player, player.server, player.getServerWorld(), content);
 
         BridgeManager.forEach(bridge -> {
             for(BridgeEntry entry : bridge.getEntries()) {

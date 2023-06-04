@@ -8,11 +8,12 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class API {
-    private static final String url = "https://api.revolt.chat";
+    private final String url;
     private String token;
     private final OkHttpClient client;
 
-    public API() {
+    public API(String url) {
+        this.url = url;
         this.client = new OkHttpClient();
     }
 
