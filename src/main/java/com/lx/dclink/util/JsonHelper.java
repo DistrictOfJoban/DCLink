@@ -15,4 +15,9 @@ public class JsonHelper {
     public static String getString(JsonElement element) {
         return (element == null || element.isJsonNull()) ? null : element.getAsString();
     }
+
+    public static String sanitize(String str) {
+        if(str == null) return null;
+        return str.replace("\"", "\\\"").replace("{", "\\{");
+    }
 }

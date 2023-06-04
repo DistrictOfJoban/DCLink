@@ -1,5 +1,6 @@
 package com.lx.dclink.data;
 
+import com.lx.dclink.util.JsonHelper;
 import com.lx.dclink.util.StringHelper;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -27,20 +28,20 @@ public class BridgePlaceholder extends Placeholder {
     }
 
     public void setData(String objName, Message.Attachment attachment) {
-        addPlaceholder(objName, "name", attachment.getFileName());
+        addPlaceholder(objName, "name", JsonHelper.sanitize(attachment.getFileName()));
         addPlaceholder(objName, "ext", attachment.getFileExtension() == null ? "" : attachment.getFileExtension());
-        addPlaceholder(objName, "url", attachment.getUrl());
+        addPlaceholder(objName, "url", JsonHelper.sanitize(attachment.getUrl()));
         addPlaceholder(objName, "size", StringHelper.formatFileSize(attachment.getSize()));
     }
 
     public void setData(String objName, Member member) {
-        addPlaceholder(objName, "nickOrUsername", member.getEffectiveName());
+        addPlaceholder(objName, "nickOrUsername", JsonHelper.sanitize(member.getEffectiveName()));
         setData(objName + "." + "user", member.getUser());
     }
 
     public void setData(String objName, User user) {
-        addPlaceholder(objName, "username", user.getName());
-        addPlaceholder(objName, "tag", user.getAsTag());
+        addPlaceholder(objName, "username", JsonHelper.sanitize(user.getName()));
+        addPlaceholder(objName, "tag", JsonHelper.sanitize(user.getAsTag()));
         addPlaceholder(objName, "id", user.getId());
         addPlaceholder(objName, "avatarURL", user.getAvatarUrl() == null ? "" : user.getAvatarUrl());
     }
@@ -51,14 +52,14 @@ public class BridgePlaceholder extends Placeholder {
 
         if(channel instanceof TextChannel) {
            addPlaceholder(objName, "mention", channel.getAsMention());
-           addPlaceholder(objName, "topic", ((TextChannel)channel).getTopic());
+           addPlaceholder(objName, "topic", JsonHelper.sanitize(((TextChannel)channel).getTopic()));
         }
     }
 
     public void setData(String objName, Guild guild) {
         addPlaceholder(objName, "memberCount", String.valueOf(guild.getMemberCount()));
         addPlaceholder(objName, "iconURL", guild.getIconUrl());
-        addPlaceholder(objName, "name", guild.getName());
+        addPlaceholder(objName, "name", JsonHelper.sanitize(guild.getName()));
 
         if(guild.getOwner() != null) {
             setData(objName + ".owner", guild.getOwner());
@@ -70,7 +71,7 @@ public class BridgePlaceholder extends Placeholder {
     }
 
     public void setData(String objName, Message message) {
-        addPlaceholder(objName, "content", message.getContentDisplay());
+        addPlaceholder(objName, "content", JsonHelper.sanitize(message.getContentDisplay()));
         addPlaceholder(objName, "jumpURL", message.getJumpUrl());
         if(message.getMember() != null) {
             setData(objName + "." + "author", message.getMember());

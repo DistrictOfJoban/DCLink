@@ -170,7 +170,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
         List<Message.Attachment> attachments = event.getMessage().getAttachments();
 
         for(MinecraftEntry entry : MinecraftConfig.entries) {
-            if(!entry.channelID.contains(event.getGuildChannel().getId())) {
+            if(!entry.channelID.isEmpty() && !entry.channelID.contains(event.getGuildChannel().getId())) {
                 continue;
             }
 
