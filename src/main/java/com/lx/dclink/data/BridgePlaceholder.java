@@ -41,9 +41,19 @@ public class BridgePlaceholder extends Placeholder {
 
     public void setData(String objName, User user) {
         addPlaceholder(objName, "username", JsonHelper.sanitize(user.getName()));
-        addPlaceholder(objName, "tag", JsonHelper.sanitize(user.getAsTag()));
+        addPlaceholder(objName, "displayName", JsonHelper.sanitize(user.getEffectiveName()));
+        addPlaceholder(objName, "tagOrUsername", JsonHelper.sanitize(getUserTagOrName(user, false)));
+        addPlaceholder(objName, "tagOrDisplayName", JsonHelper.sanitize(getUserTagOrName(user, true)));
         addPlaceholder(objName, "id", user.getId());
         addPlaceholder(objName, "avatarURL", user.getAvatarUrl() == null ? "" : user.getAvatarUrl());
+    }
+
+    private static String getUserTagOrName(User user, boolean displayName) {
+        if(user.getDiscriminator().equals("0000")) {
+            return displayName ? user.getEffectiveName() : "@" + user.getName();
+        } else {
+            return user.getAsTag();
+        }
     }
 
     public void setData(String objName, StandardGuildChannel channel) {
