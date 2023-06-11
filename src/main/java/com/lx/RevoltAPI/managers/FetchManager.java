@@ -6,8 +6,8 @@ import com.google.gson.JsonParser;
 import com.lx.RevoltAPI.API;
 import com.lx.RevoltAPI.data.APIResponse;
 import com.lx.RevoltAPI.data.Channel;
-import com.lx.RevoltAPI.data.accounts.Member;
-import com.lx.RevoltAPI.data.accounts.User;
+import com.lx.dclink.data.bridge.Member;
+import com.lx.dclink.data.bridge.User;
 
 public class FetchManager {
     public static Channel getChannel(API api, String id) {
@@ -26,7 +26,7 @@ public class FetchManager {
 
         JsonElement dataElement = new JsonParser().parse(data.getData());
         JsonObject dataObject = dataElement.getAsJsonObject();
-        return new User(dataObject);
+        return User.fromRevolt(dataObject);
     }
 
     public static User getUser(API api, String id) {
@@ -34,7 +34,7 @@ public class FetchManager {
         if(data == null || !data.isSuccess()) return null;
         JsonElement dataElement = new JsonParser().parse(data.getData());
         JsonObject dataObject = dataElement.getAsJsonObject();
-        Member member = new Member(dataObject);
+        Member member = Member.fromRevolt(dataObject);
         CacheManager.cachedMembers.put(id, member);
         return member.getUser();
     }
@@ -44,7 +44,7 @@ public class FetchManager {
         if(data == null || !data.isSuccess()) return null;
         JsonElement dataElement = new JsonParser().parse(data.getData());
         JsonObject dataObject = dataElement.getAsJsonObject();
-        Member member = new Member(dataObject);
+        Member member = Member.fromRevolt(dataObject);
         CacheManager.cachedMembers.put(id, member);
         return member;
     }

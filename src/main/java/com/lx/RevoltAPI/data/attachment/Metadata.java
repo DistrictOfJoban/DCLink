@@ -14,7 +14,10 @@ public class Metadata {
     }
 
     public Metadata(JsonObject jsonObject) {
-        this.type = jsonObject.get("type").getAsString();
+        if(jsonObject.has("type")) {
+            this.type = jsonObject.get("type").getAsString();
+        }
+
         if(jsonObject.has("width")) {
             this.width = jsonObject.get("width").getAsInt();
         }

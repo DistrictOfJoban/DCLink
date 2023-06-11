@@ -2,8 +2,8 @@ package com.lx.RevoltAPI.managers;
 
 import com.lx.RevoltAPI.data.Channel;
 import com.lx.RevoltAPI.data.Message;
-import com.lx.RevoltAPI.data.accounts.Member;
-import com.lx.RevoltAPI.data.accounts.User;
+import com.lx.dclink.data.bridge.Member;
+import com.lx.dclink.data.bridge.User;
 
 import java.util.HashMap;
 

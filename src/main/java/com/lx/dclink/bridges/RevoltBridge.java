@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.lx.RevoltAPI.RevoltListener;
 import com.lx.RevoltAPI.data.Message;
 import com.lx.RevoltAPI.data.TextEmbed;
-import com.lx.RevoltAPI.data.accounts.User;
+import com.lx.dclink.data.bridge.User;
 import com.lx.dclink.DCLink;
 import com.lx.RevoltAPI.RevoltClient;
 import com.lx.RevoltAPI.data.Channel;
@@ -17,7 +17,6 @@ import com.lx.dclink.data.MinecraftPlaceholder;
 import com.lx.dclink.data.Placeholder;
 import com.lx.dclink.util.EmbedParser;
 import com.lx.dclink.util.StringHelper;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -96,7 +95,7 @@ public class RevoltBridge implements Bridge, RevoltListener {
         return BridgeType.REVOLT;
     }
 
-    public com.lx.RevoltAPI.data.accounts.User getUserInfo() {
+    public User getUserInfo() {
         return client.getSelf();
     }
 
@@ -153,7 +152,7 @@ public class RevoltBridge implements Bridge, RevoltListener {
         //        client.getGuildCache().forEach(guild -> {
         //            emojiMap.put(guild.getId(), guild.getEmojis());
         //        });
-        LOGGER.info("[RevoltLink] Logged in as: @" + self.getUsername());
+        LOGGER.info("[RevoltLink] Logged in as: @" + self.getName());
         isReady = true;
 
         for(Runnable callback : queuedAction) {

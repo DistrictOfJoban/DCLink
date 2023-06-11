@@ -17,63 +17,83 @@ public class ServerEvent {
     }
 
     public static void serverStarting(MinecraftServer server) {
-        DCLink.server = server;
+        try {
+            DCLink.server = server;
 
-        BridgeManager.clearBridges();
-        BridgeManager.addDefaultBridges();
-        BridgeManager.login();
+            BridgeManager.clearBridges();
+            BridgeManager.addDefaultBridges();
+            BridgeManager.login();
 
-        BridgeManager.forEach(bridge -> {
-            for(BridgeEntry entry : bridge.getEntries()) {
-                bridge.sendMessage(entry.message.serverStarting, null, entry.channelID, entry.allowMention, entry.enableEmoji);
-            }
-        });
+            BridgeManager.forEach(bridge -> {
+                for(BridgeEntry entry : bridge.getEntries()) {
+                    bridge.sendMessage(entry.message.serverStarting, null, entry.channelID, entry.allowMention, entry.enableEmoji);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void serverStarted(MinecraftServer server) {
-        serverStartedTimestamp = System.currentTimeMillis();
-        Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
-        placeholder.addTimePlaceholder("time", serverStartedTimestamp - serverStartingTimestamp);
+        try {
+            serverStartedTimestamp = System.currentTimeMillis();
+            Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
+            placeholder.addTimePlaceholder("time", serverStartedTimestamp - serverStartingTimestamp);
 
-        BridgeManager.forEach(bridge -> {
-            for(BridgeEntry entry : bridge.getEntries()) {
-                bridge.sendMessage(entry.message.serverStarted, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
-            }
-            bridge.startStatus();
-        });
+            BridgeManager.forEach(bridge -> {
+                for(BridgeEntry entry : bridge.getEntries()) {
+                    bridge.sendMessage(entry.message.serverStarted, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+                }
+                bridge.startStatus();
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void serverStopping(MinecraftServer server) {
-        long serverStoppingTimestamp = System.currentTimeMillis();
-        Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
-        placeholder.addTimePlaceholder("time", serverStoppingTimestamp - serverStartedTimestamp);
+        try {
+            long serverStoppingTimestamp = System.currentTimeMillis();
+            Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
+            placeholder.addTimePlaceholder("time", serverStoppingTimestamp - serverStartedTimestamp);
 
-        BridgeManager.forEach(bridge -> {
-            for(BridgeEntry entry : bridge.getEntries()) {
-                bridge.sendMessage(entry.message.serverStopping, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
-            }
-        });
+            BridgeManager.forEach(bridge -> {
+                for(BridgeEntry entry : bridge.getEntries()) {
+                    bridge.sendMessage(entry.message.serverStopping, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void serverStopped(MinecraftServer server) {
-        BridgeManager.forEach(bridge -> {
-            for(BridgeEntry entry : bridge.getEntries()) {
-                bridge.sendMessage(entry.message.serverStopped, null, entry.channelID, entry.allowMention, entry.enableEmoji);
-            }
-        });
-        DCLink.server = null;
-        BridgeManager.logout();
+        try {
+            BridgeManager.forEach(bridge -> {
+                for(BridgeEntry entry : bridge.getEntries()) {
+                    bridge.sendMessage(entry.message.serverStopped, null, entry.channelID, entry.allowMention, entry.enableEmoji);
+                }
+            });
+            DCLink.server = null;
+            BridgeManager.logout();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void serverCrashed(CrashReport crashReport) {
-        Placeholder placeholder = new MinecraftPlaceholder();
-        placeholder.addPlaceholder("reason", crashReport.getMessage());
-        placeholder.addPlaceholder("stacktrace", crashReport.getCauseAsString());
+        try {
+            Placeholder placeholder = new MinecraftPlaceholder();
+            placeholder.addPlaceholder("reason", crashReport.getMessage());
+            placeholder.addPlaceholder("stacktrace", crashReport.getCauseAsString());
 
-        BridgeManager.forEach(bridge -> {
-            for(BridgeEntry entry : bridge.getEntries()) {
-                bridge.sendMessage(entry.message.serverCrashed, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
-            }
-        });
+            BridgeManager.forEach(bridge -> {
+                for(BridgeEntry entry : bridge.getEntries()) {
+                    bridge.sendMessage(entry.message.serverCrashed, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

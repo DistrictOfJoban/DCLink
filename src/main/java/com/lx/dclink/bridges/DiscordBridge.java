@@ -1,12 +1,12 @@
 package com.lx.dclink.bridges;
 
 import com.google.gson.JsonArray;
-import com.lx.RevoltAPI.data.UserInfo;
 import com.lx.dclink.DCLink;
 import com.lx.dclink.config.BotConfig;
 import com.lx.dclink.config.DiscordConfig;
 import com.lx.dclink.config.MinecraftConfig;
 import com.lx.dclink.data.*;
+import com.lx.dclink.data.bridge.User;
 import com.lx.dclink.util.EmbedParser;
 import com.lx.dclink.util.StringHelper;
 import net.dv8tion.jda.api.JDA;
@@ -305,8 +305,8 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
         return BridgeType.DISCORD;
     }
 
-    public com.lx.RevoltAPI.data.accounts.User getUserInfo() {
-        return new com.lx.RevoltAPI.data.accounts.User(client.getSelfUser().getId(), client.getSelfUser().getAsTag());
+    public User getUserInfo() {
+        return User.fromDiscord(client.getSelfUser());
     }
 
     public void sendMessage(String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji) {

@@ -92,7 +92,7 @@ public class dclink {
 
         BridgeManager.forEach(bridge -> {
             MutableText title = Mappings.literalText("===== " + bridge.getType().toString() + " =====").formatted(Formatting.GOLD);
-            MutableText clientAccount = bridge.isReady() ? Mappings.literalText(bridge.getUserInfo().getUsername() + " (" + bridge.getUserInfo().getId() + ")").formatted(Formatting.GREEN) : null;
+            MutableText clientAccount = bridge.isReady() ? Mappings.literalText(bridge.getUserInfo().getName() + " (" + bridge.getUserInfo().getId() + ")").formatted(Formatting.GREEN) : null;
             MutableText clientStatus = getPair("Client Status", bridge.isReady() ? onlineText : offlineText);
             MutableText loggedInAccount = getPair("Logged in as", clientAccount);
             MutableText outBound = getPair("Outbound Messages", BotConfig.getInstance().outboundEnabled ? enabledText : disabledText);

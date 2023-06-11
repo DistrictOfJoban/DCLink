@@ -3,20 +3,20 @@ package com.lx.RevoltAPI.events;
 import com.google.gson.JsonElement;
 import com.lx.RevoltAPI.RevoltListener;
 import com.lx.RevoltAPI.data.Message;
-import com.lx.RevoltAPI.data.UserInfo;
 import com.lx.RevoltAPI.data.WSResponse;
-import com.lx.RevoltAPI.data.accounts.User;
+import com.lx.dclink.data.bridge.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class EventEmitter {
+    private static final String revoltWS = "ws.revolt.chat";
     private final List<RevoltListener> listeners;
     private final WebsocketClient ws;
 
     public EventEmitter(String token) {
         this.listeners = new ArrayList<>();
-        this.ws = new WebsocketClient("wss://ws.revolt.chat"  + "?version=13&format=json"+ "&token=" + token);
+        this.ws = new WebsocketClient("wss://" + revoltWS  + "?version=13&format=json"+ "&token=" + token);
         this.ws.onMessageCallback(this::onWebSocketMessage);
     }
 

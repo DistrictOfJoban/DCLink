@@ -1,5 +1,7 @@
 package com.lx.dclink.data;
 
+import com.lx.dclink.data.bridge.Member;
+import com.lx.dclink.data.bridge.User;
 import com.lx.dclink.util.JsonHelper;
 import com.lx.dclink.util.StringHelper;
 import net.dv8tion.jda.api.entities.*;
@@ -34,12 +36,12 @@ public class BridgePlaceholder extends Placeholder {
         addPlaceholder(objName, "size", StringHelper.formatFileSize(attachment.getSize()));
     }
 
-    public void setData(String objName, Member member) {
+    public void setData(String objName, com.lx.dclink.data.bridge.Member member) {
         addPlaceholder(objName, "nickOrUsername", JsonHelper.sanitize(member.getEffectiveName()));
         setData(objName + "." + "user", member.getUser());
     }
 
-    public void setData(String objName, User user) {
+    public void setData(String objName, com.lx.dclink.data.bridge.User user) {
         addPlaceholder(objName, "username", JsonHelper.sanitize(user.getName()));
         addPlaceholder(objName, "displayName", JsonHelper.sanitize(user.getEffectiveName()));
         addPlaceholder(objName, "tagOrUsername", JsonHelper.sanitize(getUserTagOrName(user, false)));
@@ -48,7 +50,7 @@ public class BridgePlaceholder extends Placeholder {
         addPlaceholder(objName, "avatarURL", user.getAvatarUrl() == null ? "" : user.getAvatarUrl());
     }
 
-    private static String getUserTagOrName(User user, boolean displayName) {
+    private static String getUserTagOrName(com.lx.dclink.data.bridge.User user, boolean displayName) {
         if(user.getDiscriminator().equals("0000")) {
             return displayName ? user.getEffectiveName() : "@" + user.getName();
         } else {
@@ -72,7 +74,7 @@ public class BridgePlaceholder extends Placeholder {
         addPlaceholder(objName, "name", JsonHelper.sanitize(guild.getName()));
 
         if(guild.getOwner() != null) {
-            setData(objName + ".owner", guild.getOwner());
+            setData(objName + ".owner", Member.fromDiscord(guild.getOwner()));
         }
 
         if(guild.getBannerUrl() != null) {
@@ -84,9 +86,9 @@ public class BridgePlaceholder extends Placeholder {
         addPlaceholder(objName, "content", JsonHelper.sanitize(message.getContentDisplay()));
         addPlaceholder(objName, "jumpURL", message.getJumpUrl());
         if(message.getMember() != null) {
-            setData(objName + "." + "author", message.getMember());
+            setData(objName + "." + "author", Member.fromDiscord(message.getMember()));
         } else {
-            setData(objName + "." + "author" + "." + "user", message.getAuthor());
+            setData(objName + "." + "author" + "." + "user", User.fromDiscord(message.getAuthor()));
         }
     }
 }
