@@ -53,7 +53,7 @@ public class PlayerEvent {
 
     public static void playerDied(ServerPlayerEntity player, DamageSource source, World world) {
         String worldId = world.getRegistryKey().getValue().toString();
-        String deathCause = source.getDeathMessage(player).getString().replace(player.getGameProfile().getName(), "");
+        String deathCause = source.getDeathMessage(player).getString().replace(player.getDisplayName().toString(), "");
         Placeholder placeholder = new MinecraftPlaceholder(player, DCLink.server, world, null);
         placeholder.addPlaceholder("cause", deathCause);
 
