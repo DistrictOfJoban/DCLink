@@ -1,4 +1,4 @@
-package com.lx.dclink;
+package com.lx862.dclink;
 
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;

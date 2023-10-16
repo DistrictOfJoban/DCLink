@@ -1,4 +1,4 @@
-package com.lx.dclink;
+package com.lx862.dclink;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;

@@ -1,6 +1,6 @@
-package com.lx.dclink.mixin;
+package com.lx862.dclink.mixin;
 
-import com.lx.dclink.events.PlayerEvent;
+import com.lx862.dclink.events.PlayerEvent;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;

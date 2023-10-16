@@ -19,10 +19,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.lx.dclink.DCLink"
+      "com.lx862.dclink.DCLink"
     ],
     "preLaunch": [
-      "com.lx.dclink.DCLinkPrelaunch"
+      "com.lx862.dclink.DCLinkPrelaunch"
     ]
   },
   "mixins": [
@@ -32,7 +32,6 @@
   "depends": {
     "fabricloader": ">=0.12.12",
     "fabric": "*",
-    "minecraft": "${mc_version}",
-    "java": ">=${java}"
+    "minecraft": "${mc_version}"
   }
 }

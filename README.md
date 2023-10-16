@@ -1,5 +1,5 @@
 # DCLink
-A Fabric Minecraft Mod that allows relaying from Minecraft to Discord/Revolt(WIP)
+A customizable linking mod between Discord/Revolt and Minecraft, **current in Maintenance mode.**
 
 [![works badge](https://cdn.jsdelivr.net/gh/nikku/works-on-my-machine@v0.2.0/badge.svg)](https://github.com/nikku/works-on-my-machine)
 ![build status](https://github.com/Kenny-Hui/DCLink/actions/workflows/build.yml/badge.svg)
@@ -14,9 +14,6 @@ While a newer rewritten mod by the same author, [Minecord](https://github.com/ax
 I don't have enough understanding of the codebase to port either of the mod to 1.17, so I have to make another Discord linking mod just for a server I manages.
 
 Eventually I tried making it a more proper project, (hopefully) implement bridging to services outside of only Discord.
-
-# REVOLT PROGRESS (Self-note)
-- 
 
 ## Features
 - Fabric 1.16.5 - 1.19.2
@@ -60,7 +57,7 @@ You're welcome to open an issue if you believe you've found a bug, however note 
 ## Cross Version Mapping
 For easier development, all version-specific code is stored in `src/main/mappings`.
 
-The files will then be copied over to `src/main/java/com/lx/dclink`.
+The files will then be copied over to `src/main/java/com/lx862/dclink`.
 
 To change the Minecraft version for development, edit **default_mc_version** in `gradle.properties`.
 (Or if you simply want to build, `./gradlew build -PbuildVersion=<Minecraft Version Here>`)

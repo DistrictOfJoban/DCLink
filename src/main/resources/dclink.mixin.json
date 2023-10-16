@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.lx.dclink.mixin",
+  "package": "com.lx862.dclink.mixin",
   "compatibilityLevel": "JAVA_${java}",
   "mixins": [
     "CrashReportMixin",
