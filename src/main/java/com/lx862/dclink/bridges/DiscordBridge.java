@@ -88,7 +88,6 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     public void disconnect() {
         if(client != null) {
             isReady = false;
-            client.cancelRequests();
             client.shutdown();
         }
     }
