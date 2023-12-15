@@ -30,7 +30,6 @@
   ],
 
   "depends": {
-    "fabricloader": ">=0.12.12",
     "fabric": "*",
     "minecraft": "${mc_version}"
   }

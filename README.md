@@ -1,5 +1,5 @@
 # DCLink
-A customizable linking mod between Discord/Revolt and Minecraft, **current in Maintenance mode.**
+A customizable linking mod between Discord/Revolt and Minecraft, designed for use in The District of Joban. (Use at your own risk)
 
 [![works badge](https://cdn.jsdelivr.net/gh/nikku/works-on-my-machine@v0.2.0/badge.svg)](https://github.com/nikku/works-on-my-machine)
 ![build status](https://github.com/Kenny-Hui/DCLink/actions/workflows/build.yml/badge.svg)
@@ -13,7 +13,7 @@ While a newer rewritten mod by the same author, [Minecord](https://github.com/ax
 
 I don't have enough understanding of the codebase to port either of the mod to 1.17, so I have to make another Discord linking mod just for a server I manages.
 
-Eventually I tried making it a more proper project, (hopefully) implement bridging to services outside of only Discord.
+Eventually I tried making it a more proper project, (hopefully) implement bridging to services outside of only Discord. (2023-12-15: And gave up)
 
 ## Features
 - Fabric 1.16.5 - 1.19.2

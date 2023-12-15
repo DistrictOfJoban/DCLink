@@ -70,7 +70,7 @@ public class RevoltClient {
 
     public void login() {
         if(StringHelper.notValidString(token)) {
-            throw new InvalidTokenException("No token provided/Token is empty!");
+            throw new InvalidTokenException();
         }
 
         User userInfo = getSelf();

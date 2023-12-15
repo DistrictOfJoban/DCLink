@@ -8,12 +8,6 @@ on: [pull_request, push]
 
 jobs:
   build:
-    strategy:
-      matrix:
-        minecraft: [1.19.2]
-        java: [
-          17
-        ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -22,11 +16,11 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: ${{ matrix.java }}
+          java-version: 17
       - name: Make Gradle Wrapper executable
         run: chmod +x ./gradlew
       - name: Build
-        run: ./gradlew build -PbuildVersion="${{ matrix.minecraft }}"
+        run: ./gradlew build"
       - name: Capture Artifacts
         uses: actions/upload-artifact@v3
         with:
