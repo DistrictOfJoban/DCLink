@@ -20,7 +20,7 @@ jobs:
       - name: Make Gradle Wrapper executable
         run: chmod +x ./gradlew
       - name: Build
-        run: ./gradlew build"
+        run: ./gradlew build
       - name: Capture Artifacts
         uses: actions/upload-artifact@v3
         with:
