@@ -102,15 +102,14 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
 
     public void startStatus() {
         if(!BotConfig.getInstance().statuses.isEmpty() && client != null) {
-            Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.server, null, null);
             executeWhenReady(() -> {
                 stopStatus();
                 timer = new Timer();
                 timer.schedule(new TimerTask() {
-
                     @Override
                     public void run() {
                         if(DCLink.server == null) return;
+                        Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.server, null, null);
                         String status = BotConfig.getInstance().statuses.get(currentStatus++ % BotConfig.getInstance().statuses.size());
                         String formattedStatus = placeholder.parse(status);
                         client.getPresence().setActivity(Activity.playing(formattedStatus));
