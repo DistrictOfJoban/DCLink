@@ -55,6 +55,7 @@ public class MinecraftPlaceholder extends Placeholder {
             setTeamPlaceholder(objName + ".team", team);
         }
 
+        addPlaceholder(objName, "displayName", player.getDisplayName().getString());
         addPlaceholder(objName, "name", player.getGameProfile().getName());
         addPlaceholder(objName, "ping", String.valueOf(player.pingMilliseconds));
         addPlaceholder(objName, "gamemode", player.interactionManager.getGameMode() == GameMode.CREATIVE ? "Creative" : player.interactionManager.getGameMode() == GameMode.SURVIVAL ? "Survival" : player.interactionManager.getGameMode() == GameMode.ADVENTURE ? "Adventure" : "Spectator");
