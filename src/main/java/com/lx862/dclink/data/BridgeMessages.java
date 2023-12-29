@@ -25,14 +25,14 @@ public class BridgeMessages {
         serverStopping = "<<<serverStopping>>>";
         serverStopped = "<<<serverStopped>>>";
         serverCrashed = "<<<serverCrashed>>>";
-        relay = "**<{player.team.prefix}{player.name}>** {message}";
-        relayCommand = "**{player.team.prefix}{player.name}**: {message}";
+        relay = "**<{player.displayName}{player.name}>** {message}";
+        relayCommand = "**{player.displayName}{player.name}**: {message}";
         playerJoin = "<<<playerJoined>>>";
         playerLeft = "<<<playerLeft>>>";
         playerDisconnectReason = "({reason})";
-        changeDimension = "**{player.team.prefix}{player.name}** has warped to {world.name}";
-        playerDeath = ":skull: **{player.team.prefix}{player.name}** {reason}";
-        playerAdvancement = ":medal: **{player.team.prefix}{player.name}** has achieved **{advancement}**! (*{advancementDetails}*)";
+        changeDimension = "**{player.displayName}{player.name}** has warped to {world.name}";
+        playerDeath = ":skull: **{player.displayName}{player.name}** {reason}";
+        playerAdvancement = ":medal: **{player.displayName}{player.name}** has achieved **{advancement}**! (*{advancementDetails}*)";
     }
 
     public static BridgeMessages fromJson(JsonElement jsonElement) {

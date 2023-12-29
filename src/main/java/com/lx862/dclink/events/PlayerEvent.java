@@ -103,12 +103,20 @@ public class PlayerEvent {
         BridgeManager.forEach(bridge -> {
             for(BridgeEntry entry : bridge.getEntries()) {
                 if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) continue;
+                bridge.sendMessage(entry.message.relay, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+            }
+        });
+    }
 
-                if(content.startsWith("/")) {
-                    bridge.sendMessage(entry.message.relayCommand, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
-                } else {
-                    bridge.sendMessage(entry.message.relay, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
-                }
+    public static void sendCommand(String content, ServerPlayerEntity player) {
+        ServerWorld world = Mappings.getServerWorld(player);
+        String worldId = world.getRegistryKey().getValue().toString();
+        Placeholder placeholder = new MinecraftPlaceholder(player, player.server, Mappings.getServerWorld(player), content);
+
+        BridgeManager.forEach(bridge -> {
+            for(BridgeEntry entry : bridge.getEntries()) {
+                if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) continue;
+                bridge.sendMessage(entry.message.relayCommand, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
             }
         });
     }
