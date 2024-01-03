@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.lx862.dclink.DCLink;
-import com.lx862.dclink.data.BridgeEntry;
+import com.lx862.dclink.data.BridgeContext;
 import com.lx862.dclink.util.EmbedParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BridgeConfig extends BaseConfig {
+public abstract class BridgeConfig extends Config {
     public final Path CUSTOM_EMBED_PATH = CONFIG_ROOT.resolve("embeds");
-    public List<BridgeEntry> entries;
+    public List<BridgeContext> entries;
     public BridgeConfig(Path configFile) {
         super(configFile);
         this.entries = new ArrayList<>();

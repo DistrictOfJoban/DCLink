@@ -2,7 +2,7 @@ package com.lx862.dclink.config;
 
 import com.google.gson.*;
 import com.lx862.dclink.DCLink;
-import com.lx862.dclink.data.BridgeEntry;
+import com.lx862.dclink.data.BridgeContext;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -50,9 +50,9 @@ public class RevoltConfig extends BridgeConfig {
 
             final JsonArray entryList = jsonConfig.get("entries").getAsJsonArray();
             entryList.forEach(jsonElement -> {
-                BridgeEntry bridgeEntry = BridgeEntry.fromJson(jsonElement);
-                if(bridgeEntry != null) {
-                    entries.add(bridgeEntry);
+                BridgeContext bridgeContext = BridgeContext.fromJson(jsonElement);
+                if(bridgeContext != null) {
+                    entries.add(bridgeContext);
                 }
             });
             return true;
@@ -64,7 +64,7 @@ public class RevoltConfig extends BridgeConfig {
 
     @Override
     public boolean generate() {
-        BridgeEntry defaultEntry = new BridgeEntry();
+        BridgeContext defaultEntry = new BridgeContext();
         defaultEntry.allowedDimension.add("minecraft:overworld");
         entries.add(defaultEntry);
         return save();
@@ -76,8 +76,8 @@ public class RevoltConfig extends BridgeConfig {
         Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         JsonObject jsonObject = new JsonObject();
         JsonArray jsonArray = new JsonArray();
-        for(BridgeEntry entry : entries) {
-            jsonArray.add(BridgeEntry.toJson(entry));
+        for(BridgeContext entry : entries) {
+            jsonArray.add(BridgeContext.toJson(entry));
         }
 
         jsonObject.add("entries", jsonArray);

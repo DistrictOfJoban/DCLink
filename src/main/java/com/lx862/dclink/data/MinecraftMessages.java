@@ -2,7 +2,6 @@ package com.lx862.dclink.data;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.lx862.dclink.Mappings;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildChannel;
@@ -92,7 +91,7 @@ public class MinecraftMessages {
         try {
             return Text.Serializer.fromJson(str);
         } catch (Exception e) {
-            return Mappings.literalText(str);
+            return Text.literal(str);
         }
     }
 

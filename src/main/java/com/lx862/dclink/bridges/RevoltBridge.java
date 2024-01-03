@@ -1,18 +1,18 @@
 package com.lx862.dclink.bridges;
 
 import com.google.gson.JsonArray;
-import com.lx862.revoltapi.RevoltListener;
-import com.lx862.revoltapi.data.Message;
-import com.lx862.revoltapi.data.TextEmbed;
+import com.lx862.dclink.minecraft.events.ServerManager;
+import com.lx862.revoltimpl.RevoltListener;
+import com.lx862.revoltimpl.data.Message;
+import com.lx862.revoltimpl.data.TextEmbed;
 import com.lx862.dclink.data.bridge.User;
-import com.lx862.dclink.DCLink;
-import com.lx862.revoltapi.RevoltClient;
-import com.lx862.revoltapi.data.Channel;
-import com.lx862.revoltapi.data.StatusPresence;
+import com.lx862.revoltimpl.RevoltClient;
+import com.lx862.revoltimpl.data.Channel;
+import com.lx862.revoltimpl.data.StatusPresence;
 import com.lx862.dclink.config.BotConfig;
 import com.lx862.dclink.config.DiscordConfig;
 import com.lx862.dclink.config.RevoltConfig;
-import com.lx862.dclink.data.BridgeEntry;
+import com.lx862.dclink.data.BridgeContext;
 import com.lx862.dclink.data.MinecraftPlaceholder;
 import com.lx862.dclink.data.Placeholder;
 import com.lx862.dclink.util.EmbedParser;
@@ -100,15 +100,16 @@ public class RevoltBridge implements Bridge, RevoltListener {
     }
 
     public void startStatus() {
-        if(!BotConfig.getInstance().statuses.isEmpty() && client != null) {
-            Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.server, null, null);
+        if(!BotConfig.getInstance().statuses.isEmpty()) {
             executeWhenReady(() -> {
                 timer = new Timer();
                 timer.schedule(new TimerTask() {
 
                     @Override
                     public void run() {
-                        if(DCLink.server == null) return;
+                        if(!ServerManager.serverAlive()) return;
+
+                        Placeholder placeholder = new MinecraftPlaceholder(null, ServerManager.getServer(), null, null);
                         String status = BotConfig.getInstance().statuses.get(currentStatus++ % BotConfig.getInstance().statuses.size());
                         String formattedStatus = placeholder.parse(status);
                         client.setStatus(StatusPresence.ONLINE, "Playing " + formattedStatus);
@@ -124,7 +125,7 @@ public class RevoltBridge implements Bridge, RevoltListener {
             timer.purge();
         }
 
-        if(isReady && client != null) {
+        if(isReady) {
             client.setStatus(null, null);
         }
     }
@@ -137,7 +138,7 @@ public class RevoltBridge implements Bridge, RevoltListener {
         }
     }
 
-    public Collection<BridgeEntry> getEntries() {
+    public Collection<BridgeContext> getContext() {
         return config.entries;
     }
 

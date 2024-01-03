@@ -1,7 +1,7 @@
 package com.lx862.dclink.data.bridge;
 
 import com.google.gson.JsonObject;
-import com.lx862.revoltapi.data.attachment.File;
+import com.lx862.revoltimpl.data.attachment.File;
 
 public class User {
     private final String username;

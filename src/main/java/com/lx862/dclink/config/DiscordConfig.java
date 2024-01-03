@@ -2,7 +2,7 @@ package com.lx862.dclink.config;
 
 import com.google.gson.*;
 import com.lx862.dclink.DCLink;
-import com.lx862.dclink.data.BridgeEntry;
+import com.lx862.dclink.data.BridgeContext;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.apache.commons.io.FilenameUtils;
 
@@ -59,9 +59,9 @@ public class DiscordConfig extends BridgeConfig {
 
             if(jsonConfig.has("entries")) {
                 jsonConfig.get("entries").getAsJsonArray().forEach(jsonElement -> {
-                    BridgeEntry bridgeEntry = BridgeEntry.fromJson(jsonElement);
-                    if(bridgeEntry != null) {
-                        entries.add(bridgeEntry);
+                    BridgeContext bridgeContext = BridgeContext.fromJson(jsonElement);
+                    if(bridgeContext != null) {
+                        entries.add(bridgeContext);
                     }
                 });
             }
@@ -74,7 +74,7 @@ public class DiscordConfig extends BridgeConfig {
 
     @Override
     public boolean generate() {
-        BridgeEntry defaultEntry = new BridgeEntry();
+        BridgeContext defaultEntry = new BridgeContext();
         defaultEntry.allowedDimension.add("minecraft:overworld");
         entries.add(defaultEntry);
         return save();
@@ -90,8 +90,8 @@ public class DiscordConfig extends BridgeConfig {
         for(String intent : intents) {
             intentsArray.add(intent);
         }
-        for(BridgeEntry entry : entries) {
-            jsonArray.add(BridgeEntry.toJson(entry));
+        for(BridgeContext entry : entries) {
+            jsonArray.add(BridgeContext.toJson(entry));
         }
 
         jsonObject.add("intents", intentsArray);
@@ -138,7 +138,7 @@ public class DiscordConfig extends BridgeConfig {
                 e.printStackTrace();
             }
         } else {
-            DCLink.LOGGER.info("Message Embeds does not exist, generating...");
+            DCLink.LOGGER.info("[DCLink] Message Embeds does not exist, generating...");
             generateDefaultEmbed();
             loadCustomEmbeds();
         }

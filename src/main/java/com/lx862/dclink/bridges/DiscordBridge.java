@@ -1,12 +1,12 @@
 package com.lx862.dclink.bridges;
 
 import com.google.gson.JsonArray;
-import com.lx862.dclink.DCLink;
 import com.lx862.dclink.config.BotConfig;
 import com.lx862.dclink.config.DiscordConfig;
 import com.lx862.dclink.config.MinecraftConfig;
 import com.lx862.dclink.data.*;
 import com.lx862.dclink.data.bridge.User;
+import com.lx862.dclink.minecraft.events.ServerManager;
 import com.lx862.dclink.util.EmbedParser;
 import com.lx862.dclink.util.StringHelper;
 import net.dv8tion.jda.api.JDA;
@@ -57,10 +57,6 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
 
     public void login() {
         isReady = false;
-        if(StringHelper.notValidString(config.getToken())) {
-            LOGGER.warn("[DCLink] Cannot log in to Discord: No token provided/Token is empty!");
-            return;
-        }
 
         try {
             ChunkingFilter chunkingFilter = BotConfig.getInstance().getCacheMember() ? ChunkingFilter.ALL : ChunkingFilter.NONE;
@@ -78,7 +74,6 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
             client.awaitReady();
 
         } catch (InvalidTokenException | IllegalArgumentException ex) {
-            LOGGER.error(ex.getStackTrace());
             LOGGER.error("[DCLink] An invalid token has been provided! Please ensure the token is valid.");
         } catch (InterruptedException e) {
             LOGGER.error("[DCLink] Thread interrupted.");
@@ -108,8 +103,9 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        if(DCLink.server == null) return;
-                        Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.server, null, null);
+                        if(!ServerManager.serverAlive()) return;
+
+                        Placeholder placeholder = new MinecraftPlaceholder(null, ServerManager.getServer(), null, null);
                         String status = BotConfig.getInstance().statuses.get(currentStatus++ % BotConfig.getInstance().statuses.size());
                         String formattedStatus = placeholder.parse(status);
                         client.getPresence().setActivity(Activity.playing(formattedStatus));
@@ -130,7 +126,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
         }
     }
 
-    public Collection<BridgeEntry> getEntries() {
+    public Collection<BridgeContext> getContext() {
         return config.entries;
     }
 
@@ -179,7 +175,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
             }
 
             textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel().asTextChannel(), event.getMember()));
-            DCLink.sendInGameMessage(textToBeSent, entry);
+            ServerManager.sendMessage(textToBeSent, entry);
         }
     }
 
@@ -206,7 +202,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
             List<MutableText> textToBeSent = new ArrayList<>();
             MutableText formattedMessage = entry.message.getDiscordEditedMessage(oldMessage, newMessage, event.getGuildChannel().asTextChannel(), member);
             textToBeSent.add(formattedMessage);
-            DCLink.sendInGameMessage(textToBeSent, entry);
+            ServerManager.sendMessage(textToBeSent, entry);
         }
     }
 
@@ -237,7 +233,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
             }
 
             textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel().asTextChannel(), member));
-            DCLink.sendInGameMessage(textToBeSent, entry);
+            ServerManager.sendMessage(textToBeSent, entry);
         }
     }
 
@@ -264,7 +260,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
                 textToBeSent.add(formattedMessage);
             }
 
-            DCLink.sendInGameMessage(textToBeSent, entry);
+            ServerManager.sendMessage(textToBeSent, entry);
         }
     }
 
@@ -291,7 +287,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
                 textToBeSent.add(formattedMessage);
             }
 
-            DCLink.sendInGameMessage(textToBeSent, entry);
+            ServerManager.sendMessage(textToBeSent, entry);
         }
     }
 

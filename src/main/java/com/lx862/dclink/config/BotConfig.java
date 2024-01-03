@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BotConfig extends BaseConfig {
+public class BotConfig extends Config {
     private static BotConfig instance;
     private boolean cacheMember;
     private int statusRefreshInterval = 20;

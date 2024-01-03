@@ -12,7 +12,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MinecraftConfig extends BaseConfig {
+public class MinecraftConfig extends Config {
     private static MinecraftConfig instance;
     public static List<MinecraftEntry> entries = new ArrayList<>();
 

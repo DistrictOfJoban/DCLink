@@ -3,7 +3,7 @@ package com.lx862.dclink.util;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.lx862.revoltapi.data.TextEmbed;
+import com.lx862.revoltimpl.data.TextEmbed;
 import com.lx862.dclink.data.Placeholder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
