@@ -1,4 +1,4 @@
-package com.lx862.revoltimpl.data;
+package com.lx862.revoltimpl.data.text.embed;
 
 public class TextEmbedBuilder {
     private String title = null;
@@ -18,6 +18,11 @@ public class TextEmbedBuilder {
         return this;
     }
 
+    public TextEmbedBuilder appendDescription(String description) {
+        this.description += description;
+        return this;
+    }
+
     public TextEmbedBuilder setFooter(String footer) {
         this.footer = footer;
         return this;
@@ -33,7 +38,7 @@ public class TextEmbedBuilder {
         return this;
     }
 
-    public TextEmbedBuilder setIcon(String url) {
+    public TextEmbedBuilder setThumbnail(String url) {
         // Must have title for icon to appear
         if(this.title == null) {
             this.title = "  ";

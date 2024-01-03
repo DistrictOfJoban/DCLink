@@ -1,28 +1,20 @@
 package com.lx862.dclink.bridges;
 
-import com.google.gson.JsonArray;
-import com.lx862.dclink.minecraft.events.ServerManager;
-import com.lx862.revoltimpl.RevoltListener;
-import com.lx862.revoltimpl.data.Message;
-import com.lx862.revoltimpl.data.TextEmbed;
-import com.lx862.dclink.data.bridge.User;
-import com.lx862.revoltimpl.RevoltClient;
-import com.lx862.revoltimpl.data.Channel;
-import com.lx862.revoltimpl.data.StatusPresence;
-import com.lx862.dclink.config.BotConfig;
-import com.lx862.dclink.config.DiscordConfig;
 import com.lx862.dclink.config.RevoltConfig;
 import com.lx862.dclink.data.BridgeContext;
-import com.lx862.dclink.data.MinecraftPlaceholder;
-import com.lx862.dclink.data.Placeholder;
-import com.lx862.dclink.util.EmbedParser;
+import com.lx862.vendorneutral.usermember.User;
 import com.lx862.dclink.util.StringHelper;
+import com.lx862.revoltimpl.RevoltClient;
+import com.lx862.revoltimpl.RevoltListener;
+import com.lx862.revoltimpl.data.Channel;
+import com.lx862.revoltimpl.data.Message;
+import com.lx862.revoltimpl.data.StatusPresence;
+import com.lx862.revoltimpl.data.text.embed.TextEmbed;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RevoltBridge implements Bridge, RevoltListener {
@@ -32,8 +24,6 @@ public class RevoltBridge implements Bridge, RevoltListener {
     public RevoltClient client;
     public Map<String, List<RichCustomEmoji>> emojiMap = new HashMap<>();
     private boolean isReady = false;
-    private Timer timer;
-    private int currentStatus;
     private final String token;
     private final RevoltConfig config;
 
@@ -46,27 +36,12 @@ public class RevoltBridge implements Bridge, RevoltListener {
     }
 
     @Override
-    public void sendMessage(String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji) {
-        if(!isReady || !BotConfig.getInstance().outboundEnabled || StringHelper.notValidString(template) || client == null) return;
-        ArrayList<TextEmbed> embedToBeSent = new ArrayList<>();
-        Matcher matcher = EMBED_PATTERN.matcher(template);
+    public void handleMessage(String finalMessage, String channelId, List<com.lx862.vendorneutral.texts.embed.TextEmbed> embeds, boolean allowEmoji, boolean allowMention) {
+        Channel channel = client.getChannel(channelId);
+        if(channel == null) return;
 
-        if(matcher.find()) {
-            template = template.replace(matcher.group(0), "");
-            String embedName = matcher.group(0).replace("<<<", "").replace(">>>", "");
-            JsonArray embedJson = DiscordConfig.getInstance().getEmbedJson(embedName);
-            if(embedJson != null) {
-                embedToBeSent.addAll(EmbedParser.fromJsonToRevolt(placeholder, embedJson));
-            }
-        }
-
-        String finalMessage = placeholder == null ? template : placeholder.parse(template);
-
-        for(String channelId : channelList) {
-            Channel channel = client.getChannel(channelId);
-            if(channel == null) continue;
-            channel.sendMessage(client, finalMessage, embedToBeSent);
-        }
+        List<TextEmbed> rvEmbeds = embeds.stream().map(com.lx862.vendorneutral.texts.embed.TextEmbed::toRevolt).toList();
+        channel.sendMessage(client, finalMessage, rvEmbeds);
     }
 
     public void login() {
@@ -99,43 +74,12 @@ public class RevoltBridge implements Bridge, RevoltListener {
         return client.getSelf();
     }
 
-    public void startStatus() {
-        if(!BotConfig.getInstance().statuses.isEmpty()) {
-            executeWhenReady(() -> {
-                timer = new Timer();
-                timer.schedule(new TimerTask() {
-
-                    @Override
-                    public void run() {
-                        if(!ServerManager.serverAlive()) return;
-
-                        Placeholder placeholder = new MinecraftPlaceholder(null, ServerManager.getServer(), null, null);
-                        String status = BotConfig.getInstance().statuses.get(currentStatus++ % BotConfig.getInstance().statuses.size());
-                        String formattedStatus = placeholder.parse(status);
-                        client.setStatus(StatusPresence.ONLINE, "Playing " + formattedStatus);
-                    }
-                }, 0, BotConfig.getInstance().getStatusRefreshInterval() * 1000L);
-            });
-        }
+    public void updateStatus(String status) {
+        client.setStatus(StatusPresence.ONLINE, "Playing " + status);
     }
 
     public void stopStatus() {
-        if(timer != null) {
-            timer.cancel();
-            timer.purge();
-        }
-
-        if(isReady) {
-            client.setStatus(null, null);
-        }
-    }
-
-    public void executeWhenReady(Runnable callback) {
-        if(!isReady) {
-            queuedAction.add(callback);
-        } else {
-            callback.run();
-        }
+        if(isReady()) client.setStatus(null, null);
     }
 
     public Collection<BridgeContext> getContext() {

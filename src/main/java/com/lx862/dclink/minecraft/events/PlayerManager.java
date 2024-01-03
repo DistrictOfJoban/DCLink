@@ -22,7 +22,8 @@ public class PlayerManager {
             for (BridgeContext entry : bridge.getContext()) {
                 if (!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) continue;
                 Placeholder placeholder = new MinecraftPlaceholder(player, player.getServer(), world, null);
-                bridge.sendMessage(
+                BridgeManager.sendMessage(
+                        bridge,
                         entry.message.playerJoin,
                         placeholder,
                         entry.channelID,
@@ -44,7 +45,7 @@ public class PlayerManager {
                 Placeholder placeholder = new MinecraftPlaceholder(player, player.getServer(), world, null);
                 placeholder.addPlaceholder("reason", disconnectReason);
 
-                bridge.sendMessage(context.message.playerLeft, placeholder, context.channelID, context.allowMention, context.enableEmoji);
+                BridgeManager.sendMessage(bridge, context.message.playerLeft, placeholder, context.channelID, context.allowMention, context.enableEmoji);
             }
         });
     }
@@ -58,7 +59,7 @@ public class PlayerManager {
         BridgeManager.forEach(bridge -> {
             for(BridgeContext context : bridge.getContext()) {
                 if(!context.allowedDimension.isEmpty() && !context.allowedDimension.contains(worldId)) continue;
-                bridge.sendMessage(context.message.playerDeath, placeholder, context.channelID, context.allowMention, context.enableEmoji);
+                BridgeManager.sendMessage(bridge, context.message.playerDeath, placeholder, context.channelID, context.allowMention, context.enableEmoji);
             }
         });
     }
@@ -72,7 +73,7 @@ public class PlayerManager {
 
                 BridgeManager.forEach(bridge -> {
                     for(BridgeContext entry : bridge.getContext()) {
-                        bridge.sendMessage(entry.message.playerAdvancement, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+                        BridgeManager.sendMessage(bridge, entry.message.playerAdvancement, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
                     }
                 });
             }
@@ -88,7 +89,7 @@ public class PlayerManager {
             for(BridgeContext entry : bridge.getContext()) {
                 if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(newWorldId) && !entry.allowedDimension.contains(oldWorldId)) continue;
 
-                bridge.sendMessage(entry.message.changeDimension, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+                BridgeManager.sendMessage(bridge, entry.message.changeDimension, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
             }
         });
     }
@@ -101,7 +102,7 @@ public class PlayerManager {
         BridgeManager.forEach(bridge -> {
             for(BridgeContext entry : bridge.getContext()) {
                 if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) continue;
-                bridge.sendMessage(entry.message.relay, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+                BridgeManager.sendMessage(bridge, entry.message.relay, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
             }
         });
     }
@@ -114,7 +115,7 @@ public class PlayerManager {
         BridgeManager.forEach(bridge -> {
             for(BridgeContext entry : bridge.getContext()) {
                 if(!entry.allowedDimension.isEmpty() && !entry.allowedDimension.contains(worldId)) continue;
-                bridge.sendMessage(entry.message.relayCommand, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+                BridgeManager.sendMessage(bridge, entry.message.relayCommand, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
             }
         });
     }

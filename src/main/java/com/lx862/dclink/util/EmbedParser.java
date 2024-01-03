@@ -3,8 +3,9 @@ package com.lx862.dclink.util;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.lx862.revoltimpl.data.TextEmbed;
 import com.lx862.dclink.data.Placeholder;
+import com.lx862.vendorneutral.texts.embed.TextEmbed;
+import com.lx862.vendorneutral.texts.embed.TextEmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.text.SimpleDateFormat;
@@ -12,11 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmbedParser {
-    public static List<MessageEmbed> fromJson(Placeholder placeholder, JsonArray jsonArray) {
-        ArrayList<MessageEmbed> embeds = new ArrayList<>();
+    public static List<TextEmbed> fromJson(Placeholder placeholder, JsonArray jsonArray) {
+        ArrayList<TextEmbed> embeds = new ArrayList<>();
         for (JsonElement jsonElement : jsonArray) {
             try {
-                net.dv8tion.jda.api.EmbedBuilder embed = new net.dv8tion.jda.api.EmbedBuilder();
+                TextEmbedBuilder embed = new TextEmbedBuilder();
                 JsonObject json = jsonElement.getAsJsonObject();
                 String title = getString(placeholder, "title", json);
                 String description = getString(placeholder, "description", json);
@@ -29,8 +30,9 @@ public class EmbedParser {
                 if (json.has("footer")) {
                     JsonObject footerJson = json.get("footer").getAsJsonObject();
                     String content = getString(placeholder, "text", footerJson);
+                    // FIXME
                     String iconURL = getString(placeholder, "icon_url", footerJson);
-                    embed.setFooter(content, iconURL);
+                    embed.setFooter(content);
                 }
 
                 if (json.has("image")) {
@@ -47,7 +49,8 @@ public class EmbedParser {
 
                 if(json.has("timestamp")) {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.zzzX");
-                    embed.setTimestamp(simpleDateFormat.parse(json.get("timestamp").getAsString()).toInstant());
+                    // FIXME
+                    //embed.setTimestamp(simpleDateFormat.parse(json.get("timestamp").getAsString()).toInstant());
                 }
 
                 if (json.has("author")) {
@@ -71,17 +74,12 @@ public class EmbedParser {
                     });
                 }
 
-                if (!embed.isEmpty()) embeds.add(embed.build());
+                embeds.add(embed.build());
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         return embeds;
-    }
-
-    public static List<TextEmbed> fromJsonToRevolt(Placeholder placeholder, JsonArray jsonArray) {
-        List<MessageEmbed> list = fromJson(placeholder, jsonArray);
-        return list.stream().map(e -> TextEmbed.fromJDAMessageEmbed(e)).toList();
     }
 
     public static JsonArray toJson(MessageEmbed... embeds) {

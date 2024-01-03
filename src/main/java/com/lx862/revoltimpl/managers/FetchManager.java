@@ -6,8 +6,8 @@ import com.google.gson.JsonParser;
 import com.lx862.revoltimpl.API;
 import com.lx862.revoltimpl.data.APIResponse;
 import com.lx862.revoltimpl.data.Channel;
-import com.lx862.dclink.data.bridge.Member;
-import com.lx862.dclink.data.bridge.User;
+import com.lx862.vendorneutral.usermember.Member;
+import com.lx862.vendorneutral.usermember.User;
 
 public class FetchManager {
     public static Channel getChannel(API api, String id) {

@@ -1,7 +1,7 @@
 package com.lx862.dclink.data;
 
-import com.lx862.dclink.data.bridge.Member;
-import com.lx862.dclink.data.bridge.User;
+import com.lx862.vendorneutral.usermember.Member;
+import com.lx862.vendorneutral.usermember.User;
 import com.lx862.dclink.util.JsonHelper;
 import com.lx862.dclink.util.StringHelper;
 import net.dv8tion.jda.api.entities.*;
@@ -36,12 +36,12 @@ public class BridgePlaceholder extends Placeholder {
         addPlaceholder(objName, "size", StringHelper.formatFileSize(attachment.getSize()));
     }
 
-    public void setData(String objName, com.lx862.dclink.data.bridge.Member member) {
+    public void setData(String objName, Member member) {
         addPlaceholder(objName, "nickOrUsername", JsonHelper.sanitize(member.getEffectiveName()));
         setData(objName + "." + "user", member.getUser());
     }
 
-    public void setData(String objName, com.lx862.dclink.data.bridge.User user) {
+    public void setData(String objName, User user) {
         addPlaceholder(objName, "username", JsonHelper.sanitize(user.getName()));
         addPlaceholder(objName, "displayName", JsonHelper.sanitize(user.getEffectiveName()));
         addPlaceholder(objName, "tagOrUsername", JsonHelper.sanitize(getUserTagOrName(user, false)));
@@ -50,7 +50,7 @@ public class BridgePlaceholder extends Placeholder {
         addPlaceholder(objName, "avatarURL", user.getAvatarUrl() == null ? "" : user.getAvatarUrl());
     }
 
-    private static String getUserTagOrName(com.lx862.dclink.data.bridge.User user, boolean displayName) {
+    private static String getUserTagOrName(User user, boolean displayName) {
         if(user.getDiscriminator().equals("0000")) {
             return displayName ? user.getEffectiveName() : "@" + user.getName();
         } else {

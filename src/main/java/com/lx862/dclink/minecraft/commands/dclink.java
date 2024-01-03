@@ -1,9 +1,8 @@
 package com.lx862.dclink.minecraft.commands;
 
-import com.lx862.dclink.bridges.Bridge;
+import com.lx862.dclink.DCLink;
 import com.lx862.dclink.bridges.BridgeManager;
 import com.lx862.dclink.config.BotConfig;
-import com.lx862.dclink.DCLink;
 import com.lx862.dclink.config.DiscordConfig;
 import com.lx862.dclink.config.MinecraftConfig;
 import com.lx862.dclink.minecraft.MinecraftSource;
@@ -71,7 +70,7 @@ public class dclink {
             BridgeManager.clearBridges();
             BridgeManager.addDefaultBridges();
             BridgeManager.login();
-            BridgeManager.forEach(Bridge::startStatus);
+            BridgeManager.startStatus();
         }
 
         return 1;

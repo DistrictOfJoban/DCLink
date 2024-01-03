@@ -1,14 +1,13 @@
 package com.lx862.dclink.bridges;
 
-import com.google.gson.JsonArray;
 import com.lx862.dclink.config.BotConfig;
 import com.lx862.dclink.config.DiscordConfig;
 import com.lx862.dclink.config.MinecraftConfig;
 import com.lx862.dclink.data.*;
-import com.lx862.dclink.data.bridge.User;
+import com.lx862.vendorneutral.usermember.User;
 import com.lx862.dclink.minecraft.events.ServerManager;
-import com.lx862.dclink.util.EmbedParser;
 import com.lx862.dclink.util.StringHelper;
+import com.lx862.vendorneutral.texts.embed.TextEmbed;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -33,7 +32,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DiscordBridge extends ListenerAdapter implements Bridge {
@@ -41,10 +39,8 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     private static final Logger LOGGER = LogManager.getLogger("DCLinkDiscord");
     private final DiscordConfig config;
     private final Collection<GatewayIntent> intents;
-    private Timer timer;
     private final Collection<Runnable> queuedAction;
     private boolean isReady = false;
-    private int currentStatus;
     public JDA client;
     public Map<String, List<RichCustomEmoji>> emojiMap = new HashMap<>();
     public Map<Long, Message> messageCache = new HashMap<>();
@@ -81,47 +77,18 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     }
 
     public void disconnect() {
-        if(client != null) {
+        if(isReady()) {
             isReady = false;
             client.shutdown();
         }
     }
 
-    public void executeWhenReady(Runnable callback) {
-        if(!isReady) {
-            queuedAction.add(callback);
-        } else {
-            callback.run();
-        }
-    }
-
-    public void startStatus() {
-        if(!BotConfig.getInstance().statuses.isEmpty() && client != null) {
-            executeWhenReady(() -> {
-                stopStatus();
-                timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if(!ServerManager.serverAlive()) return;
-
-                        Placeholder placeholder = new MinecraftPlaceholder(null, ServerManager.getServer(), null, null);
-                        String status = BotConfig.getInstance().statuses.get(currentStatus++ % BotConfig.getInstance().statuses.size());
-                        String formattedStatus = placeholder.parse(status);
-                        client.getPresence().setActivity(Activity.playing(formattedStatus));
-                    }
-                }, 0, BotConfig.getInstance().getStatusRefreshInterval() * 1000L);
-            });
-        }
+    public void updateStatus(String status) {
+        client.getPresence().setActivity(Activity.playing(status));
     }
 
     public void stopStatus() {
-        if(timer != null) {
-            timer.cancel();
-            timer.purge();
-        }
-
-        if(isReady && client != null) {
+        if(isReady()) {
             client.getPresence().setActivity(null);
         }
     }
@@ -152,7 +119,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
-        if (!isReady || event.isFromType(ChannelType.PRIVATE) || event.getMember() == null || !BotConfig.getInstance().inboundEnabled) return;
+        if (!isReady() || event.isFromType(ChannelType.PRIVATE) || event.getMember() == null || !BotConfig.getInstance().inboundEnabled) return;
 
         messageCache.put(event.getMessageIdLong(), event.getMessage());
 
@@ -182,7 +149,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     @Override
     public void onMessageUpdate(MessageUpdateEvent event)
     {
-        if (!isReady || event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInstance().inboundEnabled) return;
+        if (!isReady() || event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInstance().inboundEnabled) return;
 
         Message newMessage = event.getMessage();
         Message oldMessage = messageCache.get(event.getMessageIdLong());
@@ -240,7 +207,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     @Override
     public void onMessageReactionRemove(MessageReactionRemoveEvent event)
     {
-        if (!isReady || event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInstance().inboundEnabled) return;
+        if (!isReady() || event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInstance().inboundEnabled) return;
 
         Message reactedMessage = messageCache.get(event.getMessageIdLong());
         if(reactedMessage == null) return;
@@ -267,7 +234,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     @Override
     public void onMessageReactionAdd(MessageReactionAddEvent event)
     {
-        if (!isReady || event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInstance().inboundEnabled) return;
+        if (!isReady() || event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInstance().inboundEnabled) return;
 
         Message reactedMessage = messageCache.get(event.getMessageIdLong());
         if(reactedMessage == null) return;
@@ -292,7 +259,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     }
 
     public boolean isReady() {
-        return isReady;
+        return isReady && client != null;
     }
 
     public BridgeType getType() {
@@ -303,68 +270,48 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
         return User.fromDiscord(client.getSelfUser());
     }
 
-    public void sendMessage(String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji) {
-        if(!isReady || !BotConfig.getInstance().outboundEnabled || StringHelper.notValidString(template) || client == null) return;
+    public void handleMessage(String finalMessage, String channelId, List<TextEmbed> embeds, boolean enableEmoji, boolean allowMention) {
+        List<MessageEmbed> ourEmbeds = embeds.stream().map(TextEmbed::toDiscord).toList();
 
-        ArrayList<MessageEmbed> embedToBeSent = new ArrayList<>();
-        Matcher matcher = EMBED_PATTERN.matcher(template);
+        TextChannel channel = client.getChannelById(TextChannel.class, channelId);
+        if(channel == null) {
+            LOGGER.warn("[DCLink] [Discord] Cannot find channel with id " + channelId);
+            return;
+        }
 
-        if(matcher.find()) {
-            template = template.replace(matcher.group(0), "");
-            String embedName = matcher.group(0).replace("<<<", "").replace(">>>", "");
-            JsonArray embedJson = config.getEmbedJson(embedName);
-            if(embedJson != null) {
-                embedToBeSent.addAll(EmbedParser.fromJson(placeholder, embedJson));
+        if(!channel.canTalk()) {
+            LOGGER.warn("[DCLink] [Discord] No permission to send message in Text Channel #" + channel.getName());
+            return;
+        }
+
+        if(enableEmoji) {
+            for (RichCustomEmoji emoji : channel.getGuild().getEmojis()) {
+                finalMessage = finalMessage.replace(":" + emoji.getName() + ":", "<:" + emoji.getName() + ":" + emoji.getId() + ">");
             }
         }
 
-        String finalMessage = placeholder == null ? template : placeholder.parse(template);
-
-        for(String channelId : channelList) {
-            try {
-                Long.parseLong(channelId);
-            } catch (Exception ignored) {
-                continue;
-            }
-            TextChannel channel = client.getChannelById(TextChannel.class, channelId);
-            if(channel == null) continue;
-
-            if(!channel.canTalk()) {
-                LOGGER.warn("No permission to send message in Text Channel #" + channel.getName());
-                continue;
-            }
-
-            List<RichCustomEmoji> emojiMap = channel.getGuild().getEmojis();
-
-            /* Parse mention */
-            if(allowMention && finalMessage.contains("@")) {
-                if(client.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
-                    for(Member member : channel.getGuild().getMembers()) {
-                        finalMessage = finalMessage.replace("@" + member.getUser().getName(), String.format("<@%s>", member.getUser().getId()));
-                    }
+        if(allowMention && finalMessage.contains("@")) {
+            if(client.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
+                for(Member member : channel.getGuild().getMembers()) {
+                    finalMessage = finalMessage.replace("@" + member.getUser().getName(), String.format("<@%s>", member.getUser().getId()));
                 }
             }
+        }
 
-            /* Parse emoji map */
-            if(enableEmoji) {
-                for (RichCustomEmoji emoji : emojiMap) {
-                    finalMessage = finalMessage.replace(":" + emoji.getName() + ":", "<:" + emoji.getName() + ":" + emoji.getId() + ">");
-                }
-            }
+        try {
+            MessageCreateAction action;
 
-            try {
+            if(finalMessage.isEmpty() && !embeds.isEmpty()) {
                 // Send Embed Only
-                if(finalMessage.isEmpty() && !embedToBeSent.isEmpty()) {
-                    channel.sendMessageEmbeds(embedToBeSent).queue();
-                } else {
-                    // Send message with embed attached
-                    MessageCreateAction action = channel.sendMessage(finalMessage);
-                    action.setEmbeds(embedToBeSent);
-                    action.queue();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+                action = channel.sendMessageEmbeds(ourEmbeds);
+            } else {
+                // Send message with embed attached
+                action = channel.sendMessage(finalMessage);
+                action.setEmbeds(ourEmbeds);
             }
+            action.queue();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

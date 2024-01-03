@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.lx862.revoltimpl.RevoltListener;
 import com.lx862.revoltimpl.data.Message;
 import com.lx862.revoltimpl.data.WSResponse;
-import com.lx862.dclink.data.bridge.User;
+import com.lx862.vendorneutral.usermember.User;
 
 import java.util.ArrayList;
 import java.util.List;

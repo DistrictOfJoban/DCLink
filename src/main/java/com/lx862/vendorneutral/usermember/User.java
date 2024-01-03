@@ -1,8 +1,11 @@
-package com.lx862.dclink.data.bridge;
+package com.lx862.vendorneutral.usermember;
 
 import com.google.gson.JsonObject;
 import com.lx862.revoltimpl.data.attachment.File;
 
+/*
+ * TODO: Rework
+ * */
 public class User {
     private final String username;
     private final String displayName;

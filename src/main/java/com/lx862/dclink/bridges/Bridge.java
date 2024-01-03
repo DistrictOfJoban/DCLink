@@ -1,14 +1,14 @@
 package com.lx862.dclink.bridges;
 
-import com.lx862.dclink.data.bridge.User;
+import com.lx862.vendorneutral.usermember.User;
 import com.lx862.dclink.data.BridgeContext;
-import com.lx862.dclink.data.Placeholder;
+import com.lx862.vendorneutral.texts.embed.TextEmbed;
 
 import java.util.Collection;
 import java.util.List;
 
 public interface Bridge {
-    void sendMessage(String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji);
+    void handleMessage(String finalMessage, String channelId, List<TextEmbed> embeds, boolean allowEmoji, boolean allowMention);
     void login();
     void disconnect();
     Collection<BridgeContext> getContext();
@@ -17,7 +17,6 @@ public interface Bridge {
     BridgeType getType();
     // TEMP
     User getUserInfo();
-    void executeWhenReady(Runnable callback);
-    void startStatus();
+    void updateStatus(String status);
     void stopStatus();
 }

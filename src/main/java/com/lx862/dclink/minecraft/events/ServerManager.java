@@ -46,7 +46,7 @@ public class ServerManager {
 
             BridgeManager.forEach(bridge -> {
                 for(BridgeContext entry : bridge.getContext()) {
-                    bridge.sendMessage(entry.message.serverStarting, null, entry.channelID, entry.allowMention, entry.enableEmoji);
+                    BridgeManager.sendMessage(bridge, entry.message.serverStarting, null, entry.channelID, entry.allowMention, entry.enableEmoji);
                 }
             });
         } catch (Exception e) {
@@ -59,13 +59,12 @@ public class ServerManager {
             serverStartedTimestamp = System.currentTimeMillis();
             Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
             placeholder.addTimePlaceholder("time", serverStartedTimestamp - serverStartingTimestamp);
-
             BridgeManager.forEach(bridge -> {
                 for(BridgeContext entry : bridge.getContext()) {
-                    bridge.sendMessage(entry.message.serverStarted, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+                    BridgeManager.sendMessage(bridge, entry.message.serverStarted, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
                 }
-                bridge.startStatus();
             });
+            BridgeManager.startStatus();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -79,7 +78,7 @@ public class ServerManager {
 
             BridgeManager.forEach(bridge -> {
                 for(BridgeContext entry : bridge.getContext()) {
-                    bridge.sendMessage(entry.message.serverStopping, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+                    BridgeManager.sendMessage(bridge, entry.message.serverStopping, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
                 }
             });
         } catch (Exception e) {
@@ -91,7 +90,7 @@ public class ServerManager {
         try {
             BridgeManager.forEach(bridge -> {
                 for(BridgeContext entry : bridge.getContext()) {
-                    bridge.sendMessage(entry.message.serverStopped, null, entry.channelID, entry.allowMention, entry.enableEmoji);
+                    BridgeManager.sendMessage(bridge, entry.message.serverStopped, null, entry.channelID, entry.allowMention, entry.enableEmoji);
                 }
             });
 
@@ -110,7 +109,7 @@ public class ServerManager {
 
             BridgeManager.forEach(bridge -> {
                 for(BridgeContext entry : bridge.getContext()) {
-                    bridge.sendMessage(entry.message.serverCrashed, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+                    BridgeManager.sendMessage(bridge, entry.message.serverCrashed, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
                 }
             });
         } catch (Exception e) {

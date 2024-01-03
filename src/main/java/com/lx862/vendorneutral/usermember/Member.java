@@ -1,4 +1,4 @@
-package com.lx862.dclink.data.bridge;
+package com.lx862.vendorneutral.usermember;
 
 import com.google.gson.JsonObject;
 
@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/*
+* TODO: Rework
+* */
 public class Member {
     private final String nickname;
     private final List<String> roles;

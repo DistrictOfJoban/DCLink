@@ -2,15 +2,11 @@ package com.lx862.dclink;
 
 import com.lx862.dclink.data.Source;
 import com.lx862.dclink.minecraft.MinecraftSource;
-import com.lx862.dclink.minecraft.commands.dclink;
 import com.lx862.dclink.config.BotConfig;
 import com.lx862.dclink.config.DiscordConfig;
 import com.lx862.dclink.config.MinecraftConfig;
 import com.lx862.dclink.config.RevoltConfig;
-import com.lx862.dclink.minecraft.events.ServerManager;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

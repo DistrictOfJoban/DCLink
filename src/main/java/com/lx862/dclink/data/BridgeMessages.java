@@ -31,7 +31,7 @@ public class BridgeMessages {
         playerLeft = "<<<playerLeft>>>";
         playerDisconnectReason = "({reason})";
         changeDimension = "**{player.displayName}{player.name}** has warped to {world.name}";
-        playerDeath = ":skull: **{player.displayName}{player.name}** {reason}";
+        playerDeath = ":skull: **{player.displayName}{player.name}** {cause}";
         playerAdvancement = ":medal: **{player.displayName}{player.name}** has achieved **{advancement}**! (*{advancementDetails}*)";
     }
 

@@ -1,4 +1,4 @@
-package com.lx862.revoltimpl.data;
+package com.lx862.revoltimpl.data.text.embed;
 
 import com.google.gson.JsonObject;
 import com.lx862.dclink.util.StringHelper;
@@ -59,7 +59,7 @@ public class TextEmbed {
         return jsonObject;
     }
 
-    public static TextEmbed fromJDAMessageEmbed(MessageEmbed embed) {
+    public static TextEmbed fromMessageEmbed(MessageEmbed embed) {
         TextEmbedBuilder embedBuilder = new TextEmbedBuilder();
         String description = "";
         if(embed.getTitle() != null) {
@@ -77,7 +77,7 @@ public class TextEmbed {
         embedBuilder.setColor(embed.getColorRaw());
 
         if(embed.getThumbnail() != null) {
-            embedBuilder.setIcon(embed.getThumbnail().getUrl());
+            embedBuilder.setThumbnail(embed.getThumbnail().getUrl());
         }
         if(embed.getFooter() != null) {
             embedBuilder.setFooter(embed.getFooter().getText());

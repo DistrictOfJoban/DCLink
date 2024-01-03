@@ -2,6 +2,7 @@ package com.lx862.revoltimpl.data;
 
 import com.lx862.revoltimpl.API;
 import com.lx862.revoltimpl.RevoltClient;
+import com.lx862.revoltimpl.data.text.embed.TextEmbed;
 
 import java.util.Collection;
 

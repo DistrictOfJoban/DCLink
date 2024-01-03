@@ -2,8 +2,8 @@ package com.lx862.revoltimpl.data;
 
 import com.google.gson.JsonObject;
 import com.lx862.revoltimpl.RevoltClient;
-import com.lx862.dclink.data.bridge.Member;
-import com.lx862.dclink.data.bridge.User;
+import com.lx862.vendorneutral.usermember.Member;
+import com.lx862.vendorneutral.usermember.User;
 import com.lx862.revoltimpl.data.attachment.File;
 
 import java.util.ArrayList;
