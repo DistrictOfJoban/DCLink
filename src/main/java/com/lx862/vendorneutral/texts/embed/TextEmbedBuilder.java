@@ -68,6 +68,6 @@ public class TextEmbedBuilder {
     }
 
     public TextEmbed build() {
-        return new TextEmbed(title, description, color, footer, url, imageUrl, iconUrl, author, fields);
+        return new TextEmbed(title, description, color, url, imageUrl, footer, iconUrl, author, fields);
     }
 }
