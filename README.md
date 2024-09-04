@@ -16,7 +16,6 @@ I don't have enough understanding of the codebase to port either of the mod to 1
 Eventually I tried making it a more proper project, (hopefully) implement bridging to services outside of only Discord. (2023-12-15: And gave up)
 
 ## Features
-- Fabric 1.16.5 - 1.19.2
 - Config hot-reloadable
 - Support bot activities
 - Support custom guild emoji (Minecraft to Discord)
@@ -48,7 +47,7 @@ Eventually I tried making it a more proper project, (hopefully) implement bridgi
 - Touch some grass
 
 ## Downloads
-**This project is not yet considered finish nor stable, expect beta quality!**
+**This project is not yet considered finish nor stable, expect alpha quality!**
 
 For downloading the latest build, please [click here](https://github.com/Kenny-Hui/DCLink/actions).
 
