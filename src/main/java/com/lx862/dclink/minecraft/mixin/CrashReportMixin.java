@@ -1,6 +1,6 @@
 package com.lx862.dclink.minecraft.mixin;
 
-import com.lx862.dclink.minecraft.events.ServerManager;
+import com.lx862.dclink.DCLink;
 import net.minecraft.util.crash.CrashReport;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,6 +13,6 @@ import java.io.File;
 public class CrashReportMixin {
     @Inject(method = "writeToFile", at = @At("HEAD"))
     public void writeToFile(File file, CallbackInfoReturnable<Boolean> cir) {
-        ServerManager.serverCrashed((CrashReport)(Object)this);
+        DCLink.getMcSource().serverCrashed((CrashReport)(Object)this);
     }
 }

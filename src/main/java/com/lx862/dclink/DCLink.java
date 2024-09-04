@@ -1,6 +1,5 @@
 package com.lx862.dclink;
 
-import com.lx862.dclink.data.Source;
 import com.lx862.dclink.minecraft.MinecraftSource;
 import com.lx862.dclink.config.BotConfig;
 import com.lx862.dclink.config.DiscordConfig;
@@ -12,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 public class DCLink implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger("DCLink");
-	private static final Source mcSource = new MinecraftSource();
+	private static final MinecraftSource mcSource = new MinecraftSource();
 
 	@Override
 	public void onInitialize() {
@@ -24,6 +23,11 @@ public class DCLink implements ModInitializer {
 
 		mcSource.initialize();
 	}
+
+	public static MinecraftSource getMcSource() {
+		return mcSource;
+	}
+
 	public static boolean loadAllConfig() {
 		return BotConfig.getInstance().load() && MinecraftConfig.getInstance().load() && DiscordConfig.getInstance().load() && RevoltConfig.getInstance().load();
 	}

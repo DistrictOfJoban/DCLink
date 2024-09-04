@@ -2,6 +2,7 @@ package com.lx862.dclink.bridges;
 
 import com.lx862.dclink.config.RevoltConfig;
 import com.lx862.dclink.data.BridgeContext;
+import com.lx862.dclink.minecraft.MinecraftSource;
 import com.lx862.vendorneutral.usermember.User;
 import com.lx862.dclink.util.StringHelper;
 import com.lx862.revoltimpl.RevoltClient;
@@ -26,8 +27,10 @@ public class RevoltBridge implements Bridge, RevoltListener {
     private boolean isReady = false;
     private final String token;
     private final RevoltConfig config;
+    private final MinecraftSource source;
 
-    public RevoltBridge(RevoltConfig config) {
+    public RevoltBridge(RevoltConfig config, MinecraftSource source) {
+        this.source = source;
         this.config = config;
         this.client = new RevoltClient(config.getToken());
         this.client.addListener(this);

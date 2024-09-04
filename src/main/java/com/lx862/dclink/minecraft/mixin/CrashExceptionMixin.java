@@ -1,6 +1,6 @@
 package com.lx862.dclink.minecraft.mixin;
 
-import com.lx862.dclink.minecraft.events.ServerManager;
+import com.lx862.dclink.DCLink;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +13,6 @@ public abstract class CrashExceptionMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void onCrashCreate(CrashReport report, CallbackInfo ci) {
-        ServerManager.serverCrashed(report);
+        DCLink.getMcSource().serverCrashed(report);
     }
 }

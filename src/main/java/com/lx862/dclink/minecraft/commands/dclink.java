@@ -3,8 +3,6 @@ package com.lx862.dclink.minecraft.commands;
 import com.lx862.dclink.DCLink;
 import com.lx862.dclink.bridges.BridgeManager;
 import com.lx862.dclink.config.BotConfig;
-import com.lx862.dclink.config.DiscordConfig;
-import com.lx862.dclink.config.MinecraftConfig;
 import com.lx862.dclink.minecraft.MinecraftSource;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
@@ -24,9 +22,6 @@ public class dclink {
                 )
                 .then(CommandManager.literal("status")
                         .executes(dclink::status)
-                )
-                .then(CommandManager.literal("save")
-                        .executes(dclink::saveConfig)
                 )
                 .then(CommandManager.literal("enable")
                         .then(CommandManager.literal("outbound")
@@ -51,7 +46,7 @@ public class dclink {
                     .requires(ctx -> ctx.hasPermissionLevel(2))
                     .then(CommandManager.literal("crashServer")
                             .executes(context -> {
-                                MinecraftSource.crashServerOnTick = true;
+                                DCLink.getMcSource().crashServerOnTick = true;
                                 return 1;
                             })
                     ));
@@ -73,14 +68,6 @@ public class dclink {
             BridgeManager.startStatus();
         }
 
-        return 1;
-    }
-
-    private static int saveConfig(CommandContext<ServerCommandSource> context) {
-        BotConfig.getInstance().save();
-        DiscordConfig.getInstance().save();
-        MinecraftConfig.getInstance().save();
-        context.getSource().sendFeedback(Text.literal("Config saved.").formatted(Formatting.GREEN), false);
         return 1;
     }
 

@@ -4,8 +4,8 @@ import com.lx862.dclink.config.BotConfig;
 import com.lx862.dclink.config.DiscordConfig;
 import com.lx862.dclink.config.MinecraftConfig;
 import com.lx862.dclink.data.*;
+import com.lx862.dclink.minecraft.MinecraftSource;
 import com.lx862.vendorneutral.usermember.User;
-import com.lx862.dclink.minecraft.events.ServerManager;
 import com.lx862.dclink.util.StringHelper;
 import com.lx862.vendorneutral.texts.embed.TextEmbed;
 import net.dv8tion.jda.api.JDA;
@@ -37,6 +37,7 @@ import java.util.regex.Pattern;
 public class DiscordBridge extends ListenerAdapter implements Bridge {
     private static final Pattern EMBED_PATTERN = Pattern.compile("(<<<.+>>>)");
     private static final Logger LOGGER = LogManager.getLogger("DCLinkDiscord");
+    private final MinecraftSource source;
     private final DiscordConfig config;
     private final Collection<GatewayIntent> intents;
     private final Collection<Runnable> queuedAction;
@@ -45,7 +46,8 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     public Map<String, List<RichCustomEmoji>> emojiMap = new HashMap<>();
     public Map<Long, Message> messageCache = new HashMap<>();
 
-    public DiscordBridge(DiscordConfig config) {
+    public DiscordBridge(DiscordConfig config, MinecraftSource source) {
+        this.source = source;
         this.config = config;
         this.intents = config.getIntents();
         this.queuedAction = new ArrayList<>();
@@ -142,7 +144,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
             }
 
             textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel().asTextChannel(), event.getMember()));
-            ServerManager.sendMessage(textToBeSent, entry);
+            source.sendMessage(textToBeSent, entry);
         }
     }
 
@@ -169,7 +171,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
             List<MutableText> textToBeSent = new ArrayList<>();
             MutableText formattedMessage = entry.message.getDiscordEditedMessage(oldMessage, newMessage, event.getGuildChannel().asTextChannel(), member);
             textToBeSent.add(formattedMessage);
-            ServerManager.sendMessage(textToBeSent, entry);
+            source.sendMessage(textToBeSent, entry);
         }
     }
 
@@ -200,7 +202,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
             }
 
             textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel().asTextChannel(), member));
-            ServerManager.sendMessage(textToBeSent, entry);
+            source.sendMessage(textToBeSent, entry);
         }
     }
 
@@ -227,7 +229,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
                 textToBeSent.add(formattedMessage);
             }
 
-            ServerManager.sendMessage(textToBeSent, entry);
+            source.sendMessage(textToBeSent, entry);
         }
     }
 
@@ -254,7 +256,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
                 textToBeSent.add(formattedMessage);
             }
 
-            ServerManager.sendMessage(textToBeSent, entry);
+            source.sendMessage(textToBeSent, entry);
         }
     }
 

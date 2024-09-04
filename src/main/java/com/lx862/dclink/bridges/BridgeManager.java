@@ -1,13 +1,13 @@
 package com.lx862.dclink.bridges;
 
 import com.google.gson.JsonArray;
+import com.lx862.dclink.DCLink;
 import com.lx862.dclink.config.BotConfig;
 import com.lx862.dclink.config.DiscordConfig;
 import com.lx862.dclink.config.RevoltConfig;
 import com.lx862.dclink.data.MinecraftPlaceholder;
 import com.lx862.dclink.data.Placeholder;
 import com.lx862.dclink.data.bridge.StatusManager;
-import com.lx862.dclink.minecraft.events.ServerManager;
 import com.lx862.dclink.util.EmbedParser;
 import com.lx862.dclink.util.StringHelper;
 import com.lx862.vendorneutral.texts.embed.TextEmbed;
@@ -25,8 +25,8 @@ public class BridgeManager {
     private static final List<Bridge> bridges = new ArrayList<>();
 
     public static void addDefaultBridges() {
-        Bridge discordBridge = new DiscordBridge(DiscordConfig.getInstance());
-        Bridge revoltBridge = new RevoltBridge(RevoltConfig.getInstance());
+        Bridge discordBridge = new DiscordBridge(DiscordConfig.getInstance(), DCLink.getMcSource());
+        Bridge revoltBridge = new RevoltBridge(RevoltConfig.getInstance(), DCLink.getMcSource());
         if(discordBridge.isValid()) BridgeManager.addBridge(discordBridge);
         if(revoltBridge.isValid()) BridgeManager.addBridge(revoltBridge);
     }
@@ -66,13 +66,13 @@ public class BridgeManager {
         StatusManager.statusTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if(!ServerManager.serverAlive()) {
+                if(!DCLink.getMcSource().alive()) {
                     StatusManager.stopTimer();
                     return;
                 }
 
                 StatusManager.nextStatus();
-                Placeholder placeholder = new MinecraftPlaceholder(null, ServerManager.getServer(), null, null);
+                Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.getMcSource().getServer(), null, null);
                 String status = BotConfig.getInstance().statuses.get(StatusManager.getCurrentStatusIndex());
                 String formattedStatus = placeholder.parse(status);
 
