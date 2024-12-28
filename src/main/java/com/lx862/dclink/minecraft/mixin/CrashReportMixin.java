@@ -13,6 +13,6 @@ import java.io.File;
 public class CrashReportMixin {
     @Inject(method = "writeToFile", at = @At("HEAD"))
     public void writeToFile(File file, CallbackInfoReturnable<Boolean> cir) {
-        DCLink.getMcSource().serverCrashed((CrashReport)(Object)this);
+        DCLink.getMaster().serverCrashed((CrashReport)(Object)this);
     }
 }

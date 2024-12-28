@@ -1,6 +1,8 @@
 package com.lx862.dclink.minecraft.mixin;
 
 import com.lx862.dclink.minecraft.events.PlayerManager;
+import net.minecraft.network.message.LastSeenMessageList;
+import net.minecraft.network.packet.c2s.play.CommandExecutionC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -9,9 +11,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.concurrent.CompletableFuture;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public abstract class ServerPlayNetworkHandlerMixin {
@@ -23,8 +22,8 @@ public abstract class ServerPlayNetworkHandlerMixin {
     }
 
     // FIXME: this prob doesn't work idk
-    @Inject(method = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;decorateCommand(Ljava/lang/String;)Ljava/util/concurrent/CompletableFuture;", at = @At("HEAD"))
-    public void sendCommand(String query, CallbackInfoReturnable<CompletableFuture<Text>> cir) {
-        PlayerManager.sendCommand(query, player);
+    @Inject(method = "handleCommandExecution", at = @At("HEAD"))
+    public void sendCommand(CommandExecutionC2SPacket packet, LastSeenMessageList lastSeenMessages, CallbackInfo ci) {
+        PlayerManager.sendCommand(packet.command(), player);
     }
 }

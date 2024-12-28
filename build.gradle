@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.7-SNAPSHOT'
+	id 'fabric-loom' version '1.8-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -9,7 +9,7 @@ targetCompatibility = JavaVersion.VERSION_17
 archivesBaseName = project.archives_base_name
 group = project.maven_group
 
-version = project.mod_version + "-" + project.minecraft_version
+version = project.mod_version + "+" + project.minecraft_version
 
 repositories {
 	mavenCentral()

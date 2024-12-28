@@ -1,8 +1,7 @@
 package com.lx862.dclink.bridges;
 
 public enum BridgeType {
-    DISCORD("Discord"),
-    REVOLT("Revolt");
+    DISCORD("Discord");
 
     private final String name;
     BridgeType(String name) {

@@ -4,14 +4,13 @@ import com.lx862.dclink.minecraft.MinecraftSource;
 import com.lx862.dclink.config.BotConfig;
 import com.lx862.dclink.config.DiscordConfig;
 import com.lx862.dclink.config.MinecraftConfig;
-import com.lx862.dclink.config.RevoltConfig;
 import net.fabricmc.api.ModInitializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class DCLink implements ModInitializer {
-	public static final Logger LOGGER = LogManager.getLogger("DCLink");
 	private static final MinecraftSource mcSource = new MinecraftSource();
+	public static final Logger LOGGER = LogManager.getLogger("DCLink");
 
 	@Override
 	public void onInitialize() {
@@ -24,11 +23,11 @@ public class DCLink implements ModInitializer {
 		mcSource.initialize();
 	}
 
-	public static MinecraftSource getMcSource() {
+	public static MinecraftSource getMaster() {
 		return mcSource;
 	}
 
 	public static boolean loadAllConfig() {
-		return BotConfig.getInstance().load() && MinecraftConfig.getInstance().load() && DiscordConfig.getInstance().load() && RevoltConfig.getInstance().load();
+		return BotConfig.getInstance().load() && MinecraftConfig.getInstance().load() && DiscordConfig.getInstance().load();
 	}
 }

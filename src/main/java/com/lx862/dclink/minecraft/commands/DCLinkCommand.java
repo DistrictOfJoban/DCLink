@@ -3,7 +3,6 @@ package com.lx862.dclink.minecraft.commands;
 import com.lx862.dclink.DCLink;
 import com.lx862.dclink.bridges.BridgeManager;
 import com.lx862.dclink.config.BotConfig;
-import com.lx862.dclink.minecraft.MinecraftSource;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.loader.api.FabricLoader;
@@ -13,30 +12,30 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-public class dclink {
+public class DCLinkCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("dclink")
                 .requires(ctx -> ctx.hasPermissionLevel(2))
                 .then(CommandManager.literal("reload")
-                        .executes(dclink::reloadConfig)
+                        .executes(DCLinkCommand::reloadConfig)
                 )
                 .then(CommandManager.literal("status")
-                        .executes(dclink::status)
+                        .executes(DCLinkCommand::status)
                 )
                 .then(CommandManager.literal("enable")
                         .then(CommandManager.literal("outbound")
-                                .executes(dclink::enableOutbound)
+                                .executes(DCLinkCommand::enableOutbound)
                         )
                         .then(CommandManager.literal("inbound")
-                                .executes(dclink::enableInbound)
+                                .executes(DCLinkCommand::enableInbound)
                         )
                 )
                 .then(CommandManager.literal("disable")
                         .then(CommandManager.literal("outbound")
-                                .executes(dclink::disableOutbound)
+                                .executes(DCLinkCommand::disableOutbound)
                         )
                         .then(CommandManager.literal("inbound")
-                                .executes(dclink::disableInbound)
+                                .executes(DCLinkCommand::disableInbound)
                         )
                 )
         );
@@ -46,7 +45,7 @@ public class dclink {
                     .requires(ctx -> ctx.hasPermissionLevel(2))
                     .then(CommandManager.literal("crashServer")
                             .executes(context -> {
-                                DCLink.getMcSource().crashServerOnTick = true;
+                                DCLink.getMaster().crashServerOnTick = true;
                                 return 1;
                             })
                     ));
@@ -61,11 +60,9 @@ public class dclink {
 
         /* Re-login if successful */
         if(success) {
-            BridgeManager.logout();
-            BridgeManager.clearBridges();
-            BridgeManager.addDefaultBridges();
+            BridgeManager.shutdown();
+            BridgeManager.startup();
             BridgeManager.login();
-            BridgeManager.startStatus();
         }
 
         return 1;

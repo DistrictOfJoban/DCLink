@@ -3,7 +3,7 @@ package com.lx862.dclink.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.lx862.dclink.util.JsonHelper;
+import net.minecraft.util.JsonHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,21 +20,17 @@ public class MinecraftEntry {
     }
 
     public static MinecraftEntry fromJson(JsonElement element) {
-        JsonObject jsonEntry = JsonHelper.getAsJsonObject(element);
-        if(jsonEntry == null) return null;
+        JsonObject jsonEntry = element.getAsJsonObject();
 
         MinecraftEntry minecraftEntry = new MinecraftEntry();
-        if(jsonEntry.has("channelID")) {
-            jsonEntry.get("channelID").getAsJsonArray().forEach(id -> {
-                minecraftEntry.channelID.add(id.getAsString());
-            });
-        }
 
-        if(jsonEntry.has("dimensions")) {
-            jsonEntry.get("dimensions").getAsJsonArray().forEach(worldId -> {
-                minecraftEntry.sendDimension.add(worldId.getAsString());
-            });
-        }
+        JsonHelper.getArray(jsonEntry, "channelID", new JsonArray()).forEach(id -> {
+            minecraftEntry.channelID.add(id.getAsString());
+        });
+
+        JsonHelper.getArray(jsonEntry, "dimensions", new JsonArray()).forEach(worldId -> {
+            minecraftEntry.sendDimension.add(worldId.getAsString());
+        });
 
         if(jsonEntry.has("messages")) {
             minecraftEntry.message = MinecraftMessages.fromJson(jsonEntry.getAsJsonObject("messages"));

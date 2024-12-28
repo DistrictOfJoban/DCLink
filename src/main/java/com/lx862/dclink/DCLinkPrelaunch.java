@@ -6,6 +6,6 @@ public class DCLinkPrelaunch implements PreLaunchEntrypoint {
 
 	@Override
 	public void onPreLaunch() {
-		DCLink.getMcSource().sourceStarted();
+		DCLink.getMaster().sourceStarted();
 	}
 }

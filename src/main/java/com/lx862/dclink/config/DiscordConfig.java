@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.lx862.dclink.DCLink;
 import com.lx862.dclink.data.BridgeContext;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.minecraft.util.JsonHelper;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -14,8 +15,8 @@ import java.util.*;
 
 public class DiscordConfig extends BridgeConfig {
     private static DiscordConfig instance;
-    private String token = null;
     private final Collection<String> intents = new ArrayList<>();
+    private String token = null;
     public final HashMap<String, JsonArray> customEmbedsList = new HashMap<>();
 
     public DiscordConfig() {
@@ -44,27 +45,20 @@ public class DiscordConfig extends BridgeConfig {
         }
 
         try {
-            final JsonObject jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(configFile))).getAsJsonObject();
-            if(jsonConfig.has("token")) {
-                token = jsonConfig.get("token").getAsString();
-            }
+            final JsonObject jsonConfig = JsonParser.parseString(String.join("", Files.readAllLines(configFile))).getAsJsonObject();
+            token = JsonHelper.getString(jsonConfig, "token", null);
 
-            if(jsonConfig.has("intents")) {
-                JsonArray channels = jsonConfig.get("intents").getAsJsonArray();
-                channels.forEach(jsonElement -> {
-                    String intent = jsonElement.getAsString();
-                    intents.add(intent);
-                });
-            }
+            JsonHelper.getArray(jsonConfig, "intents", new JsonArray()).forEach(jsonElement -> {
+                String intent = jsonElement.getAsString();
+                intents.add(intent);
+            });
 
-            if(jsonConfig.has("entries")) {
-                jsonConfig.get("entries").getAsJsonArray().forEach(jsonElement -> {
-                    BridgeContext bridgeContext = BridgeContext.fromJson(jsonElement);
-                    if(bridgeContext != null) {
-                        entries.add(bridgeContext);
-                    }
-                });
-            }
+            JsonHelper.getArray(jsonConfig, "entries", new JsonArray()).forEach(jsonElement -> {
+                BridgeContext bridgeContext = BridgeContext.fromJson(jsonElement);
+                if(bridgeContext != null) {
+                    entries.add(bridgeContext);
+                }
+            });
             return true;
         } catch (Exception e) {
             e.printStackTrace();

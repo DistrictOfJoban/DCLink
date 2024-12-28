@@ -1,5 +1,6 @@
 # DCLink
-A customizable linking mod between Discord/Revolt and Minecraft, designed for use in The District of Joban. (Use at your own risk)
+A customizable linking mod between Discord and Minecraft, designed for use in The District of Joban.  
+*Note: This project is now in maintenance mode*
 
 [![works badge](https://cdn.jsdelivr.net/gh/nikku/works-on-my-machine@v0.2.0/badge.svg)](https://github.com/nikku/works-on-my-machine)
 ![build status](https://github.com/Kenny-Hui/DCLink/actions/workflows/build.yml/badge.svg)

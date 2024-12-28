@@ -5,9 +5,7 @@ import com.lx862.dclink.config.DiscordConfig;
 import com.lx862.dclink.config.MinecraftConfig;
 import com.lx862.dclink.data.*;
 import com.lx862.dclink.minecraft.MinecraftSource;
-import com.lx862.vendorneutral.usermember.User;
 import com.lx862.dclink.util.StringHelper;
-import com.lx862.vendorneutral.texts.embed.TextEmbed;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -40,7 +38,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     private final MinecraftSource source;
     private final DiscordConfig config;
     private final Collection<GatewayIntent> intents;
-    private final Collection<Runnable> queuedAction;
+    private final RunnableQueue queue;
     private boolean isReady = false;
     public JDA client;
     public Map<String, List<RichCustomEmoji>> emojiMap = new HashMap<>();
@@ -50,7 +48,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
         this.source = source;
         this.config = config;
         this.intents = config.getIntents();
-        this.queuedAction = new ArrayList<>();
+        this.queue = new RunnableQueue();
     }
 
     public void login() {
@@ -79,10 +77,8 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     }
 
     public void disconnect() {
-        if(isReady()) {
-            isReady = false;
-            client.shutdown();
-        }
+        isReady = false;
+        client.shutdown();
     }
 
     public void updateStatus(String status) {
@@ -90,9 +86,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     }
 
     public void stopStatus() {
-        if(isReady()) {
-            client.getPresence().setActivity(null);
-        }
+        client.getPresence().setActivity(null);
     }
 
     public Collection<BridgeContext> getContext() {
@@ -111,11 +105,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
 
         LOGGER.info("[DCLink] Logged in as: " + client.getSelfUser().getAsTag());
         isReady = true;
-
-        for(Runnable callback : queuedAction) {
-            callback.run();
-        }
-        queuedAction.clear();
+        queue.drain();
     }
 
     @Override
@@ -176,8 +166,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     }
 
     @Override
-    public void onMessageDelete(MessageDeleteEvent event)
-    {
+    public void onMessageDelete(MessageDeleteEvent event) {
         if (!isReady || event.isFromType(ChannelType.PRIVATE) || !BotConfig.getInstance().inboundEnabled) return;
 
         Message message = messageCache.get(event.getMessageIdLong());
@@ -269,12 +258,10 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     }
 
     public User getUserInfo() {
-        return User.fromDiscord(client.getSelfUser());
+        return client.getSelfUser();
     }
 
-    public void handleMessage(String finalMessage, String channelId, List<TextEmbed> embeds, boolean enableEmoji, boolean allowMention) {
-        List<MessageEmbed> ourEmbeds = embeds.stream().map(TextEmbed::toDiscord).toList();
-
+    public void handleMessage(String finalMessage, String channelId, List<MessageEmbed> embeds, boolean enableEmoji, boolean allowMention) {
         TextChannel channel = client.getChannelById(TextChannel.class, channelId);
         if(channel == null) {
             LOGGER.warn("[DCLink] [Discord] Cannot find channel with id " + channelId);
@@ -305,11 +292,11 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
 
             if(finalMessage.isEmpty() && !embeds.isEmpty()) {
                 // Send Embed Only
-                action = channel.sendMessageEmbeds(ourEmbeds);
+                action = channel.sendMessageEmbeds(embeds);
             } else {
                 // Send message with embed attached
                 action = channel.sendMessage(finalMessage);
-                action.setEmbeds(ourEmbeds);
+                action.setEmbeds(embeds);
             }
             action.queue();
         } catch (Exception e) {

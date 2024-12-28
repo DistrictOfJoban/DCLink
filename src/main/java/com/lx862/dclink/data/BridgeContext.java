@@ -3,7 +3,6 @@ package com.lx862.dclink.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.lx862.dclink.util.JsonHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +25,7 @@ public class BridgeContext {
     }
 
     public static BridgeContext fromJson(JsonElement jsonElement) {
-        JsonObject jsonEntry = JsonHelper.getAsJsonObject(jsonElement);
+        JsonObject jsonEntry = jsonElement.getAsJsonObject();
         if(jsonEntry == null) return null;
 
         BridgeContext bridgeContext = new BridgeContext();

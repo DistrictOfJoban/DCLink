@@ -13,6 +13,6 @@ public abstract class CrashExceptionMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void onCrashCreate(CrashReport report, CallbackInfo ci) {
-        DCLink.getMcSource().serverCrashed(report);
+        DCLink.getMaster().serverCrashed(report);
     }
 }

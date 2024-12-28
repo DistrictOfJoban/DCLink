@@ -4,8 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lx862.dclink.data.Placeholder;
-import com.lx862.vendorneutral.texts.embed.TextEmbed;
-import com.lx862.vendorneutral.texts.embed.TextEmbedBuilder;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.text.SimpleDateFormat;
@@ -13,11 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmbedParser {
-    public static List<TextEmbed> fromJson(Placeholder placeholder, JsonArray jsonArray) {
-        ArrayList<TextEmbed> embeds = new ArrayList<>();
+    public static List<MessageEmbed> fromJson(Placeholder placeholder, JsonArray jsonArray) {
+        ArrayList<MessageEmbed> embeds = new ArrayList<>();
         for (JsonElement jsonElement : jsonArray) {
             try {
-                TextEmbedBuilder embed = new TextEmbedBuilder();
+                EmbedBuilder embed = new EmbedBuilder();
                 JsonObject json = jsonElement.getAsJsonObject();
                 String title = getString(placeholder, "title", json);
                 String description = getString(placeholder, "description", json);

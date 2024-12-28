@@ -1,25 +1,45 @@
 package com.lx862.dclink.data.bridge;
 
+import com.lx862.dclink.DCLink;
+import com.lx862.dclink.bridges.BridgeManager;
 import com.lx862.dclink.config.BotConfig;
+import com.lx862.dclink.data.MinecraftPlaceholder;
+import com.lx862.dclink.data.Placeholder;
 
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class StatusManager {
-    private static int currentStatus;
-    public static Timer statusTimer = new Timer();
+    private Timer statusTimer;
+    private int currentStatus;
 
-    public static void nextStatus() {
-        currentStatus++;
-        if(currentStatus >= BotConfig.getInstance().statuses.size()) {
-            currentStatus = 0;
-        }
+    public void start() {
+        statusTimer = new Timer();
+        statusTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+            if(!DCLink.getMaster().alive()) {
+                stop();
+                return;
+            }
+
+            nextStatus();
+            String status = BotConfig.getInstance().statuses.get(currentStatus);
+            Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.getMaster().getServer(), null, null);
+            String formattedStatus = placeholder.parse(status);
+
+            BridgeManager.forEach(bridge -> {
+                bridge.updateStatus(formattedStatus);
+            });
+            }
+        }, 0, BotConfig.getInstance().getStatusRefreshInterval() * 1000L);
     }
 
-    public static int getCurrentStatusIndex() {
-        return currentStatus;
+    private void nextStatus() {
+        currentStatus = (currentStatus + 1) % BotConfig.getInstance().statuses.size();
     }
 
-    public static void stopTimer() {
+    public void stop() {
         statusTimer.cancel();
         statusTimer.purge();
     }

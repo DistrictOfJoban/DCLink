@@ -40,7 +40,7 @@ public class MinecraftConfig extends Config {
         }
 
         try {
-            final JsonArray jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(configFile))).getAsJsonArray();
+            final JsonArray jsonConfig = JsonParser.parseString(String.join("", Files.readAllLines(configFile))).getAsJsonArray();
             jsonConfig.forEach(jsonElement -> {
                 MinecraftEntry entry = MinecraftEntry.fromJson(jsonElement);
                 if(entry != null) {

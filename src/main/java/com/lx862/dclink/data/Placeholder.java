@@ -8,8 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class Placeholder {
-    public final LinkedHashMap<String, String> placeholders;
-    public final LinkedHashMap<String, Long> timePlaceholders;
+    private final LinkedHashMap<String, String> placeholders;
+    private final LinkedHashMap<String, Long> timePlaceholders;
 
     public Placeholder() {
         this.placeholders = new LinkedHashMap<>();

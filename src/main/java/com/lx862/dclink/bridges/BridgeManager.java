@@ -4,18 +4,14 @@ import com.google.gson.JsonArray;
 import com.lx862.dclink.DCLink;
 import com.lx862.dclink.config.BotConfig;
 import com.lx862.dclink.config.DiscordConfig;
-import com.lx862.dclink.config.RevoltConfig;
-import com.lx862.dclink.data.MinecraftPlaceholder;
 import com.lx862.dclink.data.Placeholder;
 import com.lx862.dclink.data.bridge.StatusManager;
 import com.lx862.dclink.util.EmbedParser;
 import com.lx862.dclink.util.StringHelper;
-import com.lx862.vendorneutral.texts.embed.TextEmbed;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,12 +19,11 @@ import java.util.regex.Pattern;
 public class BridgeManager {
     private static final Pattern EMBED_PATTERN = Pattern.compile("(<<<.+>>>)");
     private static final List<Bridge> bridges = new ArrayList<>();
+    private static final StatusManager statusManager = new StatusManager();
 
-    public static void addDefaultBridges() {
-        Bridge discordBridge = new DiscordBridge(DiscordConfig.getInstance(), DCLink.getMcSource());
-        Bridge revoltBridge = new RevoltBridge(RevoltConfig.getInstance(), DCLink.getMcSource());
+    public static void startup() {
+        Bridge discordBridge = new DiscordBridge(DiscordConfig.getInstance(), DCLink.getMaster());
         if(discordBridge.isValid()) BridgeManager.addBridge(discordBridge);
-        if(revoltBridge.isValid()) BridgeManager.addBridge(revoltBridge);
     }
 
     public static void clearBridges() {
@@ -49,44 +44,32 @@ public class BridgeManager {
         for(Bridge bridge : bridges) {
             bridge.login();
         }
+        startStatus();
     }
 
     public static void logout() {
         for(Bridge bridge : bridges) {
+            if(!bridge.isReady()) continue;
             bridge.stopStatus();
             bridge.disconnect();
         }
     }
 
+    public static void shutdown() {
+        logout();
+        statusManager.stop();
+        clearBridges();
+    }
+
     public static void startStatus() {
         if(BotConfig.getInstance().statuses.isEmpty()) return;
-
-        BridgeManager.forEach(Bridge::stopStatus);
-        StatusManager.statusTimer = new Timer();
-        StatusManager.statusTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if(!DCLink.getMcSource().alive()) {
-                    StatusManager.stopTimer();
-                    return;
-                }
-
-                StatusManager.nextStatus();
-                Placeholder placeholder = new MinecraftPlaceholder(null, DCLink.getMcSource().getServer(), null, null);
-                String status = BotConfig.getInstance().statuses.get(StatusManager.getCurrentStatusIndex());
-                String formattedStatus = placeholder.parse(status);
-
-                BridgeManager.forEach(bridge -> {
-                    bridge.updateStatus(formattedStatus);
-                });
-            }
-        }, 0, BotConfig.getInstance().getStatusRefreshInterval() * 1000L);
+        statusManager.start();
     }
 
     public static void sendMessage(Bridge bridge, String template, Placeholder placeholder, List<String> channelList, boolean allowMention, boolean enableEmoji) {
         if(!bridge.isReady() || !BotConfig.getInstance().outboundEnabled || StringHelper.notValidString(template)) return;
 
-        ArrayList<TextEmbed> embedToBeSent = new ArrayList<>();
+        ArrayList<MessageEmbed> embedToBeSent = new ArrayList<>();
         Matcher matcher = EMBED_PATTERN.matcher(template);
 
         if(matcher.find()) {

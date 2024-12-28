@@ -1,6 +1,7 @@
 package com.lx862.dclink.config;
 
 import com.google.gson.*;
+import net.minecraft.util.JsonHelper;
 
 import java.io.FileWriter;
 import java.io.Writer;
@@ -41,21 +42,14 @@ public class BotConfig extends Config {
             }
         } else {
             try {
-                final JsonObject jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(configFile))).getAsJsonObject();
+                final JsonObject jsonConfig = JsonParser.parseString(String.join("", Files.readAllLines(configFile))).getAsJsonObject();
 
-                if(jsonConfig.has("statuses")) {
-                    jsonConfig.get("statuses").getAsJsonArray().forEach(jsonElement -> {
-                        statuses.add(jsonElement.getAsString());
-                    });
-                }
+                JsonHelper.getArray(jsonConfig, "statuses", new JsonArray()).forEach(jsonElement -> {
+                    statuses.add(jsonElement.getAsString());
+                });
 
-                if(jsonConfig.has("statusRefreshInterval")) {
-                    statusRefreshInterval = jsonConfig.get("statusRefreshInterval").getAsInt();
-                }
-
-                if(jsonConfig.has("cacheMember")) {
-                    cacheMember = jsonConfig.get("cacheMember").getAsBoolean();
-                }
+                statusRefreshInterval = JsonHelper.getInt(jsonConfig, "statusRefreshInterval", 20);
+                cacheMember = JsonHelper.getBoolean(jsonConfig, "cacheMember", false);
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;

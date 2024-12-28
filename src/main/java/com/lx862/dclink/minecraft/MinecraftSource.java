@@ -1,8 +1,9 @@
 package com.lx862.dclink.minecraft;
 
+import com.lx862.dclink.DCLink;
 import com.lx862.dclink.bridges.BridgeManager;
 import com.lx862.dclink.data.*;
-import com.lx862.dclink.minecraft.commands.dclink;
+import com.lx862.dclink.minecraft.commands.DCLinkCommand;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -23,18 +24,22 @@ public class MinecraftSource {
     private static MinecraftServer serverInstance = null;
 
     public void initialize() {
-        ServerLifecycleEvents.SERVER_STARTING.register(this::serverStarting);
-        ServerLifecycleEvents.SERVER_STARTED.register(this::serverStarted);
-        ServerLifecycleEvents.SERVER_STOPPING.register(this::serverStopping);
-        ServerLifecycleEvents.SERVER_STOPPED.register(this::serverStopped);
-        ServerTickEvents.START_SERVER_TICK.register(e -> {
-            if(crashServerOnTick) {
-                throw new RuntimeException("Manually triggered DCLink Debug crash.");
-            }
-        });
-        CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> {
-            dclink.register(dispatcher);
-        }));
+        try {
+            ServerLifecycleEvents.SERVER_STARTING.register(this::serverStarting);
+            ServerLifecycleEvents.SERVER_STARTED.register(this::serverStarted);
+            ServerLifecycleEvents.SERVER_STOPPING.register(this::serverStopping);
+            ServerLifecycleEvents.SERVER_STOPPED.register(this::serverStopped);
+            ServerTickEvents.START_SERVER_TICK.register(e -> {
+                if(crashServerOnTick) {
+                    throw new RuntimeException("Manually triggered DCLink Debug crash.");
+                }
+            });
+            CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> {
+                DCLinkCommand.register(dispatcher);
+            }));
+        } catch (Exception e) {
+            DCLink.LOGGER.error(e);
+        }
     }
 
     public boolean alive() {
@@ -45,92 +50,67 @@ public class MinecraftSource {
         return serverInstance;
     }
 
-    public long getElapsedTime() {
-        return System.currentTimeMillis() - serverStartingTimestamp;
-    }
-
     public void sourceStarted() {
         this.serverStartingTimestamp = System.currentTimeMillis();
     }
 
     public void serverStarting(MinecraftServer server) {
-        try {
-            serverInstance = server;
+        BridgeManager.startup();
+        serverInstance = server;
 
-            BridgeManager.clearBridges();
-            BridgeManager.addDefaultBridges();
-            BridgeManager.login();
-
-            BridgeManager.forEach(bridge -> {
-                for(BridgeContext entry : bridge.getContext()) {
-                    BridgeManager.sendMessage(bridge, entry.message.serverStarting, null, entry.channelID, entry.allowMention, entry.enableEmoji);
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        BridgeManager.login();
+        BridgeManager.forEach(bridge -> {
+            for(BridgeContext entry : bridge.getContext()) {
+                BridgeManager.sendMessage(bridge, entry.message.serverStarting, null, entry.channelID, entry.allowMention, entry.enableEmoji);
+            }
+        });
     }
 
     public void serverStarted(MinecraftServer server) {
-        try {
-            Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
-            placeholder.addTimePlaceholder("time", serverStartedTimestamp - serverStartingTimestamp);
-            BridgeManager.forEach(bridge -> {
-                for(BridgeContext entry : bridge.getContext()) {
-                    BridgeManager.sendMessage(bridge, entry.message.serverStarted, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
-                }
-            });
-            BridgeManager.startStatus();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        serverStartedTimestamp = System.currentTimeMillis();
+        Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
+        placeholder.addTimePlaceholder("time", serverStartedTimestamp - serverStartingTimestamp);
+        BridgeManager.forEach(bridge -> {
+            for(BridgeContext entry : bridge.getContext()) {
+                BridgeManager.sendMessage(bridge, entry.message.serverStarted, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+            }
+        });
+        BridgeManager.startStatus();
     }
 
     public void serverStopping(MinecraftServer server) {
-        try {
-            long serverStoppingTimestamp = System.currentTimeMillis();
-            Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
-            placeholder.addTimePlaceholder("time", serverStoppingTimestamp - serverStartedTimestamp);
+        long serverStoppingTimestamp = System.currentTimeMillis();
+        Placeholder placeholder = new MinecraftPlaceholder(null, server, null, null);
+        placeholder.addTimePlaceholder("time", serverStoppingTimestamp - serverStartedTimestamp);
 
-            BridgeManager.forEach(bridge -> {
-                for(BridgeContext entry : bridge.getContext()) {
-                    BridgeManager.sendMessage(bridge, entry.message.serverStopping, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        BridgeManager.forEach(bridge -> {
+            for(BridgeContext entry : bridge.getContext()) {
+                BridgeManager.sendMessage(bridge, entry.message.serverStopping, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+            }
+        });
     }
 
     public void serverStopped(MinecraftServer server) {
-        try {
-            BridgeManager.forEach(bridge -> {
-                for(BridgeContext entry : bridge.getContext()) {
-                    BridgeManager.sendMessage(bridge, entry.message.serverStopped, null, entry.channelID, entry.allowMention, entry.enableEmoji);
-                }
-            });
+        BridgeManager.forEach(bridge -> {
+            for(BridgeContext entry : bridge.getContext()) {
+                BridgeManager.sendMessage(bridge, entry.message.serverStopped, null, entry.channelID, entry.allowMention, entry.enableEmoji);
+            }
+        });
 
-            serverInstance = null;
-            BridgeManager.logout();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        serverInstance = null;
+        BridgeManager.shutdown();
     }
 
     public void serverCrashed(CrashReport crashReport) {
-        try {
-            Placeholder placeholder = new MinecraftPlaceholder();
-            placeholder.addPlaceholder("reason", crashReport.getMessage());
-            placeholder.addPlaceholder("stacktrace", crashReport.getCauseAsString());
+        Placeholder placeholder = new MinecraftPlaceholder();
+        placeholder.addPlaceholder("reason", crashReport.getMessage());
+        placeholder.addPlaceholder("stacktrace", crashReport.getCauseAsString());
 
-            BridgeManager.forEach(bridge -> {
-                for(BridgeContext entry : bridge.getContext()) {
-                    BridgeManager.sendMessage(bridge, entry.message.serverCrashed, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        BridgeManager.forEach(bridge -> {
+            for(BridgeContext entry : bridge.getContext()) {
+                BridgeManager.sendMessage(bridge, entry.message.serverCrashed, placeholder, entry.channelID, entry.allowMention, entry.enableEmoji);
+            }
+        });
     }
 
     public void sendMessage(List<MutableText> textToBeSent, MinecraftEntry entry) {
