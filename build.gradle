@@ -1,25 +1,15 @@
 plugins {
-	id 'fabric-loom' version '1.1-SNAPSHOT'
+	id 'fabric-loom' version '1.8-SNAPSHOT'
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
 group = project.maven_group
 
-/* You can set gradle properties in command line with the -P flag, this can be used in an unattended environment (e.g. Github Action) */
-/* e.g. gradlew build -PbuildVersion=1.16.5 */
-/* Otherwise we get the default_build_version above */
-def minecraft_version = rootProject.properties.containsKey("buildVersion") ? rootProject.getProperties().get("buildVersion") : project.default_mc_version
-def minecraft_major_version = minecraft_version.split("\\.")[1] as int
-def minecraft_minor_version = minecraft_version.split("\\.").size() > 2 ? minecraft_version.split("\\.")[2] as int : 0
-
-def yarn_version = project["yarn_mappings_${minecraft_version}"]
-def fabric_api_version = project["fabric_version_${minecraft_version}"]
-
-version = project.mod_version + "-" + minecraft_version
+version = project.mod_version + "+" + project.minecraft_version
 
 repositories {
 	mavenCentral()
@@ -30,8 +20,8 @@ repositories {
 
 dependencies {
 	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${minecraft_version}"
-	mappings "net.fabricmc:yarn:${yarn_version}:v2"
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	include implementation("net.dv8tion:JDA:${project.jda_version}") {
 		exclude module: 'opus-java'
@@ -48,7 +38,7 @@ dependencies {
 	include "net.sf.trove4j:trove4j:3.0.3"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
 compileJava.options.encoding = 'UTF-8'
@@ -57,34 +47,12 @@ processResources {
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version, "java": getJavaVersion(minecraft_major_version), "mc_version": "1.${minecraft_major_version}.x"
-	}
-
-	filesMatching("dclink.mixin.json") {
-		expand "java": getJavaVersion(minecraft_major_version)
-	}
-}
-
-task setupMappings() {
-	println("Copying version mappings for Minecraft ${minecraft_version}")
-	copy {
-		outputs.upToDateWhen { false }
-		from "src/main/mappings/1.${minecraft_major_version}"
-		into "src/main/java/com/lx/dclink"
-	}
-
-	// Copy extra file from minor version
-	if(new File("src/main/mappings/1.${minecraft_major_version}.${minecraft_minor_version}").exists()) {
-		copy {
-			outputs.upToDateWhen { false }
-			from "src/main/mappings/1.${minecraft_major_version}.${minecraft_minor_version}"
-			into "src/main/java/com/lx/dclink"
-		}
+		expand "version": project.version, "mc_version": "${project.minecraft_version}"
 	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = getJavaVersion(minecraft_major_version)
+	it.options.release = 17
 }
 
 java {
@@ -114,25 +82,5 @@ publishing {
 		// Notice: This block does NOT have the same function as the block in the top level.
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
-	}
-}
-
-allprojects {
-	afterEvaluate {
-		for (def task in it.tasks) {
-			if (task != rootProject.tasks.setupMappings) {
-				task.dependsOn rootProject.tasks.setupMappings
-			}
-		}
-	}
-}
-
-static def getJavaVersion(mc_version) {
-	if(mc_version == 16) {
-		return 8
-	} else if(mc_version == 17) {
-		return 16
-	} else {
-		return 17
 	}
 }

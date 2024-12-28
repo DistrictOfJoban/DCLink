@@ -1,13 +1,13 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.lx.dclink.mixin",
-  "compatibilityLevel": "JAVA_${java}",
+  "package": "com.lx862.dclink.minecraft.mixin",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "CrashExceptionMixin",
+    "CrashReportMixin",
     "PlayerAdvancementTrackerMixin",
-    "ServerPlayerEntityMixin",
     "PlayerManagerMixin",
+    "ServerPlayerEntityMixin",
     "ServerPlayNetworkHandlerMixin"
   ],
   "client": [
