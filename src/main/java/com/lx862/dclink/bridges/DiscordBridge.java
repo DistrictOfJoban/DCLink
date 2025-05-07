@@ -129,11 +129,11 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
 
             List<MutableText> textToBeSent = new ArrayList<>();
             if(!messageContent.isEmpty()) {
-                MutableText relayMessageText = entry.message.getDiscordRelayMessage(event.getMessage(), event.getGuildChannel().asTextChannel(), event.getMember(), repliedMessage, repliedMessageAuthor);
+                MutableText relayMessageText = entry.message.getDiscordRelayMessage(event.getMessage(), event.getGuildChannel().asTextChannel(), event.getMember(), repliedMessage, repliedMessageAuthor, source.getServer().getRegistryManager());
                 textToBeSent.add(relayMessageText);
             }
 
-            textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel().asTextChannel(), event.getMember()));
+            textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel().asTextChannel(), event.getMember(), source.getServer().getRegistryManager()));
             source.sendMessage(textToBeSent, entry);
         }
     }
@@ -159,7 +159,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
             }
 
             List<MutableText> textToBeSent = new ArrayList<>();
-            MutableText formattedMessage = entry.message.getDiscordEditedMessage(oldMessage, newMessage, event.getGuildChannel().asTextChannel(), member);
+            MutableText formattedMessage = entry.message.getDiscordEditedMessage(oldMessage, newMessage, event.getGuildChannel().asTextChannel(), member, source.getServer().getRegistryManager());
             textToBeSent.add(formattedMessage);
             source.sendMessage(textToBeSent, entry);
         }
@@ -186,11 +186,11 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
 
             List<MutableText> textToBeSent = new ArrayList<>();
             if(!messageContent.isEmpty()) {
-                MutableText formattedMessage = entry.message.getDiscordDeletedMessage(message, event.getGuildChannel().asTextChannel(), member);
+                MutableText formattedMessage = entry.message.getDiscordDeletedMessage(message, event.getGuildChannel().asTextChannel(), member, source.getServer().getRegistryManager());
                 textToBeSent.add(formattedMessage);
             }
 
-            textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel().asTextChannel(), member));
+            textToBeSent.addAll(entry.message.getAttachmentText(attachments, event.getGuildChannel().asTextChannel(), member, source.getServer().getRegistryManager()));
             source.sendMessage(textToBeSent, entry);
         }
     }
@@ -214,7 +214,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
 
             List<MutableText> textToBeSent = new ArrayList<>();
             if(!messageContent.isEmpty()) {
-                MutableText formattedMessage = entry.message.getReactionRemoveMessage(emoji, event.getGuildChannel().asTextChannel(), event.getMember(), messageAuthor, reactedMessage);
+                MutableText formattedMessage = entry.message.getReactionRemoveMessage(emoji, event.getGuildChannel().asTextChannel(), event.getMember(), messageAuthor, reactedMessage, source.getServer().getRegistryManager());
                 textToBeSent.add(formattedMessage);
             }
 
@@ -241,7 +241,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
 
             List<MutableText> textToBeSent = new ArrayList<>();
             if(!messageContent.isEmpty()) {
-                MutableText formattedMessage = entry.message.getReactionAddMessage(emoji, event.getGuildChannel().asTextChannel(), event.getMember(), messageAuthor, reactedMessage);
+                MutableText formattedMessage = entry.message.getReactionAddMessage(emoji, event.getGuildChannel().asTextChannel(), event.getMember(), messageAuthor, reactedMessage, source.getServer().getRegistryManager());
                 textToBeSent.add(formattedMessage);
             }
 

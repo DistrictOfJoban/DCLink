@@ -56,7 +56,7 @@ public class DCLinkCommand {
         boolean success = DCLink.loadAllConfig();
         MutableText successMessage = Text.literal("DCLink Config Reloaded, re-logging in...").formatted(Formatting.GREEN);
         MutableText failedMessage = Text.literal("DCLink Config Reload Failed, please check console for detail.").formatted(Formatting.RED);
-        context.getSource().sendFeedback(success ? successMessage : failedMessage, false);
+        context.getSource().sendFeedback(() -> success ? successMessage : failedMessage, false);
 
         /* Re-login if successful */
         if(success) {
@@ -82,11 +82,11 @@ public class DCLinkCommand {
             MutableText outBound = getPair("Outbound Messages", BotConfig.getInstance().outboundEnabled ? enabledText : disabledText);
             MutableText inBound = getPair("Inbound Messages", BotConfig.getInstance().inboundEnabled ? enabledText : disabledText);
 
-            context.getSource().sendFeedback(title, false);
-            context.getSource().sendFeedback(clientStatus, false);
-            if(bridge.isReady()) context.getSource().sendFeedback(loggedInAccount, false);
-            context.getSource().sendFeedback(outBound, false);
-            context.getSource().sendFeedback(inBound, false);
+            context.getSource().sendFeedback(() -> title, false);
+            context.getSource().sendFeedback(() -> clientStatus, false);
+            if(bridge.isReady()) context.getSource().sendFeedback(() -> loggedInAccount, false);
+            context.getSource().sendFeedback(() -> outBound, false);
+            context.getSource().sendFeedback(() -> inBound, false);
         });
 
         return 1;
@@ -100,25 +100,25 @@ public class DCLinkCommand {
 
     public static int enableOutbound(CommandContext<ServerCommandSource> context) {
         BotConfig.getInstance().outboundEnabled = true;
-        context.getSource().sendFeedback(Text.literal("Outbound messages (MC -> DC) Enabled").formatted(Formatting.GREEN), false);
+        context.getSource().sendFeedback(() -> Text.literal("Outbound messages (MC -> DC) Enabled").formatted(Formatting.GREEN), false);
         return 1;
     }
 
     public static int enableInbound(CommandContext<ServerCommandSource> context) {
         BotConfig.getInstance().inboundEnabled = true;
-        context.getSource().sendFeedback(Text.literal("Inbound messages (DC -> MC) Enabled").formatted(Formatting.GREEN), false);
+        context.getSource().sendFeedback(() -> Text.literal("Inbound messages (DC -> MC) Enabled").formatted(Formatting.GREEN), false);
         return 1;
     }
 
     public static int disableOutbound(CommandContext<ServerCommandSource> context) {
         BotConfig.getInstance().outboundEnabled = false;
-        context.getSource().sendFeedback(Text.literal("Outbound messages (MC -> DC) Disabled").formatted(Formatting.GOLD), false);
+        context.getSource().sendFeedback(() -> Text.literal("Outbound messages (MC -> DC) Disabled").formatted(Formatting.GOLD), false);
         return 1;
     }
 
     public static int disableInbound(CommandContext<ServerCommandSource> context) {
         BotConfig.getInstance().inboundEnabled = false;
-        context.getSource().sendFeedback(Text.literal("Inbound messages (DC -> MC) Disabled").formatted(Formatting.GOLD), false);
+        context.getSource().sendFeedback(() -> Text.literal("Inbound messages (DC -> MC) Disabled").formatted(Formatting.GOLD), false);
         return 1;
     }
 }

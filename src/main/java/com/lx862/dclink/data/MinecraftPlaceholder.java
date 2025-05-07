@@ -50,14 +50,14 @@ public class MinecraftPlaceholder extends Placeholder {
     }
 
     private void setPlayerPlaceholder(String objName, ServerPlayerEntity player) {
-        if(player.world != null) {
-            Team team = player.world.getScoreboard().getPlayerTeam(player.getGameProfile().getName());
+        if(player.getWorld() != null) {
+            Team team = player.getWorld().getScoreboard().getTeam(player.getGameProfile().getName());
             setTeamPlaceholder(objName + ".team", team);
         }
 
         addPlaceholder(objName, "displayName", player.getDisplayName().getString());
         addPlaceholder(objName, "name", player.getGameProfile().getName());
-        addPlaceholder(objName, "ping", String.valueOf(player.pingMilliseconds));
+        addPlaceholder(objName, "ping", String.valueOf(player.networkHandler.getLatency()));
         addPlaceholder(objName, "gamemode", player.interactionManager.getGameMode() == GameMode.CREATIVE ? "Creative" : player.interactionManager.getGameMode() == GameMode.SURVIVAL ? "Survival" : player.interactionManager.getGameMode() == GameMode.ADVENTURE ? "Adventure" : "Spectator");
         addPlaceholder(objName, "x", String.valueOf(Math.round(player.getX())));
         addPlaceholder(objName, "y", String.valueOf(Math.round(player.getY())));
