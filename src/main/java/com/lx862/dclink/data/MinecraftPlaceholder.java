@@ -87,4 +87,20 @@ public class MinecraftPlaceholder extends Placeholder {
             addPlaceholder(objName, "displayName", team.getDisplayName().getString());
         }
     }
+
+    @Override
+    public void addPlaceholder(String key, String value) {
+        super.addPlaceholder(key, escapeDiscordChars(value));
+    }
+
+    private static String escapeDiscordChars(String s) {
+        return s == null ? s :
+                s.replace("_", "\\_")
+                        .replace("#", "\\#")
+                        .replace("-", "\\-")
+                        .replace("*", "\\*")
+                        .replace("`", "\\`")
+                        .replace(">", "\\`")
+                        .replace("||", "\\||");
+    }
 }

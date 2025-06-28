@@ -33,7 +33,6 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class DiscordBridge extends ListenerAdapter implements Bridge {
-    private static final Pattern EMBED_PATTERN = Pattern.compile("(<<<.+>>>)");
     private static final Logger LOGGER = LogManager.getLogger("DCLinkDiscord");
     private final MinecraftSource source;
     private final DiscordConfig config;
@@ -79,6 +78,8 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
     public void disconnect() {
         isReady = false;
         client.shutdown();
+        client.getHttpClient().connectionPool().evictAll();
+        client.getHttpClient().dispatcher().executorService().shutdown();
     }
 
     public void updateStatus(String status) {
