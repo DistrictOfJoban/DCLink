@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildChannel;
 import net.minecraft.text.*;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +90,7 @@ public class MinecraftMessages {
 
     private MutableText toText(String str) {
         try {
-            return Text.Serializer.fromJson(str);
+            return Text.Serializer.fromJson(StringEscapeUtils.unescapeJson(str));
         } catch (Exception e) {
             return Text.literal(str);
         }
