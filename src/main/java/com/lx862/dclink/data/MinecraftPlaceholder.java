@@ -93,7 +93,7 @@ public class MinecraftPlaceholder extends Placeholder {
         super.addPlaceholder(key, escapeDiscordChars(value));
     }
 
-    private static String escapeDiscordChars(String s) {
+    public static String escapeDiscordChars(String s) {
         return s == null ? s :
                 s.replace("_", "\\_")
                         .replace("#", "\\#")

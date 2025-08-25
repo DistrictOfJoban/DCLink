@@ -283,7 +283,7 @@ public class DiscordBridge extends ListenerAdapter implements Bridge {
         if(allowMention && finalMessage.contains("@")) {
             if(client.getGatewayIntents().contains(GatewayIntent.GUILD_MEMBERS)) {
                 for(Member member : channel.getGuild().getMembers()) {
-                    finalMessage = finalMessage.replace("@" + member.getUser().getName(), String.format("<@%s>", member.getUser().getId()));
+                    finalMessage = finalMessage.replace("@" + MinecraftPlaceholder.escapeDiscordChars(member.getUser().getName()), String.format("<@%s>", member.getUser().getId()));
                 }
             }
         }
